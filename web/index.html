@@ -106,9 +106,6 @@ h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
   font-size:16px;line-height:1.6;color:#3d5138;margin:16px 0 4px;}
 .echo b{color:#1f4a1a;}
 .echo .quote{display:block;margin-top:6px;color:#5a6b55;}
-.askbox{background:#fff8e8;border:1px solid #f0dfae;border-radius:14px;padding:14px 15px;
-  font-size:16px;line-height:1.65;color:#5a4a20;margin-top:16px;}
-.askbox b{display:block;margin-bottom:4px;font-size:17px;}
 .tile .sub2{font-size:14px;color:var(--muted);line-height:1.35;}
 .tile[aria-pressed="true"] .sub2{color:var(--ok);}
 .done-screen{display:none;padding:24px 20px 34px;text-align:center;}
@@ -232,7 +229,6 @@ h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
     <div class="tipbar">累了就停。高龄患者容易疲劳，硬撑没有好处。<br>
     做不完不要紧 —— 这里没有「中断」，只有「一共做了多少」。</div>
 
-    <div id="askbox"></div>
   </section>
 
   <div class="done-screen" id="done-screen">
@@ -263,10 +259,6 @@ h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
     <b>我们刻意不做的三件事</b>：站立与步行训练、吞咽训练、以及根据你的打卡自动加量。
     前两件在没有专业人在场时风险太高（跌倒骨折、误吸窒息），第三件需要评估肌张力和心肺功能——
     这些我们判断不了，也不该替你判断。
-    <br><br>
-    如果你身边能找到康复治疗师或医生，请让他看一眼这份内容，
-    告诉你哪些适合你家的情况、哪些要改。找不到，就按这里写的做，
-    <b>并且严格守住每个动作下面写的「什么时候必须停」</b>。
   </div>
 
 </div>
@@ -298,199 +290,470 @@ h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
 const S = {};
 
 /* 喂饭 —— 坐直 */
-S.feedOK = `<svg viewBox="0 0 200 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M52 152h96" stroke="#b9b8b1" stroke-width="5"/>
-  <path d="M62 152V44h12v108" stroke="#b9b8b1" stroke-width="5"/>
-  <path d="M78 138h56" stroke="#b9b8b1" stroke-width="7"/>
-  <path d="M86 136V78" stroke="#2a78d6" stroke-width="13"/>
-  <circle cx="86" cy="56" r="17" stroke="#2a78d6" stroke-width="7"/>
-  <path d="M97 64c6 3 8 6 8 6" stroke="#2a78d6" stroke-width="6"/>
-  <path d="M86 136h44v22" stroke="#2a78d6" stroke-width="13"/>
-  <path d="M124 74h30" stroke="#0f8a2f" stroke-width="6"/>
-  <circle cx="120" cy="74" r="9" stroke="#0f8a2f" stroke-width="6"/>
-  <path d="M86 96a26 26 0 0 0 14 12" stroke="#0f8a2f" stroke-width="4.5" stroke-dasharray="7 6"/>
-  <text x="108" y="118" font-size="19" fill="#0f8a2f" font-weight="700" font-family="system-ui">90°</text>
+S.feedOK = `<svg viewBox="0 0 260 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="170" width="248" height="20" rx="9" fill="#ded9c9"/>
+  <path d="M54 174 V54" stroke="#cdc7b4" stroke-width="22" stroke-linecap="round"/>
+
+  <!-- 腿（先画，髋部被躯干盖住） -->
+  <path d="M78 138 L196 144 Q210 145 211 157 Q212 170 199 171 L82 172 Q68 171 68 155 Q68 139 78 138 Z"
+        fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M204 142 q19 -2 21 12 q2 15 -13 16 h-10 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <g transform="rotate(-6 88 172)">
+    <path d="M79 60 h22 v32 h-22 Z" fill="#eab993"/>
+    <path d="M68 172 Q62 128 66 98 Q68 82 88 80 Q110 78 114 96 Q120 130 118 172 Z"
+          fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+    <g transform="rotate(12 94 46)">
+      <circle cx="94" cy="46" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+      <path d="M69 45 Q70 21 94 21 Q118 21 119 43 Q108 31 92 32 Q78 33 69 45 Z" fill="#4a4038"/>
+      <path d="M118 45 l7 5 -7 3 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="2.6"/>
+      <circle cx="109" cy="39" r="3" fill="#4a4038"/>
+      <path d="M110 61 q7 3 11 -1" stroke="#c9885c" stroke-width="3"/>
+      <ellipse cx="82" cy="50" rx="3.6" ry="4.8" fill="#e6b590" stroke="#c9885c" stroke-width="1.8"/>
+    </g>
+    <path d="M82 98 Q106 108 124 126 Q133 135 124 143 Q115 151 107 140 Q92 122 74 112 Z"
+          fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  </g>
+
+  <ellipse cx="152" cy="62" rx="14" ry="8.5" fill="#dfe4ea" stroke="#8d97a4" stroke-width="3"/>
+  <path d="M165 63 L198 68" stroke="#8d97a4" stroke-width="5"/>
+  <path d="M194 54 q24 -2 26 13 q2 15 -15 16 q-17 1 -20 -11 Z" fill="#f5cba6" stroke="#c9885c" stroke-width="4"/>
+  <!-- 身体和大腿接近 90 度 -->
+  <path d="M24 178 V44" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="9 8"/>
+  <path d="M124 122 V166 H166" stroke="#1a9c4a" stroke-width="4.5"/>
+  <path d="M124 154 h12 v12" stroke="#1a9c4a" stroke-width="3"/>
 </svg>`;
 
 /* 喂饭 —— 半躺仰头 */
-S.feedNO = `<svg viewBox="0 0 200 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M40 152h120" stroke="#b9b8b1" stroke-width="5"/>
-  <path d="M46 152 96 96" stroke="#b9b8b1" stroke-width="5"/>
-  <path d="M96 140h56" stroke="#b9b8b1" stroke-width="7"/>
-  <path d="M96 132 66 96" stroke="#c62f2f" stroke-width="13"/>
-  <circle cx="52" cy="80" r="17" stroke="#c62f2f" stroke-width="7"/>
-  <path d="M44 66c-4-5-4-9-4-9" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M96 132h44v22" stroke="#c62f2f" stroke-width="13"/>
-  <path d="M88 62h28" stroke="#c62f2f" stroke-width="6"/>
-  <circle cx="122" cy="62" r="9" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M62 92c-6 6-10 6-10 6" stroke="#c62f2f" stroke-width="4.5" stroke-dasharray="7 6"/>
+S.feedNO = `<svg viewBox="0 0 260 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="170" width="248" height="20" rx="9" fill="#ded9c9"/>
+  <path d="M156 166 L82 90" stroke="#cdc7b4" stroke-width="22" stroke-linecap="round"/>
+
+  <path d="M130 140 L214 146 Q228 147 229 158 Q230 171 217 172 L134 173 Q120 172 120 156 Q120 141 130 140 Z"
+        fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M222 144 q19 -2 21 12 q2 15 -13 16 h-10 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <g transform="rotate(-42 152 168)">
+    <path d="M143 60 h22 v32 h-22 Z" fill="#eab993"/>
+    <path d="M132 168 Q126 128 130 98 Q132 82 152 80 Q174 78 178 96 Q184 130 182 168 Z"
+          fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+    <g transform="rotate(-28 158 46)">
+      <circle cx="158" cy="46" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+      <path d="M133 45 Q134 21 158 21 Q182 21 183 43 Q172 31 156 32 Q142 33 133 45 Z" fill="#4a4038"/>
+      <path d="M182 43 l7 5 -7 3 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="2.6"/>
+      <circle cx="173" cy="38" r="3" fill="#4a4038"/>
+      <ellipse cx="177" cy="60" rx="7.5" ry="6" fill="#b8615a" stroke="#c9885c" stroke-width="2.6"/>
+      <ellipse cx="146" cy="50" rx="3.6" ry="4.8" fill="#e6b590" stroke="#c9885c" stroke-width="1.8"/>
+    </g>
+    <path d="M146 98 Q170 108 188 126 Q197 135 188 143 Q179 151 171 140 Q156 122 138 112 Z"
+          fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  </g>
+
+  <!-- 勺子往上送、食物顺着仰头灌进去 -->
+  <g transform="rotate(-30 104 50)">
+    <ellipse cx="104" cy="50" rx="14" ry="8.5" fill="#dfe4ea" stroke="#8d97a4" stroke-width="3"/>
+    <path d="M117 51 L150 56" stroke="#8d97a4" stroke-width="5"/>
+    <path d="M146 42 q24 -2 26 13 q2 15 -15 16 q-17 1 -20 -11 Z" fill="#f5cba6" stroke="#c9885c" stroke-width="4"/>
+  </g>
+
+  <!-- 仰着头，食物直接灌向气管 -->
+  <path d="M99 76 Q104 92 111 106" stroke="#c62f2f" stroke-width="4.5" stroke-dasharray="7 7"/>
+  <path d="M104 104 l8 8 5 -10" stroke="#c62f2f" stroke-width="4.5"/>
 </svg>`;
 
 /* 扶人起身 —— 托肩背 */
-S.liftOK = `<svg viewBox="0 0 220 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="96" cy="34" r="20" stroke="#3a3935" stroke-width="6"/>
-  <path d="M96 54c-22 0-34 14-34 34v52h68V88c0-20-12-34-34-34Z" stroke="#3a3935" stroke-width="6"/>
-  <path d="M64 92 40 132" stroke="#e88a3c" stroke-width="13"/>
-  <text x="10" y="150" font-size="16" font-weight="700" fill="#e88a3c" font-family="system-ui">患侧</text>
-  <g stroke="#0f8a2f" stroke-width="5" fill="#eaf6ec">
-    <path d="M128 76c8-4 16-2 20 4s2 14-6 18l-14 6-10-14z"/>
-    <path d="M132 122c8-4 16-2 20 4s2 14-6 18l-14 6-10-14z"/>
-  </g>
-  <path d="M168 66l-14 12M172 112l-14 12" stroke="#0f8a2f" stroke-width="5"/>
-  <circle cx="182" cy="58" r="13" fill="#0f8a2f"/>
-  <text x="176" y="65" font-size="17" font-weight="700" fill="#fff" font-family="system-ui">1</text>
-  <circle cx="186" cy="104" r="13" fill="#0f8a2f"/>
-  <text x="180" y="111" font-size="17" font-weight="700" fill="#fff" font-family="system-ui">2</text>
+S.liftOK = `<svg viewBox="0 0 260 215" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="150" width="150" height="18" rx="8" fill="#ded9c9"/>
+  <path d="M18 168 v32 M140 168 v32" stroke="#cdc7b4" stroke-width="8"/>
+
+  <!-- ===== 家属 ===== -->
+  <path d="M178 166 v34 M212 166 v34" stroke="#c8b493" stroke-width="17" stroke-linecap="round"/>
+  <path d="M186 54 h18 v22 h-18 Z" fill="#eab993"/>
+  <path d="M172 90 Q168 126 170 168 L220 168 Q224 126 218 90 Q216 70 195 68 Q174 66 172 90 Z"
+        fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
+  <circle cx="195" cy="44" r="22" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M173 44 Q173 22 195 22 Q217 22 217 42 Q207 32 195 32 Q182 32 173 44 Z" fill="#59493c"/>
+  <circle cx="187" cy="46" r="2.6" fill="#4a4038"/><circle cx="203" cy="46" r="2.6" fill="#4a4038"/>
+
+  <!-- ① 一只手托住肩胛骨（穿到患者身后） -->
+  <path d="M188 84 Q158 68 128 86" stroke="#bb9a68" stroke-width="26" fill="none"/>
+  <path d="M188 84 Q158 68 128 86" stroke="#ecdcc0" stroke-width="19" fill="none"/>
+  <circle cx="124" cy="88" r="14" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- ===== 患者 ===== -->
+  <path d="M72 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M99 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M84 64 h20 v22 h-20 Z" fill="#eab993"/>
+  <path d="M66 150 Q62 118 66 98 Q69 80 94 78 Q119 76 122 96 Q127 120 124 150 Z"
+        fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+  <circle cx="94" cy="54" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M69 53 Q70 27 94 27 Q118 27 119 51 Q108 39 94 39 Q80 39 69 53 Z" fill="#4a4038"/>
+  <circle cx="85" cy="53" r="3" fill="#4a4038"/><circle cx="103" cy="53" r="3" fill="#4a4038"/>
+  <path d="M88 67 q7 5 13 0" stroke="#c9885c" stroke-width="3"/>
+  <!-- 患侧手臂（橙色）：安放在身上，不要垂在外面 -->
+  <path d="M70 100 L62 142" stroke="#cf7d2c" stroke-width="27" fill="none"/>
+  <path d="M70 100 L62 142" stroke="#f0a862" stroke-width="20" fill="none"/>
+  <circle cx="60" cy="152" r="12" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- ② 另一只手扶住腰 -->
+  <path d="M196 124 Q170 128 144 138" stroke="#bb9a68" stroke-width="26" fill="none"/>
+  <path d="M196 124 Q170 128 144 138" stroke="#ecdcc0" stroke-width="19" fill="none"/>
+  <circle cx="139" cy="140" r="14" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <circle cx="140" cy="62" r="14" fill="#1a9c4a"/>
+  <text x="133" y="69" font-size="19" font-weight="700" fill="#fff" font-family="system-ui">1</text>
+  <circle cx="156" cy="164" r="14" fill="#1a9c4a"/>
+  <text x="149" y="171" font-size="19" font-weight="700" fill="#fff" font-family="system-ui">2</text>
 </svg>`;
 
 /* 扶人起身 —— 拉患侧手 */
-S.liftNO = `<svg viewBox="0 0 220 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="86" cy="42" r="20" stroke="#3a3935" stroke-width="6"/>
-  <path d="M86 62c-22 0-34 14-34 34v48h68V96c0-20-12-34-34-34Z" stroke="#3a3935" stroke-width="6"/>
-  <path d="M118 92l52-26" stroke="#c62f2f" stroke-width="13"/>
-  <g stroke="#c62f2f" stroke-width="5" fill="#fdeded">
-    <path d="M166 48c9-3 17 0 20 7s0 15-9 18l-15 4-8-15z"/>
+S.liftNO = `<svg viewBox="0 0 260 215" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="150" width="150" height="18" rx="8" fill="#ded9c9"/>
+  <path d="M18 168 v32 M140 168 v32" stroke="#cdc7b4" stroke-width="8"/>
+
+  <!-- ===== 家属：站着往上拽 ===== -->
+  <path d="M204 168 v34 M234 168 v34" stroke="#c8b493" stroke-width="17" stroke-linecap="round"/>
+  <path d="M210 66 h18 v22 h-18 Z" fill="#eab993"/>
+  <path d="M198 104 Q192 138 196 170 L244 170 Q246 136 242 102 Q240 82 219 80 Q200 80 198 104 Z"
+        fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
+  <circle cx="219" cy="56" r="22" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M197 56 Q197 34 219 34 Q241 34 241 54 Q231 44 219 44 Q206 44 197 56 Z" fill="#59493c"/>
+  <circle cx="210" cy="58" r="2.6" fill="#4a4038"/><circle cx="226" cy="58" r="2.6" fill="#4a4038"/>
+
+  <!-- ===== 患者：被拽得歪过去 ===== -->
+  <g transform="rotate(9 94 150)">
+    <path d="M72 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+    <path d="M99 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+    <path d="M84 64 h20 v22 h-20 Z" fill="#eab993"/>
+    <path d="M66 150 Q62 118 66 98 Q69 80 94 78 Q119 76 122 96 Q127 120 124 150 Z"
+          fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+    <circle cx="94" cy="54" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+    <path d="M69 53 Q70 27 94 27 Q118 27 119 51 Q108 39 94 39 Q80 39 69 53 Z" fill="#4a4038"/>
+    <circle cx="85" cy="55" r="3" fill="#4a4038"/><circle cx="103" cy="55" r="3" fill="#4a4038"/>
+    <path d="M78 46 l11 4 M110 46 l-11 4" stroke="#4a4038" stroke-width="3"/>
+    <ellipse cx="94" cy="69" rx="6.5" ry="5" fill="#b8615a" stroke="#c9885c" stroke-width="2.4"/>
   </g>
-  <path d="M188 44l16-10" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M196 26l10 6-4 11" stroke="#c62f2f" stroke-width="6"/>
-  <g stroke="#c62f2f" stroke-width="6">
-    <path d="M114 66l-8-14M104 88l-16 6M122 106l-4 16"/>
-  </g>
-  <circle cx="118" cy="86" r="15" fill="#fdeded" stroke="#c62f2f" stroke-width="5"/>
-  <path d="M112 80l12 12M124 80l-12 12" stroke="#c62f2f" stroke-width="5"/>
-  <text x="88" y="176" font-size="17" font-weight="700" fill="#c62f2f" font-family="system-ui">肩膀会脱位</text>
+
+  <!-- 患侧手臂被硬拽起来 -->
+  <path d="M116 94 L168 70" stroke="#cf7d2c" stroke-width="27" fill="none"/>
+  <path d="M116 94 L168 70" stroke="#f0a862" stroke-width="20" fill="none"/>
+  <circle cx="174" cy="67" r="13" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <!-- 家属抓着手腕往上拉 -->
+  <path d="M202 112 L182 76" stroke="#bb9a68" stroke-width="26" fill="none"/>
+  <path d="M202 112 L182 76" stroke="#ecdcc0" stroke-width="19" fill="none"/>
+  <circle cx="179" cy="70" r="15" fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
+
+  <!-- 肩膀被拉伤 -->
+  <circle cx="110" cy="94" r="17" fill="#fdeded" stroke="#c62f2f" stroke-width="4.5"/>
+  <path d="M103 87 l14 14 M117 87 l-14 14" stroke="#c62f2f" stroke-width="4.5"/>
 </svg>`;
 
 /* 患侧卧位（推荐） */
-S.lieSide = `<svg viewBox="0 0 340 215" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="0" y="172" width="340" height="24" rx="8" fill="#e0ded3"/>
-  <rect x="86" y="140" width="132" height="34" rx="15" fill="#cfcbba"/>
-  <rect x="228" y="112" width="66" height="28" rx="13" fill="#cfcbba"/>
-  <rect x="24" y="108" width="72" height="30" rx="14" fill="#cfcbba"/>
-  <path d="M104 100h108a30 30 0 0 1 0 60H104a30 30 0 0 1 0-60Z" fill="#f2f0e9" stroke="#3a3935" stroke-width="6"/>
-  <circle cx="66" cy="104" r="25" fill="#f2f0e9" stroke="#3a3935" stroke-width="6"/>
-  <path d="M62 100l-14 6 13 7" stroke="#3a3935" stroke-width="5"/>
-  <path d="M88 96 108 84" stroke="#3a3935" stroke-width="6"/>
-  <path d="M112 112 52 78" stroke="#e88a3c" stroke-width="17"/>
-  <path d="M50 76 30 66M52 84 30 80M56 68 40 54" stroke="#e88a3c" stroke-width="7"/>
-  <path d="M126 96h64" stroke="#2a78d6" stroke-width="15"/>
-  <path d="M196 94h16" stroke="#2a78d6" stroke-width="7"/>
-  <path d="M214 122c24-6 40-6 52 4l22 26" stroke="#2a78d6" stroke-width="17"/>
-  <path d="M214 150c34 0 62 6 88 16" stroke="#e88a3c" stroke-width="16"/>
-  <circle cx="72" cy="30" r="17" fill="#e88a3c"/>
-  <text x="64" y="38" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">1</text>
-  <path d="M66 48 54 64" stroke="#e88a3c" stroke-width="4"/>
-  <circle cx="308" cy="66" r="17" fill="#2a78d6"/>
-  <text x="300" y="74" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">2</text>
-  <path d="M296 82 272 106" stroke="#2a78d6" stroke-width="4"/>
-  <circle cx="196" cy="196" r="17" fill="#e88a3c"/>
-  <text x="188" y="204" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">3</text>
-  <path d="M212 190l38-24" stroke="#e88a3c" stroke-width="4"/>
-  <circle cx="24" cy="170" r="17" fill="#3a3935"/>
-  <text x="16" y="178" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">4</text>
-  <path d="M40 160l22-18M40 176l46 0" stroke="#3a3935" stroke-width="4"/>
+S.lieSide = `<svg viewBox="0 0 340 235" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="0" y="200" width="340" height="22" rx="9" fill="#ded9c9"/>
+
+  <!-- ④ 头下的枕头 / 背后靠的枕头 -->
+  <rect x="12" y="118" width="92" height="46" rx="20" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+  <rect x="152" y="84" width="116" height="46" rx="20" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+
+  <!-- ③ 患侧腿：在后面（贴床），自然伸直 -->
+  <path d="M222 182 L312 188" stroke="#cf7d2c" stroke-width="30"/>
+  <path d="M222 182 L312 188" stroke="#f0a862" stroke-width="22"/>
+  <path d="M310 176 q25 4 24 15 q-1 13 -17 13 h-17 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- 脖子 -->
+  <path d="M88 124 h52 v46 h-52 Z" fill="#eab993"/>
+
+  <!-- 躯干：肩—腰—髋，看得出是侧躺 -->
+  <path d="M114 150 Q116 118 140 112 Q182 102 226 112 Q244 116 246 142 Q248 174 232 186
+           Q200 200 168 196 Q130 192 118 176 Q112 166 114 150 Z"
+        fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+
+  <!-- 头：侧脸朝前上方（不是趴着） -->
+  <g transform="rotate(-10 64 124)">
+    <circle cx="64" cy="124" r="30" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+    <path d="M38 106 Q40 82 66 82 Q94 82 94 118 L81 124 Q84 100 68 96 Q50 92 38 106 Z" fill="#4a4038"/>
+    <path d="M36 120 l-10 6 10 5 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="3"/>
+    <circle cx="45" cy="116" r="3.4" fill="#4a4038"/>
+    <path d="M39 138 q9 5 15 1" stroke="#c9885c" stroke-width="3"/>
+    <ellipse cx="76" cy="130" rx="6" ry="8" fill="#e6b590" stroke="#c9885c" stroke-width="2.4"/>
+  </g>
+
+  <!-- ① 患侧肩往前送、手臂往前伸出来，手心朝上，手指张开 -->
+  <circle cx="132" cy="166" r="22" fill="#f0a862" stroke="#cf7d2c" stroke-width="4"/>
+  <path d="M132 166 L72 190" stroke="#cf7d2c" stroke-width="30"/>
+  <path d="M132 166 L72 190" stroke="#f0a862" stroke-width="22"/>
+  <path d="M70 180 q-25 6 -27 19 q-2 11 10 12 q13 1 18 -9 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <g stroke="#c9885c" stroke-width="3.6" fill="none">
+    <path d="M46 186 q-14 -3 -17 5"/><path d="M52 178 q-13 -6 -18 1"/><path d="M59 171 q-11 -9 -17 -4"/>
+  </g>
+
+  <!-- 健侧手臂：搭在身上 -->
+  <path d="M154 120 Q180 142 202 160" stroke="#6f9bd0" stroke-width="28"/>
+  <path d="M154 120 Q180 142 202 160" stroke="#a9c9ea" stroke-width="21"/>
+  <circle cx="208" cy="166" r="13" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- ② 健侧腿：在前面，膝盖弯曲，下面垫枕头 -->
+  <rect x="238" y="140" width="84" height="34" rx="15" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M228 158 L292 138 L302 176" stroke="#6f9bd0" stroke-width="32" fill="none"/>
+  <path d="M228 158 L292 138 L302 176" stroke="#a9c9ea" stroke-width="24" fill="none"/>
+  <path d="M294 172 q18 10 11 21 q-8 12 -20 4 l-10 -9 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <g font-family="system-ui" font-weight="700" font-size="20" fill="#fff">
+    <path d="M44 208 L58 196" stroke="#e88a3c" stroke-width="4"/>
+    <circle cx="36" cy="214" r="15" fill="#e88a3c"/><text x="29" y="221">1</text>
+    <path d="M294 92 L288 128" stroke="#2a78d6" stroke-width="4"/>
+    <circle cx="296" cy="78" r="15" fill="#2a78d6"/><text x="289" y="85">2</text>
+    <path d="M236 210 L252 196" stroke="#e88a3c" stroke-width="4"/>
+    <circle cx="228" cy="216" r="15" fill="#e88a3c"/><text x="221" y="223">3</text>
+    <path d="M28 70 L22 112" stroke="#8a8578" stroke-width="4"/>
+    <circle cx="30" cy="56" r="15" fill="#8a8578"/><text x="23" y="63">4</text>
+    <path d="M196 48 L204 80" stroke="#8a8578" stroke-width="4"/>
+    <circle cx="194" cy="34" r="15" fill="#8a8578"/><text x="187" y="41">4</text>
+  </g>
 </svg>`;
 
 /* 翻身 2 小时 */
-S.turn = `<svg viewBox="0 0 240 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="8" y="88" width="224" height="14" rx="6" fill="#eceae2"/>
-  <circle cx="56" cy="60" r="15" stroke="#2a78d6" stroke-width="6"/>
-  <path d="M71 66h58l12 22" stroke="#2a78d6" stroke-width="13"/>
-  <path d="M162 62c14-10 30-10 44 0" stroke="#0f8a2f" stroke-width="6"/>
-  <path d="M200 50l8 12-13 3" stroke="#0f8a2f" stroke-width="6"/>
-  <text x="163" y="94" font-size="26" font-weight="700" fill="#0f8a2f" font-family="system-ui">2小时</text>
+S.turn = `<svg viewBox="0 0 340 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 床（俯视） -->
+  <rect x="10" y="26" width="212" height="116" rx="16" fill="#ded9c9"/>
+  <rect x="22" y="38" width="52" height="60" rx="14" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="3"/>
+
+  <!-- 人（俯视，头在左） -->
+  <path d="M92 66 h30 v28 h-30 Z" fill="#eab993" stroke="#c9885c" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M118 52 h58 q12 0 12 12 v34 q0 12 -12 12 h-58 q-12 0 -12 -12 V64 q0 -12 12 -12 Z"
+        fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M176 62 L206 68" stroke="#6f9bd0" stroke-width="20"/>
+  <path d="M176 62 L206 68" stroke="#a9c9ea" stroke-width="13"/>
+  <path d="M176 100 L206 94" stroke="#6f9bd0" stroke-width="20"/>
+  <path d="M176 100 L206 94" stroke="#a9c9ea" stroke-width="13"/>
+  <path d="M118 58 L104 44" stroke="#c9885c" stroke-width="17"/>
+  <path d="M118 58 L104 44" stroke="#f0c4a0" stroke-width="11"/>
+  <path d="M118 104 L104 118" stroke="#c9885c" stroke-width="17"/>
+  <path d="M118 104 L104 118" stroke="#f0c4a0" stroke-width="11"/>
+  <circle cx="76" cy="80" r="24" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M62 62 Q76 52 92 62 Q84 68 76 68 Q68 68 62 62 Z" fill="#4a4038"/>
+  <circle cx="70" cy="74" r="3" fill="#4a4038"/><circle cx="84" cy="74" r="3" fill="#4a4038"/>
+  <path d="M70 90 q7 5 14 0" stroke="#c9885c" stroke-width="3"/>
+
+  <!-- 翻身方向 -->
+  <path d="M112 20 A62 62 0 0 1 196 20" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M186 8 l12 12 -13 10" stroke="#1a9c4a" stroke-width="6"/>
+
+  <!-- 每 2 小时 -->
+  <circle cx="278" cy="72" r="34" fill="#eaf6ec" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M278 50 V72 h16" stroke="#1a9c4a" stroke-width="6"/>
+  <text x="234" y="134" font-size="25" font-weight="700" fill="#1a9c4a" font-family="system-ui">每 2 小时</text>
 </svg>`;
 
 /* 家居防跌 */
-S.home = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M14 122h212" stroke="#b9b8b1" stroke-width="6"/>
-  <path d="M22 122V30h6v92" stroke="#c9c7bd" stroke-width="4"/>
-  <path d="M36 74h58" stroke="#0f8a2f" stroke-width="11"/>
-  <circle cx="36" cy="74" r="7" fill="#0f8a2f"/><circle cx="94" cy="74" r="7" fill="#0f8a2f"/>
-  <rect x="118" y="96" width="72" height="22" rx="8" fill="#cfe3f8" stroke="#2a78d6" stroke-width="4"/>
-  <path d="M126 107h8M144 107h8M162 107h8" stroke="#2a78d6" stroke-width="4"/>
-  <circle cx="210" cy="46" r="14" fill="#ffe9a8" stroke="#d9a520" stroke-width="4"/>
-  <path d="M210 22v8M232 46h-8M226 30l-6 6M194 30l6 6" stroke="#d9a520" stroke-width="4"/>
+S.home = `<svg viewBox="0 0 330 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 红：拆门槛 · 72 小时 -->
+  <path d="M14 108 h94" stroke="#b9b3a0" stroke-width="6"/>
+  <path d="M28 108 V34 h64 v74" stroke="#cdc7b4" stroke-width="7"/>
+  <path d="M40 108 h40" stroke="#e0dcd0" stroke-width="10"/>
+  <path d="M44 76 h34" stroke="#c62f2f" stroke-width="6" stroke-dasharray="2 9"/>
+  <path d="M52 62 l14 14 -14 14" stroke="#c62f2f" stroke-width="6"/>
+  <circle cx="24" cy="34" r="15" fill="#c62f2f"/>
+  <text x="17" y="41" font-size="19" font-weight="700" fill="#fff" font-family="system-ui">红</text>
+  <text x="18" y="146" font-size="21" font-weight="700" fill="#c62f2f" font-family="system-ui">72 小时</text>
+
+  <!-- 黄：卫浴扶手 · 2 周 -->
+  <path d="M124 108 h84" stroke="#b9b3a0" stroke-width="6"/>
+  <path d="M132 108 V34" stroke="#cdc7b4" stroke-width="7"/>
+  <path d="M148 56 h44" stroke="#d9a520" stroke-width="11"/>
+  <circle cx="148" cy="56" r="8" fill="#d9a520"/><circle cx="192" cy="56" r="8" fill="#d9a520"/>
+  <rect x="150" y="76" width="46" height="32" rx="8" fill="#f1eee4" stroke="#b9b3a0" stroke-width="4"/>
+  <circle cx="126" cy="34" r="15" fill="#d9a520"/>
+  <text x="119" y="41" font-size="19" font-weight="700" fill="#fff" font-family="system-ui">黄</text>
+  <text x="140" y="146" font-size="21" font-weight="700" fill="#c08c10" font-family="system-ui">2 周</text>
+
+  <!-- 绿：夜间照明 · 1~3 个月 -->
+  <path d="M226 108 h92" stroke="#b9b3a0" stroke-width="6"/>
+  <rect x="252" y="66" width="38" height="42" rx="8" fill="#f1eee4" stroke="#b9b3a0" stroke-width="4"/>
+  <circle cx="271" cy="54" r="17" fill="#fff3cd" stroke="#1a9c4a" stroke-width="5"/>
+  <path d="M271 26 v10 M299 54 h-10 M292 34 l-7 7 M250 34 l7 7" stroke="#1a9c4a" stroke-width="5"/>
+  <circle cx="228" cy="34" r="15" fill="#1a9c4a"/>
+  <text x="221" y="41" font-size="19" font-weight="700" fill="#fff" font-family="system-ui">绿</text>
+  <text x="232" y="146" font-size="21" font-weight="700" fill="#1a9c4a" font-family="system-ui">1~3 个月</text>
 </svg>`;
 
 /* 药 */
-S.pill = `<svg viewBox="0 0 240 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="24" y="34" width="60" height="70" rx="12" stroke="#2a78d6" stroke-width="7"/>
-  <path d="M40 20h28v14H40z" fill="#2a78d6"/>
-  <path d="M38 62h32M38 80h32" stroke="#2a78d6" stroke-width="6"/>
-  <circle cx="140" cy="70" r="20" stroke="#0f8a2f" stroke-width="7"/>
-  <path d="M131 70l7 8 12-15" stroke="#0f8a2f" stroke-width="6"/>
-  <circle cx="200" cy="70" r="20" stroke="#c62f2f" stroke-width="7"/>
-  <path d="M191 61l18 18M209 61l-18 18" stroke="#c62f2f" stroke-width="6"/>
-  <text x="118" y="112" font-size="17" font-weight="700" fill="#0f8a2f" font-family="system-ui">按时吃</text>
-  <text x="176" y="112" font-size="17" font-weight="700" fill="#c62f2f" font-family="system-ui">自己停</text>
+S.pill = `<svg viewBox="0 0 300 150" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 一周药盒 -->
+  <rect x="12" y="54" width="164" height="52" rx="10" fill="#eaf2fb" stroke="#6f9bd0" stroke-width="4"/>
+  <g stroke="#6f9bd0" stroke-width="3">
+    <path d="M35 56 V104 M58 56 V104 M81 56 V104 M104 56 V104 M127 56 V104 M150 56 V104"/>
+  </g>
+  <g fill="#f0a862" stroke="#cf7d2c" stroke-width="3">
+    <rect x="17" y="72" width="13" height="16" rx="6.5"/><rect x="40" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="63" y="72" width="13" height="16" rx="6.5"/><rect x="86" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="109" y="72" width="13" height="16" rx="6.5"/><rect x="132" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="155" y="72" width="13" height="16" rx="6.5"/>
+  </g>
+  <circle cx="168" cy="46" r="19" fill="#1a9c4a"/>
+  <path d="M159 46 l6 7 12 -14" stroke="#fff" stroke-width="5"/>
+  <text x="30" y="140" font-size="24" font-weight="700" fill="#1a9c4a" font-family="system-ui">按时吃</text>
+
+  <!-- 自己停药 -->
+  <rect x="212" y="46" width="52" height="62" rx="10" fill="#fdf6f6" stroke="#c62f2f" stroke-width="4"/>
+  <rect x="220" y="30" width="36" height="16" rx="5" fill="#c62f2f"/>
+  <path d="M224 68 h28 M224 86 h28" stroke="#c62f2f" stroke-width="4"/>
+  <circle cx="268" cy="40" r="21" fill="#fdeded" stroke="#c62f2f" stroke-width="5"/>
+  <path d="M260 32 l16 16 M276 32 l-16 16" stroke="#c62f2f" stroke-width="5"/>
+  <text x="200" y="140" font-size="24" font-weight="700" fill="#c62f2f" font-family="system-ui">自己停</text>
 </svg>`;
 
 /* FAST 脸歪 */
-S.face = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="65" cy="62" r="38" stroke="#c62f2f" stroke-width="7"/>
-  <circle cx="51" cy="52" r="4.5" fill="#c62f2f"/><circle cx="79" cy="52" r="4.5" fill="#c62f2f"/>
-  <path d="M46 78c8 8 22 10 34 0" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M46 78c-2-4-3-7-3-7" stroke="#c62f2f" stroke-width="6"/>
+S.face = `<svg viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="60" cy="60" r="42" fill="#f0c4a0" stroke="#c9885c" stroke-width="5"/>
+  <path d="M18 58 Q18 18 60 18 Q102 18 102 56 Q88 36 60 36 Q32 36 18 58 Z" fill="#4a4038"/>
+  <circle cx="44" cy="58" r="4.6" fill="#4a4038"/><circle cx="76" cy="58" r="4.6" fill="#4a4038"/>
+  <path d="M32 90 Q46 76 60 76 Q76 76 86 66" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M22 74 V96" stroke="#c62f2f" stroke-width="5"/>
+  <path d="M15 88 l7 9 7 -9" stroke="#c62f2f" stroke-width="5"/>
 </svg>`;
 /* FAST 手垂 */
-S.arm = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="65" cy="26" r="14" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M65 40v46" stroke="#c62f2f" stroke-width="12"/>
-  <path d="M65 52h32" stroke="#2a78d6" stroke-width="10"/>
-  <path d="M65 52 44 90" stroke="#c62f2f" stroke-width="10"/>
-  <path d="M40 100l6-12 10 4" stroke="#c62f2f" stroke-width="5"/>
+S.arm = `<svg viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M53 26 h14 v24 h-14 Z" fill="#eab993" stroke="#c9885c" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="60" cy="22" r="16" fill="#f0c4a0" stroke="#c9885c" stroke-width="4.5"/>
+  <path d="M44 21 Q44 5 60 5 Q76 5 76 20 Q69 13 60 13 Q51 13 44 21 Z" fill="#4a4038"/>
+  <circle cx="54" cy="24" r="2.4" fill="#4a4038"/><circle cx="66" cy="24" r="2.4" fill="#4a4038"/>
+  <path d="M48 44 h24 q8 0 8 9 v45 h-40 V53 q0 -9 8 -9 Z" fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4.5"/>
+  <path d="M76 54 L104 50" stroke="#6f9bd0" stroke-width="17"/>
+  <path d="M76 54 L104 50" stroke="#a9c9ea" stroke-width="11"/>
+  <path d="M44 58 L30 90" stroke="#cf7d2c" stroke-width="17"/>
+  <path d="M44 58 L30 90" stroke="#f0a862" stroke-width="11"/>
+  <path d="M14 62 V88" stroke="#c62f2f" stroke-width="5"/>
+  <path d="M7 80 l7 9 7 -9" stroke="#c62f2f" stroke-width="5"/>
 </svg>`;
 /* FAST 说话不清 */
-S.speech = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M20 26h90a10 10 0 0 1 10 10v40a10 10 0 0 1-10 10H62l-22 20V86H20a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10z" stroke="#c62f2f" stroke-width="6"/>
-  <path d="M32 48h26M32 66h44M70 48h20" stroke="#c62f2f" stroke-width="6" stroke-dasharray="4 9"/>
+S.speech = `<svg viewBox="0 0 120 120" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="38" cy="66" r="30" fill="#f0c4a0" stroke="#c9885c" stroke-width="5"/>
+  <path d="M8 64 Q8 34 38 34 Q68 34 68 62 Q56 46 38 46 Q20 46 8 64 Z" fill="#4a4038"/>
+  <circle cx="46" cy="64" r="4" fill="#4a4038"/>
+  <ellipse cx="52" cy="80" rx="8" ry="6" fill="#b8615a" stroke="#c9885c" stroke-width="2.6"/>
+  <path d="M78 14 h30 a8 8 0 0 1 8 8 v26 a8 8 0 0 1 -8 8 H92 l-12 12 V56 h-2 a8 8 0 0 1 -8 -8 V22 a8 8 0 0 1 8 -8 Z"
+        fill="#fdeded" stroke="#c62f2f" stroke-width="5"/>
+  <path d="M82 28 h12 M100 28 h8 M82 42 h6 M94 42 h14" stroke="#c62f2f" stroke-width="5"/>
 </svg>`;
 
 /* 今日打卡图标 */
 
 /* 穿上衣：先穿患侧 */
-S.dressOK = `<svg viewBox="0 0 200 150" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M62 42 46 56l12 16 10-8v50h64V64l10 8 12-16-16-14h-16a14 14 0 0 1-28 0H62Z" stroke="#4a4945" stroke-width="6"/>
-  <path d="M56 62 34 78" stroke="#e88a3c" stroke-width="9"/>
-  <circle cx="30" cy="82" r="15" fill="#fff" stroke="#e88a3c" stroke-width="5"/>
-  <text x="24" y="89" font-size="19" font-weight="700" fill="#e88a3c" font-family="system-ui">1</text>
-  <path d="M144 62l22 16" stroke="#2a78d6" stroke-width="9"/>
-  <circle cx="170" cy="82" r="15" fill="#fff" stroke="#2a78d6" stroke-width="5"/>
-  <text x="164" y="89" font-size="19" font-weight="700" fill="#2a78d6" font-family="system-ui">2</text>
-  <text x="8" y="126" font-size="17" font-weight="700" fill="#e88a3c" font-family="system-ui">患侧先</text>
-  <text x="140" y="126" font-size="17" font-weight="700" fill="#2a78d6" font-family="system-ui">健侧后</text>
+S.dressOK = `<svg viewBox="0 0 260 165" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="130" cy="34" r="24" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M106 33 Q107 8 130 8 Q153 8 154 31 Q143 20 130 20 Q117 20 106 33 Z" fill="#4a4038"/>
+  <circle cx="121" cy="34" r="3" fill="#4a4038"/><circle cx="139" cy="34" r="3" fill="#4a4038"/>
+  <path d="M124 46 q6 5 12 0" stroke="#c9885c" stroke-width="3"/>
+  <path d="M120 54 h20 v14 h-20 Z" fill="#eab993"/>
+
+  <!-- 手臂 -->
+  <path d="M110 84 L64 114" stroke="#cf7d2c" stroke-width="27"/>
+  <path d="M110 84 L64 114" stroke="#f0a862" stroke-width="20"/>
+  <circle cx="56" cy="119" r="12" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M150 84 L196 110" stroke="#6f9bd0" stroke-width="27"/>
+  <path d="M150 84 L196 110" stroke="#a9c9ea" stroke-width="20"/>
+  <circle cx="204" cy="115" r="12" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- 上衣：两只袖子分别套在两条手臂上 -->
+  <path d="M104 66 Q130 58 156 66 L180 96 L162 110 L152 100 v34 h-44 v-34 l-10 10 -18 -14 Z"
+        fill="#e9eef4" stroke="#7d8794" stroke-width="4"/>
+  <path d="M112 68 q18 12 36 0" stroke="#7d8794" stroke-width="3.4"/>
+
+  <circle cx="46" cy="140" r="16" fill="#e88a3c"/>
+  <text x="38" y="148" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">1</text>
+  <circle cx="214" cy="140" r="16" fill="#2a78d6"/>
+  <text x="206" y="148" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">2</text>
 </svg>`;
 
 /* 上下楼梯 */
-S.stair = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M14 122h48V96h44V70h44V44h48" stroke="#b9b8b1" stroke-width="7"/>
-  <path d="M40 40h150" stroke="#c9c7bd" stroke-width="5"/>
-  <path d="M52 60c22-14 44-14 66 0" stroke="#0f8a2f" stroke-width="6"/>
-  <path d="M112 48l8 12-13 4" stroke="#0f8a2f" stroke-width="6"/>
-  <text x="40" y="86" font-size="18" font-weight="700" fill="#0f8a2f" font-family="system-ui">上：健腿先</text>
-  <path d="M206 96c-20 14-42 14-62 0" stroke="#2a78d6" stroke-width="6"/>
-  <path d="M148 84l-8 12 13 4" stroke="#2a78d6" stroke-width="6"/>
-  <text x="140" y="122" font-size="18" font-weight="700" fill="#2a78d6" font-family="system-ui">下：患腿先</text>
+S.stair = `<svg viewBox="0 0 320 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <text x="10" y="28" font-size="25" font-weight="700" fill="#2a78d6" font-family="system-ui">上：健腿先</text>
+  <path d="M14 172 V148 h32 V122 h32 V96 h32 v76 Z" fill="#e6e2d5" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M30 92 V58" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M22 66 l8 -10 8 10" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M94 40 V78" stroke="#6f9bd0" stroke-width="24"/>
+  <path d="M94 40 V78" stroke="#a9c9ea" stroke-width="17"/>
+  <path d="M90 78 q20 -2 22 9 q2 9 -10 9 h-12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M62 66 V104" stroke="#cf7d2c" stroke-width="24"/>
+  <path d="M62 66 V104" stroke="#f0a862" stroke-width="17"/>
+  <path d="M58 104 q20 -2 22 9 q2 9 -10 9 h-12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <path d="M160 44 V176" stroke="#e6e2d5" stroke-width="3"/>
+
+  <text x="182" y="28" font-size="25" font-weight="700" fill="#e88a3c" font-family="system-ui">下：患腿先</text>
+  <path d="M306 172 V148 h-32 V122 h-32 V96 h-32 v76 Z" fill="#e6e2d5" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M290 58 V92" stroke="#e88a3c" stroke-width="6"/>
+  <path d="M282 84 l8 10 8 -10" stroke="#e88a3c" stroke-width="6"/>
+  <path d="M226 40 V78" stroke="#6f9bd0" stroke-width="24"/>
+  <path d="M226 40 V78" stroke="#a9c9ea" stroke-width="17"/>
+  <path d="M230 78 q-20 -2 -22 9 q-2 9 10 9 h12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M258 66 V104" stroke="#cf7d2c" stroke-width="24"/>
+  <path d="M258 66 V104" stroke="#f0a862" stroke-width="17"/>
+  <path d="M262 104 q-20 -2 -22 9 q-2 9 10 9 h12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
 </svg>`;
 
 /* 床椅转移：椅子放健侧 45 度 */
-S.transfer = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="14" y="52" width="92" height="16" rx="6" fill="#eceae2"/>
-  <path d="M20 68v46M100 68v46" stroke="#c9c7bd" stroke-width="6"/>
-  <circle cx="76" cy="34" r="14" stroke="#2a78d6" stroke-width="6"/>
-  <path d="M76 48v22" stroke="#2a78d6" stroke-width="11"/>
-  <g transform="rotate(45 168 78)">
-    <path d="M142 60h52M142 60v46M194 60v46" stroke="#0f8a2f" stroke-width="7"/>
-    <path d="M136 34v26h12" stroke="#0f8a2f" stroke-width="7"/>
+S.transfer = `<svg viewBox="0 0 300 180" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="10" y="26" width="120" height="112" rx="14" fill="#ded9c9"/>
+  <rect x="20" y="36" width="44" height="50" rx="12" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="3"/>
+  <text x="52" y="166" font-size="21" font-weight="700" fill="#8a8578" font-family="system-ui">床</text>
+
+  <g transform="rotate(45 228 84)">
+    <rect x="196" y="52" width="64" height="64" rx="12" fill="#eef4e9" stroke="#1a9c4a" stroke-width="5"/>
+    <rect x="182" y="48" width="15" height="72" rx="7" fill="#1a9c4a"/>
+    <path d="M204 116 v12 M252 116 v12" stroke="#1a9c4a" stroke-width="6"/>
   </g>
-  <path d="M92 62c16-4 30 0 40 8" stroke="#0f8a2f" stroke-width="5" stroke-dasharray="8 7"/>
-  <text x="112" y="132" font-size="17" font-weight="700" fill="#0f8a2f" font-family="system-ui">椅子放健侧 · 45°</text>
+  <text x="176" y="166" font-size="21" font-weight="700" fill="#1a9c4a" font-family="system-ui">椅子放健侧</text>
+
+  <path d="M134 84 h42" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M134 84 L166 52" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M168 84 A34 34 0 0 0 158 60" stroke="#1a9c4a" stroke-width="4"/>
+  <text x="142" y="34" font-size="23" font-weight="700" fill="#1a9c4a" font-family="system-ui">45°</text>
 </svg>`;
 
-S.call120 = `<svg viewBox="0 0 130 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <rect x="8" y="18" width="114" height="64" rx="14" fill="#fff" stroke="#c62f2f" stroke-width="6"/>
-  <text x="20" y="66" font-size="40" font-weight="700" fill="#c62f2f" font-family="system-ui">120</text>
+S.call120 = `<svg viewBox="0 0 150 110" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="8" y="16" width="134" height="76" rx="18" fill="#fff" stroke="#c62f2f" stroke-width="6"/>
+  <text x="24" y="70" font-size="44" font-weight="700" fill="#c62f2f" font-family="system-ui">120</text>
+</svg>`;
+
+S.fit = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="18" y="16" width="94" height="104" rx="12" fill="#fff" stroke="#2a78d6" stroke-width="6"/>
+  <rect x="44" y="6" width="42" height="20" rx="7" fill="#2a78d6"/>
+  <path d="M34 48 l7 8 14 -17" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M66 48 h32" stroke="#c8d4e2" stroke-width="6"/>
+  <path d="M34 74 l7 8 14 -17" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M66 74 h32" stroke="#c8d4e2" stroke-width="6"/>
+  <path d="M34 94 l16 16 M50 94 l-16 16" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M66 102 h32" stroke="#c8d4e2" stroke-width="6"/>
+</svg>`;
+S.thPill = `<svg viewBox="0 0 100 84" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <g transform="rotate(-38 44 42)">
+    <rect x="12" y="28" width="64" height="30" rx="15" fill="#f0a862" stroke="#cf7d2c" stroke-width="5"/>
+    <path d="M44 28 v30" stroke="#cf7d2c" stroke-width="5"/>
+  </g>
+  <circle cx="76" cy="60" r="19" fill="#1a9c4a"/>
+  <path d="M67 60 l6 7 12 -14" stroke="#fff" stroke-width="5.5"/>
+</svg>`;
+S.thHome = `<svg viewBox="0 0 100 84" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 40 L46 14 L80 40" stroke="#8a8578" stroke-width="6"/>
+  <path d="M20 38 V70 h52 V38" stroke="#8a8578" stroke-width="6"/>
+  <path d="M34 52 h26" stroke="#d9a520" stroke-width="8"/>
+  <circle cx="34" cy="52" r="5.5" fill="#d9a520"/><circle cx="60" cy="52" r="5.5" fill="#d9a520"/>
+  <circle cx="86" cy="20" r="7" fill="#c62f2f"/>
+  <circle cx="86" cy="40" r="7" fill="#d9a520"/>
+  <circle cx="86" cy="60" r="7" fill="#1a9c4a"/>
+</svg>`;
+S.thMove = `<svg viewBox="0 0 100 84" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="16" width="40" height="52" rx="8" fill="#ded9c9"/>
+  <rect x="11" y="21" width="16" height="20" rx="6" fill="#f4f1e8"/>
+  <g transform="rotate(45 74 42)">
+    <rect x="60" y="28" width="30" height="30" rx="7" fill="#eef4e9" stroke="#1a9c4a" stroke-width="4.5"/>
+    <rect x="53" y="26" width="8" height="34" rx="4" fill="#1a9c4a"/>
+  </g>
+  <path d="M50 42 h12" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="5 5"/>
+  <path d="M50 42 L60 30" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="5 5"/>
 </svg>`;
 
 const IC = {
@@ -696,6 +959,10 @@ MV.wrist = `<svg class="mv" viewBox="0 0 390 300" fill="none">
 MV.elbow = `<svg class="mv" viewBox="0 0 300 300" fill="none">
   <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
     <path d="M70 42 Q70 14 96 14 Q122 14 122 42 Q122 64 108 72 L110 86 Q84 90 80 76 Q70 64 70 42 Z" fill="#f0c4a0"/>
+    <path d="M70 40 Q70 12 96 12 Q122 12 122 38 Q112 24 96 24 Q79 24 70 40 Z" fill="#4a4038" stroke="none"/>
+    <circle cx="85" cy="44" r="3.2" fill="#4a4038" stroke="none"/>
+    <circle cx="107" cy="44" r="3.2" fill="#4a4038" stroke="none"/>
+    <path d="M89 60 q7 5 14 0" stroke="#c9885c" stroke-width="3" fill="none"/>
     <path d="M76 90 Q98 80 122 90 Q138 98 140 126 L142 300 L62 300 L64 126 Q66 98 76 90 Z"
           fill="#cfd9e4" stroke="#9db0c4"/>
     <!-- 前臂+手：在肘(122,190)转动；下垂 ↔ 前平举 -->
@@ -718,6 +985,10 @@ MV.knee = `<svg class="mv" viewBox="0 0 370 210" fill="none">
   <rect x="0" y="178" width="370" height="14" rx="6" fill="#ddd9cc"/>
   <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
     <path d="M18 126 Q18 104 40 104 Q62 104 62 126 Q62 146 44 148 L46 158 Q26 160 22 148 Q18 140 18 126 Z" fill="#f0c4a0"/>
+    <path d="M40 104 Q18 104 18 126 Q18 140 26 150 Q20 136 26 122 Q32 110 43 111 Z" fill="#4a4038" stroke="none"/>
+    <path d="M44 106 l3 -10 7 9 Z" fill="#f0c4a0" stroke-width="3"/>
+    <circle cx="36" cy="116" r="3" fill="#4a4038" stroke="none"/>
+    <path d="M56 117 q4 6 1 11" stroke="#c9885c" stroke-width="3" fill="none"/>
     <!-- 腿：髋(158,142) → 膝(230,142) → 踝(292,142) -->
     <g>
       <animateTransform attributeName="transform" type="rotate"
@@ -767,7 +1038,12 @@ MV.bridge = `<svg class="mv" viewBox="0 0 340 210" fill="none">
             fill="#cfd9e4" stroke="#9db0c4"/>
     </g>
     <!-- 头（不动，枕在床上） -->
-    <path d="M12 148 Q12 126 34 126 Q56 126 56 148 Q56 168 38 170 L40 178 Q20 180 16 168 Q12 160 12 148 Z" fill="#f0c4a0"/>
+    <path d="M92 130 L48 130 Q38 148 48 170 L92 170" fill="#f0c4a0"/>
+    <ellipse cx="34" cy="148" rx="26" ry="24" fill="#f0c4a0"/>
+    <path d="M34 124 Q8 124 8 148 Q8 164 18 172 Q10 156 16 140 Q22 128 36 129 Z" fill="#4a4038" stroke="none"/>
+    <path d="M37 126 l3 -10 7 9 Z" fill="#f0c4a0" stroke-width="3"/>
+    <circle cx="30" cy="136" r="3" fill="#4a4038" stroke="none"/>
+    <path d="M49 137 q4 6 1 11" stroke="#c9885c" stroke-width="3" fill="none"/>
   </g>
   <path d="M150 82 V60" stroke="#0f8a2f" stroke-width="7" stroke-linecap="round"/>
   <path d="M141 70 l9-14 9 14" stroke="#0f8a2f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -778,6 +1054,10 @@ MV.bridge = `<svg class="mv" viewBox="0 0 340 210" fill="none">
 MV.bobath = `<svg class="mv" viewBox="0 0 300 280" fill="none">
   <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
     <path d="M70 44 Q70 16 96 16 Q122 16 122 44 Q122 66 108 74 L110 88 Q84 92 80 78 Q70 66 70 44 Z" fill="#f0c4a0"/>
+    <path d="M70 42 Q70 14 96 14 Q122 14 122 40 Q112 26 96 26 Q79 26 70 42 Z" fill="#4a4038" stroke="none"/>
+    <circle cx="85" cy="46" r="3.2" fill="#4a4038" stroke="none"/>
+    <circle cx="107" cy="46" r="3.2" fill="#4a4038" stroke="none"/>
+    <path d="M89 62 q7 5 14 0" stroke="#c9885c" stroke-width="3" fill="none"/>
     <path d="M74 92 Q98 82 124 92 Q140 100 142 128 L146 278 L62 278 L64 128 Q66 100 74 92 Z"
           fill="#cfd9e4" stroke="#9db0c4"/>
     <!-- 双臂叉握：在肩(112,124)转动 -->
@@ -907,7 +1187,7 @@ function doneCount(){ return allTasks.filter(t=> state.progress[t.id] >= t.targe
 const items = [
   {
     id:'fit', t:'先确认：适合用吗', d:'有几种情况不该照这个练',
-    thumb:S.call120, calm:true,
+    thumb:S.fit, calm:true,
     lead:'2025 年的远程康复专家共识写明了适用人群。对不上的，先别按这里练。',
     points:[
       {n:'1', p:'诊断明确、病情稳定', q:'还在急性期、病情还在变的，先听医院的'},
@@ -985,7 +1265,7 @@ const items = [
   },
   {
     id:'drug', t:'药一天都不能停', d:'停药是复发最常见的原因',
-    thumb:S.pill,
+    thumb:S.thPill,
     lead:'感觉好转了也要继续吃，这些药是防下一次发作的。',
     big:S.pill, caption:'感觉变好 ≠ 可以停药',
     points:[
@@ -998,7 +1278,7 @@ const items = [
   },
   {
     id:'home', t:'家里要改的，分三批', d:'哪些 72 小时内必须做完',
-    thumb:S.home,
+    thumb:S.thHome,
     lead:'2025 年的居家康复环境指南把改造按紧急程度分成红黄绿三批。红的最要命。',
     big:S.home, caption:'红 72 小时 · 黄 2 周 · 绿 1～3 个月',
     points:[
@@ -1033,7 +1313,7 @@ const items = [
   },
   {
     id:'move', t:'怎么扶他起来', q:'',  d:'方法不对，两个人都容易受伤',
-    thumb:S.transfer,
+    thumb:S.thMove,
     lead:'扶人不是靠力气，是靠位置和顺序。',
     big:S.transfer, caption:'椅子放在健侧，和床成 45 度',
     points:[
@@ -1099,20 +1379,11 @@ function renderEcho(){
     (y.note ? '<span class="quote">你昨天记下：「'+y.note+'」</span>' : '');
 }
 
-function renderAsk(){
-  // 连续做到 → 不自动加量，而是把决定权交回给人
-  document.getElementById('askbox').innerHTML =
-    '<div class="askbox"><b>一个可以带去复诊的问题</b>' +
-    '「自己洗脸」这一周做到了 6 天。下次见康复师，可以问问能不能试着让他自己刷牙。' +
-    '<br><br>要不要加量、加什么，让康复师定 —— 这里不会自己给你升级难度。</div>';
-}
-
 function renderDaily(){
   document.getElementById('daysub').textContent = '第 '+state.day+' 天 · '+state.date;
   renderEcho();
   renderTiles(careList,'grid-care');
   renderTiles(trainList,'grid-train');
-  renderAsk();
   renderMoves();
 }
 
