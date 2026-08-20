@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>回家以后 · 脑卒中居家照护</title>
+<style>
+:root{
+  --bg:#f7f7f5; --card:#ffffff; --ink:#0b0b0b; --ink2:#4a4945; --muted:#7a7873;
+  --line:#e3e2dc; --blue:#2a78d6; --blue-soft:#e8f1fd;
+  --ok:#0f8a2f; --ok-soft:#eaf6ec; --no:#c62f2f; --no-soft:#fdeded;
+  --warn:#f5f0e0;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);font-size:20px;line-height:1.6;}
+.app{max-width:520px;margin:0 auto;background:var(--bg);min-height:100vh;
+  padding-bottom:40px;position:relative;}
+
+header{padding:22px 18px 6px;}
+h1{font-size:27px;margin:0;letter-spacing:-.02em;}
+.sub{color:var(--ink2);font-size:17px;margin:4px 0 0;}
+
+section{padding:0 18px;}
+h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
+  letter-spacing:.04em;}
+
+/* ---------- 今日打卡：大图标格 ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.tile{background:var(--card);border:2px solid var(--line);border-radius:18px;
+  padding:14px 10px 12px;text-align:center;cursor:pointer;user-select:none;
+  display:flex;flex-direction:column;align-items:center;gap:6px;min-height:132px;
+  justify-content:center;transition:background .15s,border-color .15s;}
+.tile .label{font-size:19px;font-weight:600;line-height:1.3;}
+.tile .times{font-size:15px;color:var(--muted);}
+.tile[aria-pressed="true"]{background:var(--ok-soft);border-color:#9fd0a8;}
+.tile[aria-pressed="true"] .times{color:var(--ok);font-weight:600;}
+.tile .check{width:26px;height:26px;}
+.tile[aria-pressed="false"] .check{visibility:hidden;}
+
+/* ---------- 六件事卡片 ---------- */
+.item{background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:14px;margin-bottom:11px;cursor:pointer;display:flex;gap:13px;
+  align-items:center;}
+.item .thumb{width:88px;height:74px;flex:0 0 auto;border-radius:12px;
+  background:var(--blue-soft);display:grid;place-items:center;overflow:hidden;}
+.item .t{font-size:21px;font-weight:700;line-height:1.25;}
+.item .d{font-size:16px;color:var(--ink2);margin-top:3px;line-height:1.45;}
+.item .go{color:var(--muted);flex:0 0 auto;}
+
+/* ---------- 详情层 ---------- */
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:90;overflow-y:auto;
+  max-width:520px;margin:0 auto;display:none;}
+.sheet.on{display:block;}
+.sheet-top{position:sticky;top:0;background:var(--bg);padding:14px 18px 10px;
+  border-bottom:1px solid var(--line);z-index:2;}
+.closebtn{background:var(--card);border:2px solid var(--line);border-radius:14px;
+  width:100%;min-height:60px;font-family:inherit;font-size:20px;font-weight:600;
+  cursor:pointer;color:var(--ink);display:flex;align-items:center;
+  justify-content:center;gap:8px;}
+.sheet h3{font-size:26px;margin:18px 18px 4px;line-height:1.3;}
+.sheet .lead{font-size:18px;color:var(--ink2);margin:0 18px 16px;}
+
+/* 对错并排 */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:0 18px;}
+.panel{border-radius:16px;padding:10px 10px 12px;border:2px solid;}
+.panel.yes{background:var(--ok-soft);border-color:#9fd0a8;}
+.panel.no{background:var(--no-soft);border-color:#eab5b5;}
+.panel > svg{width:100%;height:auto;display:block;}
+.ptag{display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:18px;font-weight:700;margin-top:6px;text-align:center;line-height:1.3;}
+.ptag svg{width:20px;height:20px;flex:0 0 auto;}
+.panel.yes .ptag{color:var(--ok);}
+.panel.no .ptag{color:var(--no);}
+
+.big{padding:0 18px;margin-top:14px;}
+.big .frame{background:var(--card);border:2px solid var(--line);border-radius:16px;
+  padding:12px;}
+.big svg{width:100%;height:auto;display:block;}
+.caption{font-size:18px;text-align:center;margin-top:8px;color:var(--ink2);}
+
+.points{padding:0 18px;margin-top:18px;}
+.point{display:flex;gap:12px;align-items:flex-start;padding:12px 0;
+  border-bottom:1px solid var(--line);}
+.point:last-child{border-bottom:0;}
+.point .n{width:32px;height:32px;border-radius:50%;background:var(--blue);
+  color:#fff;font-size:18px;font-weight:700;display:grid;place-items:center;
+  flex:0 0 auto;margin-top:1px;}
+.point .n.bad{background:var(--no);}
+.point .p{font-size:20px;font-weight:600;line-height:1.45;}
+.point .q{font-size:16px;color:var(--ink2);line-height:1.5;margin-top:2px;}
+
+.why{margin:20px 18px 0;background:var(--warn);border-radius:16px;padding:15px;
+  font-size:17px;line-height:1.65;color:#4b4327;}
+.why b{font-size:18px;}
+
+
+.foot{padding:26px 18px 10px;font-size:14px;color:var(--muted);line-height:1.65;}
+.foot b{color:var(--ink2);}
+
+.note{font-size:16px;color:var(--ink2);line-height:1.6;margin:-4px 0 12px;}
+.tipbar{margin-top:14px;background:#eef3f9;border:1px solid #d5e3f3;border-radius:14px;
+  padding:13px 15px;font-size:16px;line-height:1.6;color:#2f4a68;}
+.echo{background:#f0f4ee;border:1px solid #d7e3d3;border-radius:14px;padding:13px 15px;
+  font-size:16px;line-height:1.6;color:#3d5138;margin:16px 0 4px;}
+.echo b{color:#1f4a1a;}
+.echo .quote{display:block;margin-top:6px;color:#5a6b55;}
+.askbox{background:#fff8e8;border:1px solid #f0dfae;border-radius:14px;padding:14px 15px;
+  font-size:16px;line-height:1.65;color:#5a4a20;margin-top:16px;}
+.askbox b{display:block;margin-bottom:4px;font-size:17px;}
+.tile .sub2{font-size:14px;color:var(--muted);line-height:1.35;}
+.tile[aria-pressed="true"] .sub2{color:var(--ok);}
+.done-screen{display:none;padding:24px 20px 34px;text-align:center;}
+.done-screen.on{display:block;}
+.ds-tick{width:100px;margin:8px auto 16px;}
+.ds-tick svg{width:100%;height:auto;display:block;}
+.ds-t{font-size:27px;font-weight:700;letter-spacing:-.02em;line-height:1.3;}
+.ds-s{font-size:17px;color:var(--ink2);margin-top:10px;line-height:1.7;}
+.ds-s b{color:var(--ink);}
+.ds-card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:14px;margin:22px 0 16px;text-align:left;}
+.ds-label{font-size:16px;color:var(--ink2);margin-bottom:8px;}
+.ds-card textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;
+  font-family:inherit;font-size:18px;resize:none;color:var(--ink);background:#fcfcfb;}
+.btn-quiet{width:100%;min-height:64px;border:2px solid var(--line);background:var(--card);
+  border-radius:15px;font-family:inherit;font-size:19px;font-weight:600;color:var(--ink);cursor:pointer;}
+.ds-rest{font-size:16px;color:var(--muted);margin-top:20px;}
+.demobar2{background:#2c2c2a;color:#fff;padding:8px 14px;font-size:13px;display:flex;
+  align-items:center;gap:10px;}
+.demobar2 span{opacity:.75;}
+.demobar2 button{background:#4a4a46;color:#fff;border:0;border-radius:8px;padding:6px 12px;
+  font-size:13px;font-family:inherit;cursor:pointer;margin-left:auto;}
+
+/* ===== 动作动画 ===== */
+.mv{width:100%;height:auto;display:block;}
+/* 首页内联训练卡 */
+.mvcard{background:var(--card);border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;margin-bottom:12px;}
+.mvcard.done{border-color:#c5e0c5;}
+.mvcard .banner{background:#eef4fb;border-bottom:1px solid #e2ebf5;}
+.mvcard.done .banner{background:#f0f7f0;border-bottom-color:#d7ead7;}
+.mvcard .banner svg{width:100%;height:auto;display:block;}
+.mvcard .row{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;}
+.mvcard .mt{font-size:20px;font-weight:700;line-height:1.25;}
+.mvcard .md{font-size:15px;color:var(--ink2);margin-top:2px;}
+.mvcard .dosemini{font-size:14px;font-weight:600;color:#23527c;background:#eaf1f9;
+  border-radius:99px;padding:5px 11px;white-space:nowrap;}
+.mvcard .mvck{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);
+  flex:0 0 auto;display:grid;place-items:center;background:#fff;}
+.mvcard.done .mvck{background:var(--ok);border-color:var(--ok);}
+.mvcard .mvck svg{display:none;width:22px;height:22px;}
+.mvcard.done .mvck svg{display:block;}
+.mvcard .detail-hint{font-size:13px;color:var(--muted);padding:0 14px 11px;
+  display:flex;align-items:center;gap:4px;}
+
+.mv .a-brea{transform-box:fill-box;}
+@keyframes ankle   {0%,100%{transform:rotate(-32deg)} 50%{transform:rotate(30deg)}}
+@keyframes grip    {0%,100%{transform:rotate(0deg)}   50%{transform:rotate(72deg)}}
+@keyframes wrist   {0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(34deg)}}
+@keyframes elbow   {0%,100%{transform:rotate(0deg)}   50%{transform:rotate(-98deg)}}
+@keyframes knee    {0%,100%{transform:rotate(0deg)}   50%{transform:rotate(-52deg)}}
+@keyframes shin    {0%,100%{transform:translateX(0)}  50%{transform:translateX(-42px)}}
+@keyframes hip     {0%,100%{transform:translateY(0)}  40%,70%{transform:translateY(-26px)}}
+@keyframes bobath  {0%,100%{transform:translateY(0) } 50%{transform:translateY(-46px)}}
+@keyframes breathe {0%,100%{transform:scale(1)}       50%{transform:scale(1.28)}}
+.a-ankle {animation:ankle   2.6s ease-in-out infinite; transform-origin:8% 46%;}
+.a-grip  {animation:grip    2.2s ease-in-out infinite;}
+.a-wrist {animation:wrist   2.4s ease-in-out infinite; transform-origin:6% 50%;}
+.a-elbow {animation:elbow   3s   ease-in-out infinite; transform-origin:4% 50%;}
+.a-knee  {animation:knee    3s   ease-in-out infinite; transform-origin:4% 8%;}
+.a-shin  {animation:shin    3s   ease-in-out infinite;}
+.a-hip   {animation:hip     3.2s ease-in-out infinite;}
+.a-bob   {animation:bobath  3s   ease-in-out infinite;}
+.a-brea  {animation:breathe 4s   ease-in-out infinite; transform-origin:50% 50%;}
+@media (prefers-reduced-motion:reduce){.mv *{animation:none !important}}
+
+.mv-wrap{background:#eef4fb;border:1px solid #d5e3f3;border-radius:16px;padding:10px;}
+.dose{display:flex;gap:8px;flex-wrap:wrap;margin:12px 18px 0;}
+.dose span{background:#eaf1f9;color:#23527c;border-radius:99px;padding:7px 14px;
+  font-size:16px;font-weight:600;}
+.stopbox{margin:18px 18px 0;background:#fdeded;border:1px solid #f0c9c9;border-radius:14px;
+  padding:14px 15px;font-size:16px;line-height:1.65;color:#7a2626;}
+.stopbox b{display:block;margin-bottom:5px;font-size:17px;}
+.mvitem{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:10px;cursor:pointer;}
+.mvitem.done{background:#f2f8f2;border-color:#c5e0c5;}
+.mvitem .mvthumb{width:84px;height:64px;flex:0 0 auto;border-radius:11px;
+  background:#eef4fb;display:grid;place-items:center;overflow:hidden;padding:4px;}
+.mvitem .mt{font-size:19px;font-weight:700;line-height:1.3;}
+.mvitem .md{font-size:15px;color:var(--ink2);margin-top:2px;}
+.mvcheck{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);
+  flex:0 0 auto;display:grid;place-items:center;background:#fff;}
+.mvitem.done .mvcheck{background:var(--ok);border-color:var(--ok);}
+.mvitem.done .mvcheck svg{display:block}
+.mvcheck svg{display:none;width:20px;height:20px}
+.entry{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,#f4f9ff,#eaf2fb);
+  border:2px solid #cfe0f2;border-radius:18px;padding:16px;cursor:pointer;margin-top:4px;}
+.entry .et{font-size:21px;font-weight:700;}
+.entry .ed{font-size:16px;color:#3c5a78;margin-top:3px;}
+.entry .ring{width:56px;height:56px;flex:0 0 auto;}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="demobar2">
+    <span>原型演示</span>
+    <button id="nextday">跳到明天早上 →</button>
+  </div>
+
+  <header>
+    <h1>回家以后</h1>
+    <p class="sub" id="daysub">第 68 天 · 8 月 19 日</p>
+  </header>
+
+  <section id="main-today">
+    <div id="echo" class="echo"></div>
+
+    <h2>今天要做的（照护）</h2>
+    <div class="grid" id="grid-care"></div>
+
+    <h2>今天的训练 · 床上就能做</h2>
+    <p class="note" id="mv-sub">按顺序做，做不完就做前面几个。<b>踝泵和呼吸这两个，哪怕只做这两个也值得。</b></p>
+    <div id="mv-list"></div>
+
+    <h2>今天让他自己做的（日常也是训练）</h2>
+    <p class="note">每一件他自己完成的事，都是一次真正的康复训练。<br>
+    帮他做完，不如陪他慢慢做。做不动就换下一件。</p>
+    <div class="grid" id="grid-train"></div>
+
+    <div class="tipbar">累了就停。高龄患者容易疲劳，硬撑没有好处。<br>
+    做不完不要紧 —— 这里没有「中断」，只有「一共做了多少」。</div>
+
+    <div id="askbox"></div>
+  </section>
+
+  <div class="done-screen" id="done-screen">
+    <div class="ds-tick">
+      <svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="44" fill="#eaf6ec"/><path d="M28 49l14 14 27-30" stroke="#0f8a2f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="ds-t">今天的都做完了</div>
+    <div class="ds-s" id="ds-sum"></div>
+    <div class="ds-card">
+      <div class="ds-label">今天他怎么样？（可以不写）</div>
+      <textarea id="note" rows="2" placeholder="比如：今天自己把粥喝完了"></textarea>
+    </div>
+    <button class="btn-quiet" id="ds-close">收起，明天见</button>
+    <div class="ds-rest">剩下的时间，给你自己。</div>
+  </div>
+
+  <section>
+    <h2>请一定要知道</h2>
+    <div id="items"></div>
+  </section>
+
+  <div class="foot">
+    <b>关于这些内容</b><br>
+    这里的照护要点和训练动作，都来自国内公开的康复指南、专家共识和三甲医院、
+    国家级康复机构的公开科普，每一条都有出处，且经过多个来源交叉核对。
+    它们是<b>对绝大多数卒中患者通用的基础内容</b>。
+    <br><br>
+    <b>我们刻意不做的三件事</b>：站立与步行训练、吞咽训练、以及根据你的打卡自动加量。
+    前两件在没有专业人在场时风险太高（跌倒骨折、误吸窒息），第三件需要评估肌张力和心肺功能——
+    这些我们判断不了，也不该替你判断。
+    <br><br>
+    如果你身边能找到康复治疗师或医生，请让他看一眼这份内容，
+    告诉你哪些适合你家的情况、哪些要改。找不到，就按这里写的做，
+    <b>并且严格守住每个动作下面写的「什么时候必须停」</b>。
+  </div>
+
+</div>
+
+<div class="sheet" id="mvsheet">
+  <div class="sheet-top">
+    <button class="closebtn" id="mvclose">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回
+    </button>
+  </div>
+  <div id="mvbody"></div>
+  <div style="height:40px"></div>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="sheet-top">
+    <button class="closebtn" id="close">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回
+    </button>
+  </div>
+  <div id="sheet-body"></div>
+  <div style="height:40px"></div>
+</div>
+
+<script>
+/* ============ 图示 ============ */
+const S = {};
+
+/* 喂饭 —— 坐直 */
+S.feedOK = `<svg viewBox="0 0 200 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M52 152h96" stroke="#b9b8b1" stroke-width="5"/>
+  <path d="M62 152V44h12v108" stroke="#b9b8b1" stroke-width="5"/>
+  <path d="M78 138h56" stroke="#b9b8b1" stroke-width="7"/>
+  <path d="M86 136V78" stroke="#2a78d6" stroke-width="13"/>
+  <circle cx="86" cy="56" r="17" stroke="#2a78d6" stroke-width="7"/>
+  <path d="M97 64c6 3 8 6 8 6" stroke="#2a78d6" stroke-width="6"/>
+  <path d="M86 136h44v22" stroke="#2a78d6" stroke-width="13"/>
+  <path d="M124 74h30" stroke="#0f8a2f" stroke-width="6"/>
+  <circle cx="120" cy="74" r="9" stroke="#0f8a2f" stroke-width="6"/>
+  <path d="M86 96a26 26 0 0 0 14 12" stroke="#0f8a2f" stroke-width="4.5" stroke-dasharray="7 6"/>
+  <text x="108" y="118" font-size="19" fill="#0f8a2f" font-weight="700" font-family="system-ui">90°</text>
+</svg>`;
+
+/* 喂饭 —— 半躺仰头 */
+S.feedNO = `<svg viewBox="0 0 200 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M40 152h120" stroke="#b9b8b1" stroke-width="5"/>
+  <path d="M46 152 96 96" stroke="#b9b8b1" stroke-width="5"/>
+  <path d="M96 140h56" stroke="#b9b8b1" stroke-width="7"/>
+  <path d="M96 132 66 96" stroke="#c62f2f" stroke-width="13"/>
+  <circle cx="52" cy="80" r="17" stroke="#c62f2f" stroke-width="7"/>
+  <path d="M44 66c-4-5-4-9-4-9" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M96 132h44v22" stroke="#c62f2f" stroke-width="13"/>
+  <path d="M88 62h28" stroke="#c62f2f" stroke-width="6"/>
+  <circle cx="122" cy="62" r="9" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M62 92c-6 6-10 6-10 6" stroke="#c62f2f" stroke-width="4.5" stroke-dasharray="7 6"/>
+</svg>`;
+
+/* 扶人起身 —— 托肩背 */
+S.liftOK = `<svg viewBox="0 0 220 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="96" cy="34" r="20" stroke="#3a3935" stroke-width="6"/>
+  <path d="M96 54c-22 0-34 14-34 34v52h68V88c0-20-12-34-34-34Z" stroke="#3a3935" stroke-width="6"/>
+  <path d="M64 92 40 132" stroke="#e88a3c" stroke-width="13"/>
+  <text x="10" y="150" font-size="16" font-weight="700" fill="#e88a3c" font-family="system-ui">患侧</text>
+  <g stroke="#0f8a2f" stroke-width="5" fill="#eaf6ec">
+    <path d="M128 76c8-4 16-2 20 4s2 14-6 18l-14 6-10-14z"/>
+    <path d="M132 122c8-4 16-2 20 4s2 14-6 18l-14 6-10-14z"/>
+  </g>
+  <path d="M168 66l-14 12M172 112l-14 12" stroke="#0f8a2f" stroke-width="5"/>
+  <circle cx="182" cy="58" r="13" fill="#0f8a2f"/>
+  <text x="176" y="65" font-size="17" font-weight="700" fill="#fff" font-family="system-ui">1</text>
+  <circle cx="186" cy="104" r="13" fill="#0f8a2f"/>
+  <text x="180" y="111" font-size="17" font-weight="700" fill="#fff" font-family="system-ui">2</text>
+</svg>`;
+
+/* 扶人起身 —— 拉患侧手 */
+S.liftNO = `<svg viewBox="0 0 220 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="86" cy="42" r="20" stroke="#3a3935" stroke-width="6"/>
+  <path d="M86 62c-22 0-34 14-34 34v48h68V96c0-20-12-34-34-34Z" stroke="#3a3935" stroke-width="6"/>
+  <path d="M118 92l52-26" stroke="#c62f2f" stroke-width="13"/>
+  <g stroke="#c62f2f" stroke-width="5" fill="#fdeded">
+    <path d="M166 48c9-3 17 0 20 7s0 15-9 18l-15 4-8-15z"/>
+  </g>
+  <path d="M188 44l16-10" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M196 26l10 6-4 11" stroke="#c62f2f" stroke-width="6"/>
+  <g stroke="#c62f2f" stroke-width="6">
+    <path d="M114 66l-8-14M104 88l-16 6M122 106l-4 16"/>
+  </g>
+  <circle cx="118" cy="86" r="15" fill="#fdeded" stroke="#c62f2f" stroke-width="5"/>
+  <path d="M112 80l12 12M124 80l-12 12" stroke="#c62f2f" stroke-width="5"/>
+  <text x="88" y="176" font-size="17" font-weight="700" fill="#c62f2f" font-family="system-ui">肩膀会脱位</text>
+</svg>`;
+
+/* 患侧卧位（推荐） */
+S.lieSide = `<svg viewBox="0 0 340 215" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="0" y="172" width="340" height="24" rx="8" fill="#e0ded3"/>
+  <rect x="86" y="140" width="132" height="34" rx="15" fill="#cfcbba"/>
+  <rect x="228" y="112" width="66" height="28" rx="13" fill="#cfcbba"/>
+  <rect x="24" y="108" width="72" height="30" rx="14" fill="#cfcbba"/>
+  <path d="M104 100h108a30 30 0 0 1 0 60H104a30 30 0 0 1 0-60Z" fill="#f2f0e9" stroke="#3a3935" stroke-width="6"/>
+  <circle cx="66" cy="104" r="25" fill="#f2f0e9" stroke="#3a3935" stroke-width="6"/>
+  <path d="M62 100l-14 6 13 7" stroke="#3a3935" stroke-width="5"/>
+  <path d="M88 96 108 84" stroke="#3a3935" stroke-width="6"/>
+  <path d="M112 112 52 78" stroke="#e88a3c" stroke-width="17"/>
+  <path d="M50 76 30 66M52 84 30 80M56 68 40 54" stroke="#e88a3c" stroke-width="7"/>
+  <path d="M126 96h64" stroke="#2a78d6" stroke-width="15"/>
+  <path d="M196 94h16" stroke="#2a78d6" stroke-width="7"/>
+  <path d="M214 122c24-6 40-6 52 4l22 26" stroke="#2a78d6" stroke-width="17"/>
+  <path d="M214 150c34 0 62 6 88 16" stroke="#e88a3c" stroke-width="16"/>
+  <circle cx="72" cy="30" r="17" fill="#e88a3c"/>
+  <text x="64" y="38" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">1</text>
+  <path d="M66 48 54 64" stroke="#e88a3c" stroke-width="4"/>
+  <circle cx="308" cy="66" r="17" fill="#2a78d6"/>
+  <text x="300" y="74" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">2</text>
+  <path d="M296 82 272 106" stroke="#2a78d6" stroke-width="4"/>
+  <circle cx="196" cy="196" r="17" fill="#e88a3c"/>
+  <text x="188" y="204" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">3</text>
+  <path d="M212 190l38-24" stroke="#e88a3c" stroke-width="4"/>
+  <circle cx="24" cy="170" r="17" fill="#3a3935"/>
+  <text x="16" y="178" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">4</text>
+  <path d="M40 160l22-18M40 176l46 0" stroke="#3a3935" stroke-width="4"/>
+</svg>`;
+
+/* 翻身 2 小时 */
+S.turn = `<svg viewBox="0 0 240 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="8" y="88" width="224" height="14" rx="6" fill="#eceae2"/>
+  <circle cx="56" cy="60" r="15" stroke="#2a78d6" stroke-width="6"/>
+  <path d="M71 66h58l12 22" stroke="#2a78d6" stroke-width="13"/>
+  <path d="M162 62c14-10 30-10 44 0" stroke="#0f8a2f" stroke-width="6"/>
+  <path d="M200 50l8 12-13 3" stroke="#0f8a2f" stroke-width="6"/>
+  <text x="163" y="94" font-size="26" font-weight="700" fill="#0f8a2f" font-family="system-ui">2小时</text>
+</svg>`;
+
+/* 家居防跌 */
+S.home = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14 122h212" stroke="#b9b8b1" stroke-width="6"/>
+  <path d="M22 122V30h6v92" stroke="#c9c7bd" stroke-width="4"/>
+  <path d="M36 74h58" stroke="#0f8a2f" stroke-width="11"/>
+  <circle cx="36" cy="74" r="7" fill="#0f8a2f"/><circle cx="94" cy="74" r="7" fill="#0f8a2f"/>
+  <rect x="118" y="96" width="72" height="22" rx="8" fill="#cfe3f8" stroke="#2a78d6" stroke-width="4"/>
+  <path d="M126 107h8M144 107h8M162 107h8" stroke="#2a78d6" stroke-width="4"/>
+  <circle cx="210" cy="46" r="14" fill="#ffe9a8" stroke="#d9a520" stroke-width="4"/>
+  <path d="M210 22v8M232 46h-8M226 30l-6 6M194 30l6 6" stroke="#d9a520" stroke-width="4"/>
+</svg>`;
+
+/* 药 */
+S.pill = `<svg viewBox="0 0 240 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="24" y="34" width="60" height="70" rx="12" stroke="#2a78d6" stroke-width="7"/>
+  <path d="M40 20h28v14H40z" fill="#2a78d6"/>
+  <path d="M38 62h32M38 80h32" stroke="#2a78d6" stroke-width="6"/>
+  <circle cx="140" cy="70" r="20" stroke="#0f8a2f" stroke-width="7"/>
+  <path d="M131 70l7 8 12-15" stroke="#0f8a2f" stroke-width="6"/>
+  <circle cx="200" cy="70" r="20" stroke="#c62f2f" stroke-width="7"/>
+  <path d="M191 61l18 18M209 61l-18 18" stroke="#c62f2f" stroke-width="6"/>
+  <text x="118" y="112" font-size="17" font-weight="700" fill="#0f8a2f" font-family="system-ui">按时吃</text>
+  <text x="176" y="112" font-size="17" font-weight="700" fill="#c62f2f" font-family="system-ui">自己停</text>
+</svg>`;
+
+/* FAST 脸歪 */
+S.face = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="65" cy="62" r="38" stroke="#c62f2f" stroke-width="7"/>
+  <circle cx="51" cy="52" r="4.5" fill="#c62f2f"/><circle cx="79" cy="52" r="4.5" fill="#c62f2f"/>
+  <path d="M46 78c8 8 22 10 34 0" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M46 78c-2-4-3-7-3-7" stroke="#c62f2f" stroke-width="6"/>
+</svg>`;
+/* FAST 手垂 */
+S.arm = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="65" cy="26" r="14" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M65 40v46" stroke="#c62f2f" stroke-width="12"/>
+  <path d="M65 52h32" stroke="#2a78d6" stroke-width="10"/>
+  <path d="M65 52 44 90" stroke="#c62f2f" stroke-width="10"/>
+  <path d="M40 100l6-12 10 4" stroke="#c62f2f" stroke-width="5"/>
+</svg>`;
+/* FAST 说话不清 */
+S.speech = `<svg viewBox="0 0 130 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 26h90a10 10 0 0 1 10 10v40a10 10 0 0 1-10 10H62l-22 20V86H20a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10z" stroke="#c62f2f" stroke-width="6"/>
+  <path d="M32 48h26M32 66h44M70 48h20" stroke="#c62f2f" stroke-width="6" stroke-dasharray="4 9"/>
+</svg>`;
+
+/* 今日打卡图标 */
+
+/* 穿上衣：先穿患侧 */
+S.dressOK = `<svg viewBox="0 0 200 150" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M62 42 46 56l12 16 10-8v50h64V64l10 8 12-16-16-14h-16a14 14 0 0 1-28 0H62Z" stroke="#4a4945" stroke-width="6"/>
+  <path d="M56 62 34 78" stroke="#e88a3c" stroke-width="9"/>
+  <circle cx="30" cy="82" r="15" fill="#fff" stroke="#e88a3c" stroke-width="5"/>
+  <text x="24" y="89" font-size="19" font-weight="700" fill="#e88a3c" font-family="system-ui">1</text>
+  <path d="M144 62l22 16" stroke="#2a78d6" stroke-width="9"/>
+  <circle cx="170" cy="82" r="15" fill="#fff" stroke="#2a78d6" stroke-width="5"/>
+  <text x="164" y="89" font-size="19" font-weight="700" fill="#2a78d6" font-family="system-ui">2</text>
+  <text x="8" y="126" font-size="17" font-weight="700" fill="#e88a3c" font-family="system-ui">患侧先</text>
+  <text x="140" y="126" font-size="17" font-weight="700" fill="#2a78d6" font-family="system-ui">健侧后</text>
+</svg>`;
+
+/* 上下楼梯 */
+S.stair = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14 122h48V96h44V70h44V44h48" stroke="#b9b8b1" stroke-width="7"/>
+  <path d="M40 40h150" stroke="#c9c7bd" stroke-width="5"/>
+  <path d="M52 60c22-14 44-14 66 0" stroke="#0f8a2f" stroke-width="6"/>
+  <path d="M112 48l8 12-13 4" stroke="#0f8a2f" stroke-width="6"/>
+  <text x="40" y="86" font-size="18" font-weight="700" fill="#0f8a2f" font-family="system-ui">上：健腿先</text>
+  <path d="M206 96c-20 14-42 14-62 0" stroke="#2a78d6" stroke-width="6"/>
+  <path d="M148 84l-8 12 13 4" stroke="#2a78d6" stroke-width="6"/>
+  <text x="140" y="122" font-size="18" font-weight="700" fill="#2a78d6" font-family="system-ui">下：患腿先</text>
+</svg>`;
+
+/* 床椅转移：椅子放健侧 45 度 */
+S.transfer = `<svg viewBox="0 0 240 140" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="14" y="52" width="92" height="16" rx="6" fill="#eceae2"/>
+  <path d="M20 68v46M100 68v46" stroke="#c9c7bd" stroke-width="6"/>
+  <circle cx="76" cy="34" r="14" stroke="#2a78d6" stroke-width="6"/>
+  <path d="M76 48v22" stroke="#2a78d6" stroke-width="11"/>
+  <g transform="rotate(45 168 78)">
+    <path d="M142 60h52M142 60v46M194 60v46" stroke="#0f8a2f" stroke-width="7"/>
+    <path d="M136 34v26h12" stroke="#0f8a2f" stroke-width="7"/>
+  </g>
+  <path d="M92 62c16-4 30 0 40 8" stroke="#0f8a2f" stroke-width="5" stroke-dasharray="8 7"/>
+  <text x="112" y="132" font-size="17" font-weight="700" fill="#0f8a2f" font-family="system-ui">椅子放健侧 · 45°</text>
+</svg>`;
+
+S.call120 = `<svg viewBox="0 0 130 100" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="8" y="18" width="114" height="64" rx="14" fill="#fff" stroke="#c62f2f" stroke-width="6"/>
+  <text x="20" y="66" font-size="40" font-weight="700" fill="#c62f2f" font-family="system-ui">120</text>
+</svg>`;
+
+const IC = {
+  meal:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 26h32a16 16 0 0 1-32 0Z"/><path d="M6 40h36"/><path d="M14 8v10M20 8v10M17 18v6"/></svg>`,
+  turn:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 32a14 14 0 1 1 6 11"/><path d="M8 22l2 10 10-2"/></svg>`,
+  pill:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="12" width="24" height="28" rx="6"/><path d="M18 6h12v6H18z"/><path d="M18 24h12M18 32h12"/></svg>`,
+  pos:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="30" width="40" height="8" rx="3"/><circle cx="14" cy="18" r="6"/><path d="M20 22h16"/></svg>`,
+  dress:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8 8 14l4 6 4-3v18h16V17l4 3 4-6-10-6h-4a4 4 0 0 1-8 0h-2Z"/></svg>`,
+  wash:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h32v6a12 12 0 0 1-12 12h-8A12 12 0 0 1 8 28v-6Z"/><path d="M24 22V10a4 4 0 0 1 8 0"/></svg>`,
+  sit:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="10" r="5"/><path d="M18 16v14h14"/><path d="M32 30v10"/><path d="M8 40h32"/></svg>`,
+  bp:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="36" height="24" rx="6"/><path d="M12 26h6l3-7 4 12 3-5h8"/></svg>`,
+  talk:`<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="#2a78d6" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10h32v22H24l-10 8v-8H8V10Z"/><path d="M16 19h8M16 25h14"/></svg>`
+};
+const TICK = `<svg class="check" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#0f8a2f"/><path d="M6.5 12.5l3.6 3.6L17.5 8.6" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* ============ 内容 ============ */
+const careList = [
+  {id:'m', icon:IC.meal, label:'坐直了喂饭', times:'每一餐',      target:1},
+  {id:'t', icon:IC.turn, label:'翻身',       times:'每 2 小时',    target:1},
+  {id:'p', icon:IC.pill, label:'吃药',       times:'按医嘱',      target:1},
+  {id:'s', icon:IC.pos,  label:'摆好姿势',   times:'每次躺下',    target:1},
+  {id:'bp',icon:IC.bp,   label:'量血压',     times:'每天记下来',  target:1}
+];
+
+const trainList = [
+  {id:'d', icon:IC.dress, label:'自己穿上衣', times:'早上 1 次',        target:1},
+  {id:'w', icon:IC.wash,  label:'自己洗脸',   times:'早上 1 次',        target:1},
+  {id:'u', icon:IC.sit,   label:'坐起来',     times:'15 分钟 × 2 次',   target:2},
+  {id:'k', icon:IC.talk,  label:'和他聊天',   times:'10 分钟 × 1 次',   target:1}
+];
+
+
+/* ===================== 动作动画 ===================== */
+const MV = {};
+/* 统一风格：皮肤色肢体 + 关节圆点 + SMIL 让关节在正确位置转动。
+   橙色=患侧，蓝色=健侧/箭头，灰色=躯干/床。 */
+
+/* 踝泵：小腿平放，脚在踝关节处上下摆 */
+MV.ankle = `<svg class="mv" viewBox="0 0 340 250" fill="none">
+  <rect x="0" y="216" width="340" height="16" rx="7" fill="#ddd9cc"/>
+  <path fill="#eab595" stroke="#d08f61" stroke-width="4" stroke-linejoin="round"
+        d="M146 122 Q180 134 214 144 Q236 150 252 152 Q264 162 264 178 Q264 192 238 190
+           Q218 188 200 184 Q190 182 186 188 Q180 200 168 198 Q154 194 150 172 Q148 146 146 122 Z">
+    <animate attributeName="d" dur="3s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+      values="M146 122 Q180 134 214 144 Q236 150 252 152 Q264 162 264 178 Q264 192 238 190
+              Q218 188 200 184 Q190 182 186 188 Q180 200 168 198 Q154 194 150 172 Q148 146 146 122 Z;
+              M146 122 Q176 124 196 116 Q204 100 207 71 Q210 56 235 69 Q250 82 237 97
+              Q228 122 216 144 Q208 160 198 170 Q186 190 170 186 Q156 182 152 164 Q148 142 146 122 Z;
+              M146 122 Q180 134 214 144 Q236 150 252 152 Q264 162 264 178 Q264 192 238 190
+              Q218 188 200 184 Q190 182 186 188 Q180 200 168 198 Q154 194 150 172 Q148 146 146 122 Z"/>
+  </path>
+  <path d="M0 114 L158 124 Q178 128 180 144 Q180 162 164 166
+           Q122 182 78 198 Q34 208 0 190 Z"
+        fill="#eab595" stroke="#d08f61" stroke-width="4" stroke-linejoin="round"/>
+</svg>`;
+
+/* 握拳伸展：手掌 + 四指在掌指关节处屈伸 */
+MV.grip = `<svg class="mv" viewBox="0 0 250 260" fill="none">
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M88 260 L90 200 Q92 188 106 186 L142 186 Q156 188 158 200 L160 260 Z" fill="#f0c4a0"/>
+
+
+    <!-- 四指：放射状张开 ↔ 折叠成四个指关节圆弧 -->
+    <path fill="#f0c4a0" d="M90 120 L82 62 Q80 52 88 51 Q96 50 98 60 L106 118 Z">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M90 120 L82 62 Q80 52 88 51 Q96 50 98 60 L106 118 Z;
+                M86 126 Q86 96 99 96 Q112 96 112 126 Z;
+                M90 120 L82 62 Q80 52 88 51 Q96 50 98 60 L106 118 Z"/>
+    </path>
+    <path fill="#f0c4a0" d="M109 114 L108 46 Q108 36 118 36 Q128 36 128 46 L128 114 Z">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M109 114 L108 46 Q108 36 118 36 Q128 36 128 46 L128 114 Z;
+                M106 122 Q106 86 119 86 Q132 86 132 122 Z;
+                M109 114 L108 46 Q108 36 118 36 Q128 36 128 46 L128 114 Z"/>
+    </path>
+    <path fill="#f0c4a0" d="M130 118 L138 58 Q140 48 148 49 Q156 50 154 60 L147 118 Z">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M130 118 L138 58 Q140 48 148 49 Q156 50 154 60 L147 118 Z;
+                M128 126 Q128 93 140 93 Q152 93 152 126 Z;
+                M130 118 L138 58 Q140 48 148 49 Q156 50 154 60 L147 118 Z"/>
+    </path>
+    <path fill="#f0c4a0" d="M150 128 L163 84 Q166 75 173 77 Q180 79 177 88 L164 128 Z">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M150 128 L163 84 Q166 75 173 77 Q180 79 177 88 L164 128 Z;
+                M148 130 Q148 105 158 105 Q168 105 168 130 Z;
+                M150 128 L163 84 Q166 75 173 77 Q180 79 177 88 L164 128 Z"/>
+    </path>
+
+    <!-- 手背：后画，掌指关节弧线盖住指根 -->
+    <path d="M86 126 Q120 106 158 126 Q160 158 154 190 L92 190 Q84 158 86 126 Z" fill="#f0c4a0"/>
+    <!-- 拇指：45°张开 ↔ 折叠锁在拳侧，指尖横跨食指中指 -->
+    <path fill="#f0c4a0"
+      d="M94 176 Q80 170 66 156 Q54 144 46 132 Q40 122 50 116 Q60 111 68 124 Q80 140 96 150 Q104 156 104 168 Z">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M94 176 Q80 170 66 156 Q54 144 46 132 Q40 122 50 116 Q60 111 68 124 Q80 140 96 150 Q104 156 104 168 Z;
+                M92 186 Q76 178 74 158 Q72 138 84 126 Q98 113 116 120 Q134 127 129 143 Q124 158 110 162 Q96 167 100 182 Z;
+                M94 176 Q80 170 66 156 Q54 144 46 132 Q40 122 50 116 Q60 111 68 124 Q80 140 96 150 Q104 156 104 168 Z"/>
+    </path>
+  </g>
+
+  <!-- 手背肌腱纹理：握拳时拉紧变明显 -->
+  <g stroke="#dda87f" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.35">
+    <animate attributeName="opacity" dur="3s" repeatCount="indefinite" calcMode="spline"
+      keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1" values="0.35;0.95;0.35"/>
+    <path d="M105 184 Q108 158 105 134"/>
+    <path d="M124 186 Q126 158 124 132"/>
+    <path d="M141 184 Q142 158 140 136"/>
+  </g>
+
+  <!-- 指节折痕：伸展时在指节间，握拳时压在指关节弧上 -->
+  <g stroke="#dda87f" stroke-width="2" stroke-linecap="round" fill="none">
+    <path d="M84 100 l14 -2">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M84 100 l14 -2; M92 112 q7 -5 14 0; M84 100 l14 -2"/></path>
+    <path d="M81 76 l15 -2">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M81 76 l15 -2; M91 106 q8 -5 16 0; M81 76 l15 -2"/></path>
+    <path d="M109 90 h19">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M109 90 h19; M111 108 q8 -5 16 0; M109 90 h19"/></path>
+    <path d="M108 66 h20">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M108 66 h20; M110 100 q9 -6 18 0; M108 66 h20"/></path>
+    <path d="M134 98 l14 2">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M134 98 l14 2; M132 112 q8 -5 16 0; M134 98 l14 2"/></path>
+    <path d="M138 74 l14 2">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M138 74 l14 2; M131 105 q9 -6 18 0; M138 74 l14 2"/></path>
+    <path d="M156 106 l12 4">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M156 106 l12 4; M151 120 q7 -4 14 0; M156 106 l12 4"/></path>
+    <!-- 拇指指间关节 -->
+    <path d="M56 138 l12 -10">
+      <animate attributeName="d" dur="3s" repeatCount="indefinite" calcMode="spline"
+        keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"
+        values="M56 138 l12 -10; M84 140 l14 -6; M56 138 l12 -10"/></path>
+    <!-- 大鱼际 -->
+    <path d="M97 186 Q104 158 96 132"/>
+  </g>
+</svg>`;
+
+/* 腕关节屈伸：前臂平放，手在腕关节处上下摆 */
+MV.wrist = `<svg class="mv" viewBox="0 0 390 300" fill="none">
+  <!-- 活动范围提示弧 -->
+  <path d="M260 26 A150 150 0 0 1 260 274" stroke="#9dbde0" stroke-width="5" stroke-dasharray="3 12" stroke-linecap="round"/>
+
+  <!-- 手（绕腕关节 176,150 转动） -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate"
+      values="52 176 150; -52 176 150; 52 176 150" dur="3.2s" repeatCount="indefinite"
+      calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+
+    <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <!-- 手指：远→近，先画远的 -->
+      <path d="M228 120 Q272 110 296 106 Q310 105 311 116 Q312 127 297 128 Q268 131 228 136 Z" fill="#e4b08c"/>
+      <path d="M228 136 Q274 132 302 132 Q316 132 316 143 Q316 154 300 154 Q270 154 228 154 Z" fill="#ebbb98"/>
+      <path d="M228 154 Q268 154 292 157 Q306 159 305 170 Q304 181 289 179 Q262 176 228 172 Z" fill="#f0c4a0"/>
+      <!-- 手掌：从腕部变宽到掌指关节 -->
+      <path d="M170 136 Q204 122 236 120 Q248 119 252 126 Q254 130 254 134 L254 158 Q252 173 232 175 Q196 178 170 164 Z" fill="#f0c4a0"/>
+      <!-- 拇指：从掌根向前下方 45° 伸出 -->
+      <path d="M212 164 Q238 172 252 186 Q261 196 252 204 Q243 212 233 201 Q219 185 204 178 Z" fill="#f2c9a6"/>
+    </g>
+
+    <!-- 指间关节折痕 -->
+    <g stroke="#d69a70" stroke-width="2.2" fill="none" stroke-linecap="round">
+      <path d="M272 110 q4 9 1 19"/>
+      <path d="M277 133 q4 10 1 20"/>
+      <path d="M272 156 q4 9 1 18"/>
+      <path d="M244 195 q-7 5 -9 11"/>
+    </g>
+    <!-- 手背肌腱 / 大鱼际 -->
+    <g stroke="#e0ab84" stroke-width="2.2" fill="none" stroke-linecap="round">
+      <path d="M196 130 Q218 138 236 136"/>
+      <path d="M204 150 Q214 166 209 180"/>
+    </g>
+  </g>
+
+  <!-- 前臂：最后画，圆弧端盖以腕关节为圆心，遮住手的根部 -->
+  <path d="M0 112 Q106 120 168 134 A18 18 0 0 1 168 166 Q106 182 0 192 Z"
+        fill="#f0c4a0" stroke="#c9885c" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 腕横纹 -->
+  <g stroke="#dda87f" stroke-width="2.2" fill="none" stroke-linecap="round">
+    <path d="M150 130 q6 16 1 32"/>
+    <path d="M161 133 q5 14 1 27"/>
+  </g>
+</svg>`;
+
+/* 肘关节屈伸：上臂固定，前臂在肘关节处弯起 */
+MV.elbow = `<svg class="mv" viewBox="0 0 300 300" fill="none">
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M70 42 Q70 14 96 14 Q122 14 122 42 Q122 64 108 72 L110 86 Q84 90 80 76 Q70 64 70 42 Z" fill="#f0c4a0"/>
+    <path d="M76 90 Q98 80 122 90 Q138 98 140 126 L142 300 L62 300 L64 126 Q66 98 76 90 Z"
+          fill="#cfd9e4" stroke="#9db0c4"/>
+    <!-- 前臂+手：在肘(122,190)转动；下垂 ↔ 前平举 -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="0 122 190; -100 122 190; 0 122 190" dur="3.2s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <path d="M112 250 Q110 276 116 288 Q120 296 130 294 Q139 292 138 282 Q136 268 136 250 Z" fill="#f0c4a0"/>
+      <path d="M108 186 Q124 182 138 186 Q146 191 145 206 L140 252 Q126 259 112 252 L108 206 Q106 190 108 186 Z" fill="#f0c4a0"/>
+      <path d="M116 258 q12 4 20 0" stroke="#dda87f" stroke-width="2" fill="none"/>
+    </g>
+    <!-- 上臂：后画盖住肘缝，垂在体侧 -->
+    <path d="M110 116 Q126 110 140 116 Q147 122 146 138 L142 190 Q126 198 112 190 L108 138 Q106 122 110 116 Z" fill="#f0c4a0"/>
+  </g>
+  <path d="M186 214 A66 66 0 0 0 214 170" stroke="#9dbde0" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="3 11"/>
+</svg>`;
+
+/* 膝关节屈伸：仰卧，大腿在髋处抬起、小腿在膝处折叠（脚跟贴床往回滑） */
+MV.knee = `<svg class="mv" viewBox="0 0 370 210" fill="none">
+  <rect x="0" y="178" width="370" height="14" rx="6" fill="#ddd9cc"/>
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18 126 Q18 104 40 104 Q62 104 62 126 Q62 146 44 148 L46 158 Q26 160 22 148 Q18 140 18 126 Z" fill="#f0c4a0"/>
+    <!-- 腿：髋(158,142) → 膝(230,142) → 踝(292,142) -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="0 158 142; -52 158 142; 0 158 142" dur="3.4s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <g>
+        <animateTransform attributeName="transform" type="rotate"
+          values="0 230 142; 104 230 142; 0 230 142" dur="3.4s" repeatCount="indefinite"
+          calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+        <!-- 足 -->
+        <path d="M286 122 Q310 124 322 136 Q334 147 340 154 Q346 162 340 168
+                 Q332 174 322 170 L302 164 Q292 161 288 168 Q280 178 274 168
+                 Q268 156 270 142 Q273 126 286 122 Z" fill="#f0c4a0"/>
+        <!-- 小腿：上缘平直，下缘腓肠肌鼓起 -->
+        <path d="M226 126 L288 132 Q298 136 298 146 Q298 158 288 160 Q258 168 226 162 Z" fill="#f0c4a0"/>
+      </g>
+      <!-- 大腿：后画盖住膝缝 -->
+      <path d="M152 122 Q192 118 230 124 Q240 128 240 142 Q240 158 230 161 Q192 168 152 164 Z" fill="#f0c4a0"/>
+    </g>
+    <!-- 躯干：后画盖住髋缝 -->
+    <path d="M56 110 Q96 100 140 108 Q160 112 162 132 L162 152 Q160 170 140 172 Q96 178 56 168 Q46 140 56 110 Z"
+          fill="#cfd9e4" stroke="#9db0c4"/>
+  </g>
+</svg>`;
+
+/* 桥式：仰卧，肩和脚不动，臀部抬起（路径整体上抬） */
+MV.bridge = `<svg class="mv" viewBox="0 0 340 210" fill="none">
+  <rect x="0" y="180" width="340" height="14" rx="6" fill="#ddd9cc"/>
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- 脚（踩床，不动） -->
+    <path d="M244 164 Q268 162 288 168 Q304 173 308 180 Q311 187 302 188 L250 187 Q238 186 238 176 Q239 166 244 164 Z" fill="#f0c4a0"/>
+    <!-- 小腿（不动） -->
+    <path d="M218 116 Q232 102 246 106 L270 166 Q272 176 258 178 Q246 180 242 172 Z" fill="#f0c4a0"/>
+    <!-- 大腿：以膝(232,110)为轴 -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="0 232 110; 47 232 110; 0 232 110" dur="3.6s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0;0.4;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <path d="M170 134 Q176 126 222 96 Q234 108 242 124 Q198 152 190 162 Q178 154 170 134 Z" fill="#f0c4a0"/>
+    </g>
+    <!-- 躯干：以肩(66,148)为轴，肩留在床上 -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="0 66 148; -26 66 148; 0 66 148" dur="3.6s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0;0.4;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <path d="M58 126 Q110 116 166 124 Q184 128 186 148 Q186 168 166 172 Q110 180 58 170 Q48 148 58 126 Z"
+            fill="#cfd9e4" stroke="#9db0c4"/>
+    </g>
+    <!-- 头（不动，枕在床上） -->
+    <path d="M12 148 Q12 126 34 126 Q56 126 56 148 Q56 168 38 170 L40 178 Q20 180 16 168 Q12 160 12 148 Z" fill="#f0c4a0"/>
+  </g>
+  <path d="M150 82 V60" stroke="#0f8a2f" stroke-width="7" stroke-linecap="round"/>
+  <path d="M141 70 l9-14 9 14" stroke="#0f8a2f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="170" y="74" font-size="22" font-weight="700" fill="#0f8a2f" font-family="system-ui">停 5 秒</text>
+</svg>`;
+
+/* 双手叉握上举：侧坐，整条手臂在肩处从大腿抬到胸口 */
+MV.bobath = `<svg class="mv" viewBox="0 0 300 280" fill="none">
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M70 44 Q70 16 96 16 Q122 16 122 44 Q122 66 108 74 L110 88 Q84 92 80 78 Q70 66 70 44 Z" fill="#f0c4a0"/>
+    <path d="M74 92 Q98 82 124 92 Q140 100 142 128 L146 278 L62 278 L64 128 Q66 100 74 92 Z"
+          fill="#cfd9e4" stroke="#9db0c4"/>
+    <!-- 双臂叉握：在肩(112,124)转动 -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate"
+        values="62 112 124; -4 112 124; 62 112 124" dur="3.2s" repeatCount="indefinite"
+        calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <!-- 健侧手臂（下层，蓝袖） -->
+      <path d="M104 122 Q160 116 210 124 Q226 127 226 140 Q226 153 210 155 Q160 162 104 155 Z"
+            fill="#8fb4dd" stroke="#4f7fb5"/>
+      <!-- 患侧手臂（上层） -->
+      <path d="M104 110 Q160 104 208 112 Q224 115 224 128 Q224 141 208 143 Q160 150 104 143 Z" fill="#f0c4a0"/>
+      <!-- 交握的双手 -->
+      <path d="M214 104 Q248 104 262 118 Q274 132 262 148 Q246 164 216 156 Q202 151 204 128 Z" fill="#f0c4a0"/>
+      <!-- 患侧拇指在上 -->
+      <path d="M226 106 Q214 92 226 84 Q240 78 248 92 Q252 102 246 110 Z"
+            fill="#e8944a" stroke="#c06a1e"/>
+      <path d="M232 122 q14 -4 24 2 M230 138 q14 -4 24 2" stroke="#dda87f" stroke-width="2" fill="none"/>
+    </g>
+  </g>
+  <path d="M196 88 A70 70 0 0 1 206 172" stroke="#9dbde0" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="3 11"/>
+  <text x="8" y="272" font-size="17" font-weight="700" fill="#e8944a" font-family="system-ui">患侧拇指在上</text>
+</svg>`;
+
+/* 呼吸：侧面头部撮唇吹气，气球慢慢变大 */
+MV.breathe = `<svg class="mv" viewBox="0 0 300 200" fill="none">
+  <g stroke="#c9885c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+    <!-- 侧面头部：额、鼻、撮起的唇、下巴、下颌 -->
+    <path d="M60 66 Q62 34 98 32 Q132 30 138 60 Q142 76 134 86
+             L148 102 Q155 109 146 111 L138 112
+             Q143 122 132 126 Q136 138 122 142
+             Q106 148 90 141 Q68 132 62 110 Q54 88 60 66 Z" fill="#f0c4a0"/>
+    <!-- 撮起的嘴唇 -->
+    <path d="M138 116 Q152 114 158 120 Q152 128 138 125 Z" fill="#d97b62" stroke="#b25843" stroke-width="3"/>
+  </g>
+  <!-- 五官与头发 -->
+  <g stroke="#a9713f" stroke-width="3.5" stroke-linecap="round" fill="none">
+    <path d="M74 44 Q100 26 130 44"/>
+    <path d="M108 64 q12 -5 20 -1"/>
+  </g>
+  <circle cx="120" cy="76" r="4.5" fill="#7a5236"/>
+  <path d="M82 96 q10 -6 14 2 q3 8 -6 10" stroke="#c9885c" stroke-width="3" fill="none"/>
+  <!-- 气流 -->
+  <path d="M170 120 h26" stroke="#2a78d6" stroke-width="5" stroke-dasharray="6 8" stroke-linecap="round"/>
+  <!-- 气球：慢慢变大 -->
+  <g>
+    <ellipse cx="238" cy="112" rx="26" ry="30" fill="#ffe0e6" stroke="#e0607f" stroke-width="5">
+      <animate attributeName="rx" values="24;36;24" dur="4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+      <animate attributeName="ry" values="27;41;27" dur="4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.2 1;0.4 0 0.2 1"/>
+    </ellipse>
+    <path d="M212 112 l-10 -6 0 12 z" fill="#e0607f"/>
+  </g>
+  <text x="196" y="180" font-size="19" font-weight="700" fill="#2a78d6" font-family="system-ui">慢慢吹</text>
+</svg>`;
+
+/* ===================== 动作数据 ===================== */
+const STOP = '<div class="stopbox"><b>什么时候必须停</b>' +
+  '出现<b>疼痛</b> —— 立刻停，不要「忍一下就过去了」。<br>' +
+  '出现<b>头晕、乏力、气短、脸色发白</b> —— 停下来休息。<br>' +
+  '全程<b>不要憋气</b>，慢慢做，不要甩、不要用猛劲。<br>' +
+  '第二天如果比平时更累，说明昨天做多了，减量。</div>';
+
+const moves = [
+  {id:'mk', name:'踝泵', sub:'勾脚尖、绷脚尖', svg:MV.ankle,
+   dose:['20 次 / 组','3 组','一天 3 次'],
+   why:'这是全套里最安全、也最该每天做的一个。长期卧床容易在腿部形成血栓，踝泵能推动血液回流。',
+   steps:['脚尖用力往回勾，勾到最大，停 2 秒','再用力往下绷，绷到最大，停 2 秒','慢慢来，一次一次数'],
+   note:'好的那条腿也一起做。'},
+
+  {id:'mg', name:'握拳伸展', sub:'张开、握紧', svg:MV.grip,
+   dose:['20 次 / 组','3 组','一天 2～3 次'],
+   why:'手指长时间攥着会慢慢僵死，掰不开。每天张开握紧，是最直接的预防。',
+   steps:['五指尽量张开，撑到最大','再慢慢握成拳','如果他自己做不了，用你的手帮他一根一根轻轻掰开——不要硬掰'],
+   note:'掰的时候只用很轻的力。掰不动就停，不要较劲。'},
+
+  {id:'mw', name:'腕关节屈伸', sub:'手腕上下摆', svg:MV.wrist,
+   dose:['20 次 / 组','2～3 组','一天 2 次'],
+   why:'手腕僵住会让整只手都用不上。',
+   steps:['前臂放在桌上或床上垫稳','手腕往上翘起来，再往下垂','动作范围到有点紧就够，不要压到疼'],
+   note:'是上下摆，不是转圈。手腕不适合大幅度旋转。'},
+
+  {id:'me', name:'肘关节屈伸', sub:'弯起来、伸直', svg:MV.elbow,
+   dose:['15 次 / 组','2～3 组','一天 2 次'],
+   why:'肘部容易屈曲挛缩——弯久了就伸不直了。',
+   steps:['手臂放平，慢慢弯到手碰到肩膀附近','再慢慢完全伸直','伸直这一下更重要，别偷懒'],
+   note:'全程托着他的手腕和肘部，不要只拉着手。'},
+
+  {id:'mn', name:'膝关节屈伸', sub:'脚贴着床往回滑', svg:MV.knee,
+   dose:['15 次 / 组','2～3 组','一天 2 次'],
+   why:'为以后能坐、能站做准备，也防止膝关节僵硬。',
+   steps:['平躺，脚掌贴着床面','慢慢把脚往屁股方向滑，膝盖立起来','再慢慢滑回去伸直'],
+   note:'脚不要离开床面。这样最省力也最安全。'},
+
+  {id:'mb', name:'桥式运动', sub:'抬起屁股，停 5 秒', svg:MV.bridge,
+   dose:['10 个 / 组','3 组','一天 1～2 次'],
+   why:'练的是腰臀的力量。能做好这个，翻身、坐起、用便盆都会轻松很多，也能减轻你的负担。',
+   steps:['平躺，两腿屈膝，脚掌踩实床面','收紧屁股，把臀部抬起来，身体成一条斜线','维持 5 秒，正常呼吸，不要憋气','慢慢放下来'],
+   note:'抬不起来就先只做「用力想抬」的动作，也有用。抬得低一点没关系。'},
+
+  {id:'mo', name:'双手叉握上举', sub:'十指交叉，患侧拇指在上', svg:MV.bobath,
+   dose:['10 次 / 组','2 组','一天 2 次'],
+   why:'用好手带着患手动，让患侧的肩胛骨跟着活动起来。这是家里最推荐的上肢动作，因为力度由他自己控制。',
+   steps:['十指交叉相握，<b>患侧的拇指压在健侧拇指上面</b>','用好的那只手带着，把两只手一起慢慢举起来','<b>举到胸口高度就够了</b>，先不要往头顶举','慢慢放下'],
+   note:'这是全套里唯一需要特别当心的动作。肩膀一旦有疼，马上停。'},
+
+  {id:'mr', name:'吹气球 / 缩唇呼吸', sub:'慢慢吹，把气吐长', svg:MV.breathe,
+   dose:['15 分钟','一天 3～4 次'],
+   why:'长期卧床最怕坠积性肺炎。把气吐深、把痰咳出来，比什么都管用。而且这个动作没有任何风险。',
+   steps:['用鼻子慢慢吸气','嘴唇像吹蜡烛一样撮起来，慢慢把气吐出去','吐气的时间要比吸气长一倍','或者直接吹气球、吹纸片，更有意思'],
+   note:'头晕就停下来歇一会儿。'}
+];
+
+/* ===== 状态（原型用内存变量） ===== */
+const state = {
+  day: 68,
+  date: '8 月 19 日',
+  cum: 412,                 // 累计完成的事，只增不减
+  careDays: 21,             // 这个月家属陪着做的天数
+  yesterday: {done: 7, total: 8, note: '今天自己把粥喝完了'},
+  progress: {}              // id -> 已完成次数
+};
+const allTasks = careList.concat(trainList);
+allTasks.forEach(t=> state.progress[t.id]=0);
+const totalTasks = allTasks.length;
+function doneCount(){ return allTasks.filter(t=> state.progress[t.id] >= t.target).length; }
+
+const items = [
+  {
+    id:'fit', t:'先确认：适合用吗', d:'有几种情况不该照这个练',
+    thumb:S.call120, calm:true,
+    lead:'2025 年的远程康复专家共识写明了适用人群。对不上的，先别按这里练。',
+    points:[
+      {n:'1', p:'诊断明确、病情稳定', q:'还在急性期、病情还在变的，先听医院的'},
+      {n:'2', p:'没有严重的并发症或其他重病', q:''},
+      {n:'3', p:'能听懂并配合指令', q:'认知障碍严重的，训练部分要家属全程带'},
+      {n:'4', p:'家里有人能陪、能看着', q:'共识把「具备社会支持」列为条件之一'},
+      {n:'5', p:'他本人愿意', q:'不愿意就先不练，别硬来'},
+      {n:'✕',bad:true, p:'有高血压、糖尿病、心脏病、慢阻肺的，练之前先问医生', q:'共识要求这类患者要综合考虑整体健康状况'},
+      {n:'✕',bad:true, p:'练的时候留意血压、心率，有条件测一下血氧', q:'共识明确要求监测这几项'}
+    ],
+    why:'<b>为什么把这条放进来：</b>不是所有卒中患者都适合居家自己练。共识意见 1（证据质量中、强推荐）明确列了适用条件，也明确说「对于存在远程康复禁忌证的患者，不推荐使用」。<br><br>照护那部分（喂饭、翻身、体位、防跌）任何情况都适用；有疑问的是训练那部分。'
+  },
+  {
+    id:'feed', t:'喂饭要坐直', d:'呛一次，可能就是一场肺炎',
+    thumb:S.feedOK,
+    lead:'卒中后吞咽会变差，躺着喂饭很容易呛进肺里。',
+    compare:[
+      {ok:true,  svg:S.feedOK, tag:'坐直，下巴微收'},
+      {ok:false, svg:S.feedNO, tag:'半躺着、仰头'}
+    ],
+    points:[
+      {n:'1', p:'身体坐到接近 90 度', q:'床摇起来也算，但越直越好'},
+      {n:'2', p:'下巴微微向下收', q:'不要仰头喝水'},
+      {n:'3', p:'小口、慢喂、咽下去再喂下一口', q:''},
+      {n:'4', p:'饭后坐 30 分钟再躺下', q:''},
+      {n:'✕',bad:true, p:'呛咳、吃饭后声音变"湿"，告诉医生', q:'可能需要调整食物稠度'}
+    ],
+    why:'<b>为什么这条排第一：</b>卒中急性期肺炎发生率 7%～22%，是卒中死亡的重要危险因素之一。很多呛咳并不明显，家里不容易察觉。'
+  },
+  {
+    id:'lift', t:'不要拉患侧的手', d:'一次用力，可能疼一辈子',
+    thumb:S.liftOK,
+    lead:'瘫的那侧肩膀肌肉没力气，被拉一下就可能脱位，而且很难恢复。',
+    compare:[
+      {ok:true,  svg:S.liftOK, tag:'托肩背和腰'},
+      {ok:false, svg:S.liftNO, tag:'拉患侧手'}
+    ],
+    points:[
+      {n:'1', p:'一只手托住他的肩胛骨（后背上方）', q:''},
+      {n:'2', p:'另一只手扶住他的腰', q:'用你的身体带，不要用胳膊拽'},
+      {n:'✕',bad:true, p:'绝对不要抓患侧的手腕或胳膊往上拉', q:'那只胳膊的肩膀是「挂」着的，一拉就掉'},
+      {n:'3', p:'翻身搬动前，先把患侧手臂放到他身上', q:'不要让它垂在外面被压住或拖着'},
+      {n:'4', p:'坐着时给患侧手臂垫个枕头', q:'不要让它一直往下坠'},
+      {n:'✕',bad:true, p:'肩膀出现疼痛、摸到凹陷，告诉医生', q:''}
+    ],
+    why:'<b>为什么重要：</b>肩关节半脱位是高龄卒中最常见的继发损伤之一，专家共识把它和压疮、疼痛并列为需要专门评定的继发性功能障碍。多数由不当牵拉和搬动造成，一旦发生，疼痛会让这只手更不愿意动，恢复更难。'
+  },
+  {
+    id:'turn', t:'每 2 小时翻一次身', d:'皮肤破了很难长回来',
+    thumb:S.turn,
+    lead:'长时间压着同一处，皮肤会坏死，形成压疮。',
+    big:S.turn, caption:'白天黑夜都要，包括夜里',
+    points:[
+      {n:'1', p:'每 2 小时换一次姿势', q:'左侧、右侧、平躺轮着来'},
+      {n:'2', p:'骨头突出的地方垫软枕', q:'尾骨、脚跟、髋部、肩胛'},
+      {n:'3', p:'床单拉平，不要有褶子和渣子', q:''},
+      {n:'4', p:'保持皮肤干爽', q:'出汗、失禁后及时清理'},
+      {n:'✕',bad:true, p:'皮肤发红、按下去不褪色 —— 已经是早期压疮', q:'立刻不要再压那一侧，并告诉医生'}
+    ]
+  },
+  {
+    id:'pos', t:'躺的姿势有讲究', d:'摆错了，几个月后手就掰不开了',
+    thumb:S.lieSide,
+    lead:'姿势不对，关节会慢慢僵掉、手指握死，这是掰不回来的。',
+    big:S.lieSide, caption:'<b style="color:#e88a3c">橙色＝瘫的那一侧</b>　<b style="color:#2a78d6">蓝色＝好的那一侧</b>',
+    points:[
+      {n:'1', p:'患侧手臂往前伸出来，手心朝上，手指张开', q:'千万不要压在身子底下'},
+      {n:'2', p:'健侧的腿放在前面，膝盖弯曲，下面垫个枕头', q:''},
+      {n:'3', p:'患侧的腿在后面，自然伸直', q:''},
+      {n:'4', p:'头下垫枕头，背后也垫一个靠住', q:'别让身子往后倒'},
+      {n:'✕',bad:true, p:'手指不要长时间攥着，脚不要长时间下垂', q:'脚底可以用枕头顶住'},
+      {n:'✕',bad:true, p:'不要长时间半躺着看电视', q:'那个姿势最容易加重痉挛'}
+    ],
+    why:'<b>说明：</b>这里只讲最基本的原则，图上画的是「患侧卧位」。<b>出院前请让病房护士当面摆一次给你看，并用手机拍下来</b>——每个人情况不同，照片比任何图都准。'
+  },
+  {
+    id:'drug', t:'药一天都不能停', d:'停药是复发最常见的原因',
+    thumb:S.pill,
+    lead:'感觉好转了也要继续吃，这些药是防下一次发作的。',
+    big:S.pill, caption:'感觉变好 ≠ 可以停药',
+    points:[
+      {n:'1', p:'抗血小板、他汀、降压药，按医嘱一直吃', q:''},
+      {n:'2', p:'血压每天量，记下来', q:'复诊时给医生看'},
+      {n:'3', p:'药快吃完了提前去开', q:'不要断顿'},
+      {n:'✕',bad:true, p:'有不舒服先问医生，不要自己停', q:'很多副作用可以换药解决'}
+    ],
+    why:'<b>数字：</b>卒中复发率约 17.7%，门诊里约 40% 的患者是二次以上复发。规范的二级预防用药是目前证据最扎实的防复发手段。'
+  },
+  {
+    id:'home', t:'家里要改的，分三批', d:'哪些 72 小时内必须做完',
+    thumb:S.home,
+    lead:'2025 年的居家康复环境指南把改造按紧急程度分成红黄绿三批。红的最要命。',
+    big:S.home, caption:'红 72 小时 · 黄 2 周 · 绿 1～3 个月',
+    points:[
+      {n:'红',bad:true, p:'72 小时内：拆掉门槛、装床边护栏、配燃气报警器', q:'这三样是基础安全改造，指南要求最优先'},
+      {n:'黄', p:'2 周内：卫浴装扶手、地面做防滑、台面改成能调高度的', q:'坐便器太低、浴缸边太高都会让他起坐困难而跌倒'},
+      {n:'绿', p:'1～3 个月：夜间照明、智能监测', q:'不急，但别忘'},
+      {n:'1', p:'装一个一键紧急呼叫按钮', q:'指南明确点名：一键式按钮或可穿戴设备'},
+      {n:'2', p:'手机、遥控器放在他一只手够得到的地方', q:'够不到就等于没有'},
+      {n:'3', p:'室内温度 20～26℃，湿度 40%～60%', q:'温度骤变会引起血压波动'},
+      {n:'4', p:'白天让房间亮起来，夜间通道留灯', q:'约 70% 的卒中患者有睡眠-觉醒周期紊乱，白天光照不足会加重'},
+      {n:'5', p:'如果他有偏盲，患侧那边要多加一盏灯', q:'偏盲的人对光照不对称特别敏感；晃眼也会让人躲，反而摔倒'},
+      {n:'✕',bad:true, p:'每 4～6 周重新看一遍，他变了，家也要跟着变', q:''}
+    ],
+    why:'<b>出处：</b>《脑卒中患者居家康复环境评估与改造实践指南（2025 ICF版）》，中国康复医学会社区康复工作委员会。红黄绿三色优先级、温湿度和照明要求都是指南原文。'
+  },
+  {
+    id:'dress', t:'穿衣有顺序', d:'顺序对了，很多事他能自己做',
+    thumb:S.dressOK,
+    lead:'瘫的那侧不听使唤，所以穿的时候先让它进去，脱的时候最后出来。',
+    big:S.dressOK, caption:'穿上衣：<b style="color:#e88a3c">患侧先进</b>，<b style="color:#2a78d6">健侧后进</b>',
+    big2:S.stair, caption2:'上楼梯健腿先上，下楼梯患腿先下',
+    points:[
+      {n:'1', p:'穿上衣：先穿患侧，再穿健侧', q:'脱的时候反过来，先脱健侧'},
+      {n:'2', p:'穿裤子：坐着叉开腿，先穿患腿', q:'再穿健腿，然后躺下用健腿撑起屁股把裤子拉上'},
+      {n:'3', p:'穿袜子鞋：把健腿架在患腿上', q:''},
+      {n:'4', p:'上楼梯健腿先上，下楼梯患腿先下', q:'手一定要扶扶手'},
+      {n:'5', p:'洗脸让他自己来', q:'毛巾绕在水龙头上，用健手就能拧干'},
+      {n:'6', p:'洗澡坐着洗，用长柄刷擦后背', q:'浴室一定要有防滑垫'},
+      {n:'✕',bad:true, p:'衣服要宽松，裤子用松紧带，鞋用搭扣', q:'不要买系鞋带的'}
+    ],
+    why:'<b>为什么值得花力气：</b>每一件他能自己做的事，都是一次真实的功能恢复，也是尊严。共识里专门强调「鼓励患者用单手进行」——帮他做完，不如教他自己做。'
+  },
+  {
+    id:'move', t:'怎么扶他起来', q:'',  d:'方法不对，两个人都容易受伤',
+    thumb:S.transfer,
+    lead:'扶人不是靠力气，是靠位置和顺序。',
+    big:S.transfer, caption:'椅子放在健侧，和床成 45 度',
+    points:[
+      {n:'1', p:'椅子或轮椅放在健侧床边，成 45 度角', q:'让他用健手扶住外侧扶手'},
+      {n:'2', p:'从坐到站：躯干挺直，双脚踩地，患脚放后面', q:'身体前倾，重心move到脚前掌，再站'},
+      {n:'3', p:'床上翻身移动，一定有人保护', q:'特别注意护住患侧肩膀'},
+      {n:'4', p:'用轮椅一定先拉手刹', q:''},
+      {n:'✕',bad:true, p:'第一次这么做，请让护士或康复师当面示范一遍', q:'并且用手机拍下来'}
+    ]
+  },
+  {
+    id:'again', t:'万一复发，怎么认', d:'不是吓唬人，是复发确实常见',
+    thumb:S.call120, calm:true,
+    lead:'得过一次的人再得的概率不低。认得出来，就能少损失很多。',
+    fast:[
+      {svg:S.face,   t:'脸歪了',        q:'让他笑一下，一边嘴角不动'},
+      {svg:S.arm,    t:'一只手抬不起来', q:'让他平举双手，一只往下掉'},
+      {svg:S.speech, t:'说话说不清',    q:'让他说一句话，含糊或说不出'}
+    ],
+    points:[
+      {n:'1', p:'记住开始的时间', q:'医生一定会问，这决定能不能溶栓'},
+      {n:'2', p:'打 120，不要自己开车送', q:'救护车能提前通知医院准备'},
+      {n:'3', p:'让他平躺，头偏向一侧', q:'防止呕吐物呛进肺里'},
+      {n:'✕',bad:true, p:'不要喂水、不要喂药、不要掐人中', q:'喂东西可能直接导致窒息'}
+    ],
+    why:'<b>为什么放在这里而不是天天提醒你：</b>复发率约 17.7%，门诊里约 40% 是二次以上发作，所以这件事值得知道一次、记住。但它不该每天在你眼前晃——你们已经够辛苦了。<br><br>静脉溶栓通常只有发病后 4.5 小时的窗口。'
+  }
+];
+
+
+/* ============ 渲染 ============ */
+function renderTiles(list, host){
+  const grid = document.getElementById(host);
+  grid.innerHTML='';
+  list.forEach(d=>{
+    const n = state.progress[d.id], full = n >= d.target;
+    const b = document.createElement('div');
+    b.className='tile'; b.setAttribute('role','button');
+    b.setAttribute('aria-pressed', full?'true':'false');
+    const line = d.target>1 ? (full ? '已完成' : n+' / '+d.target+' 次') : (full?'已完成':d.times);
+    b.innerHTML = d.icon +
+      '<div class="label">'+d.label+'</div>' +
+      '<div class="times">'+line+'</div>' +
+      (d.target>1 && !full ? '<div class="sub2">'+d.times+'</div>' : '') +
+      TICK;
+    b.addEventListener('click', ()=>{
+      if(state.progress[d.id] >= d.target){ state.progress[d.id] = 0; }
+      else { state.progress[d.id]++; state.cum++; if(navigator.vibrate) navigator.vibrate(20); }
+      renderAll();
+    });
+    grid.appendChild(b);
+  });
+}
+
+function renderEcho(){
+  const y = state.yesterday, el = document.getElementById('echo');
+  if(!y){ el.style.display='none'; return; }
+  el.style.display='block';
+  const line = y.done === y.total
+      ? '昨天 <b>'+y.total+' 件都做完了</b>。'
+      : '昨天做了 <b>'+y.done+' 件</b>。';
+  el.innerHTML = line + '　累计已经完成 <b>'+state.cum+'</b> 件事。' +
+    (y.note ? '<span class="quote">你昨天记下：「'+y.note+'」</span>' : '');
+}
+
+function renderAsk(){
+  // 连续做到 → 不自动加量，而是把决定权交回给人
+  document.getElementById('askbox').innerHTML =
+    '<div class="askbox"><b>一个可以带去复诊的问题</b>' +
+    '「自己洗脸」这一周做到了 6 天。下次见康复师，可以问问能不能试着让他自己刷牙。' +
+    '<br><br>要不要加量、加什么，让康复师定 —— 这里不会自己给你升级难度。</div>';
+}
+
+function renderDaily(){
+  document.getElementById('daysub').textContent = '第 '+state.day+' 天 · '+state.date;
+  renderEcho();
+  renderTiles(careList,'grid-care');
+  renderTiles(trainList,'grid-train');
+  renderAsk();
+  renderMoves();
+}
+
+function renderAll(){
+  const done = doneCount();
+  const finished = done === totalTasks;
+  document.getElementById('main-today').classList.toggle('hidden', finished);
+  document.getElementById('done-screen').classList.toggle('on', finished);
+  renderDaily();
+  if(finished){
+    document.getElementById('ds-sum').innerHTML =
+      '今天 '+totalTasks+' 件都完成了。<br>' +
+      '累计 <b>'+state.cum+'</b> 件事 —— 这个数字只会往上走。<br><br>' +
+      '这个月，你陪着做了 <b>'+state.careDays+' 天</b>。';
+  }
+}
+
+document.getElementById('ds-close').addEventListener('click', ()=>{
+  document.getElementById('done-screen').classList.remove('on');
+  document.getElementById('main-today').classList.remove('hidden');
+  renderDaily();
+});
+
+document.getElementById('nextday').addEventListener('click', ()=>{
+  const done = doneCount();
+  const note = (document.getElementById('note').value||'').trim();
+  state.yesterday = {done: done, total: totalTasks, note: note || state.yesterday.note};
+  state.day += 1;
+  state.date = '8 月 ' + (19 + (state.day - 68)) + ' 日';
+  if(done > 0) state.careDays += 1;
+  allTasks.forEach(t=> state.progress[t.id]=0);
+  moves.forEach(m=> state.progress['mv_'+m.id]=0);
+  document.getElementById('note').value='';
+  renderAll();
+  window.scrollTo(0,0);
+});
+
+const itemsEl = document.getElementById('items');
+items.forEach(it=>{
+  const el = document.createElement('div');
+  el.className='item';
+  el.innerHTML = '<div class="thumb">'+it.thumb+'</div>'+
+    '<div style="flex:1;min-width:0"><div class="t">'+it.t+'</div><div class="d">'+it.d+'</div></div>'+
+    '<div class="go"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  el.addEventListener('click', ()=> openSheet(it));
+  itemsEl.appendChild(el);
+});
+
+const sheet = document.getElementById('sheet');
+const body  = document.getElementById('sheet-body');
+
+function ptsHTML(pts){
+  return '<div class="points">'+pts.map(p=>
+    '<div class="point"><div class="n'+(p.bad?' bad':'')+'">'+p.n+'</div>'+
+    '<div><div class="p">'+p.p+'</div>'+(p.q?'<div class="q">'+p.q+'</div>':'')+'</div></div>'
+  ).join('')+'</div>';
+}
+
+function openSheet(it){
+  let h = '<h3>'+it.t+'</h3><p class="lead">'+it.lead+'</p>';
+  if(it.compare){
+    h += '<div class="compare">'+it.compare.map(c=>
+      '<div class="panel '+(c.ok?'yes':'no')+'">'+c.svg+
+      '<div class="ptag">'+(c.ok
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#0f8a2f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#c62f2f" stroke-width="3" stroke-linecap="round"/></svg>')
+      +c.tag+'</div></div>').join('')+'</div>';
+  }
+  if(it.big){
+    h += '<div class="big"><div class="frame">'+it.big+'</div>'+
+         (it.caption?'<div class="caption">'+it.caption+'</div>':'')+'</div>';
+  }
+  if(it.big2){
+    h += '<div class="big"><div class="frame">'+it.big2+'</div>'+
+         (it.caption2?'<div class="caption">'+it.caption2+'</div>':'')+'</div>';
+  }
+  if(it.fast){
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:0 18px;margin-top:14px">'+
+      it.fast.map(f=>'<div class="panel no" style="padding:8px 6px 10px">'+f.svg+
+        '<div style="font-size:17px;font-weight:700;color:#c62f2f;text-align:center;margin-top:4px;line-height:1.3">'+f.t+'</div>'+
+        '<div style="font-size:13.5px;color:#4a4945;text-align:center;line-height:1.4;margin-top:3px">'+f.q+'</div></div>').join('')+
+      '</div>';
+  }
+  h += ptsHTML(it.points);
+  if(it.why) h += '<div class="why">'+it.why+'</div>';
+  body.innerHTML = h;
+  sheet.classList.add('on');
+  sheet.scrollTop = 0;
+  document.body.style.overflow='hidden';
+}
+
+
+document.getElementById('close').addEventListener('click', ()=>{
+  sheet.classList.remove('on');
+  document.body.style.overflow='';
+});
+
+/* ===================== 训练动作交互 ===================== */
+moves.forEach(m=> state.progress['mv_'+m.id]=0);
+function mvDone(){ return moves.filter(m=> state.progress['mv_'+m.id]).length; }
+
+const TICKSM = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.5l4 4 8-9" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* 首页内联渲染 8 个训练动作，动画直接可见，不用点进去 */
+function renderMoves(){
+  const host = document.getElementById('mv-list');
+  host.innerHTML = '';
+  moves.forEach(m=>{
+    const on = state.progress['mv_'+m.id];
+    const el = document.createElement('div');
+    el.className = 'mvcard'+(on?' done':'');
+    el.innerHTML =
+      '<div class="banner">'+m.svg+'</div>'+
+      '<div class="row" data-open="'+m.id+'">'+
+        '<div style="flex:1;min-width:0"><div class="mt">'+m.name+'</div>'+
+        '<div class="md">'+m.sub+'</div></div>'+
+        '<div class="dosemini">'+m.dose[0]+'</div>'+
+        '<div class="mvck" data-check="'+m.id+'">'+TICKSM+'</div>'+
+      '</div>'+
+      '<div class="detail-hint" data-open="'+m.id+'">点这里看做法和「什么时候必须停」 ›</div>';
+    host.appendChild(el);
+  });
+  host.querySelectorAll('[data-check]').forEach(c=>{
+    c.addEventListener('click', e=>{
+      e.stopPropagation();
+      const id = c.dataset.check, was = state.progress['mv_'+id];
+      state.progress['mv_'+id] = was ? 0 : 1;
+      if(!was){ state.cum++; if(navigator.vibrate) navigator.vibrate(20); }
+      renderMoves(); renderAll();
+    });
+  });
+  host.querySelectorAll('[data-open]').forEach(el=>{
+    el.addEventListener('click', ()=> openMoveDetail(moves.find(x=>x.id===el.dataset.open)));
+  });
+}
+
+function openMoveDetail(m){
+  const on = state.progress['mv_'+m.id];
+  document.getElementById('mvbody').innerHTML =
+    '<h3>'+m.name+'</h3><p class="lead">'+m.sub+'</p>'+
+    '<div class="big"><div class="mv-wrap">'+m.svg+'</div></div>'+
+    '<div class="dose">'+m.dose.map(d=>'<span>'+d+'</span>').join('')+'</div>'+
+    '<div class="why" style="margin-top:16px">'+m.why+'</div>'+
+    '<div class="points">'+m.steps.map((t,i)=>
+      '<div class="point"><div class="n">'+(i+1)+'</div><div><div class="p">'+t+'</div></div></div>').join('')+
+      '<div class="point"><div class="n bad">!</div><div><div class="p">'+m.note+'</div></div></div>'+
+    '</div>' + STOP +
+    '<div style="padding:18px"><button class="btn-quiet" id="mvtoggle">'+
+      (on?'取消勾选':'今天这个做完了')+'</button></div>';
+  document.getElementById('mvsheet').classList.add('on');
+  document.body.style.overflow='hidden';
+  document.getElementById('mvsheet').scrollTop = 0;
+  document.getElementById('mvtoggle').addEventListener('click', ()=>{
+    state.progress['mv_'+m.id] = on ? 0 : 1;
+    if(!on){ state.cum++; if(navigator.vibrate) navigator.vibrate(20); }
+    closeMvSheet();
+  });
+}
+
+function closeMvSheet(){
+  document.getElementById('mvsheet').classList.remove('on');
+  document.body.style.overflow='';
+  renderMoves(); renderAll();
+}
+document.getElementById('mvclose').addEventListener('click', closeMvSheet);
+
+renderMoves();
+renderAll();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>复健路 · 脑卒中居家康复训练记录</title>
+<style>
+:root{
+  --surface-1:#fcfcfb;
+  --page:#f9f9f7;
+  --text-primary:#0b0b0b;
+  --text-secondary:#52514e;
+  --muted:#6e6c66;
+  --grid:#e1e0d9;
+  --baseline:#c3c2b7;
+  --series-1:#2a78d6;
+  --series-1-soft:#cde2fb;
+  --good:#0ca30c;
+  --good-text:#006300;
+  --warning:#fab219;
+  --critical:#d03b3b;
+  --border:rgba(11,11,11,0.10);
+  --radius:14px;
+  --tap:76px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--page);
+  color:var(--text-primary);
+  font-size:19px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.app{max-width:520px;margin:0 auto;background:var(--surface-1);min-height:100vh;
+  box-shadow:0 0 0 1px var(--border);position:relative;padding-bottom:150px;}
+
+/* ---------- 演示用角色切换（真实产品中不存在） ---------- */
+.demobar{background:#2c2c2a;color:#fff;padding:8px 12px;font-size:13px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.4;}
+.demobar span{opacity:.75;}
+.demobar .roles{display:flex;gap:6px;margin-left:auto;}
+.demobar button{background:#4a4a46;color:#fff;border:0;border-radius:8px;
+  padding:6px 11px;font-size:13px;font-family:inherit;cursor:pointer;}
+.demobar button[aria-pressed="true"]{background:var(--series-1);font-weight:600;}
+
+/* ---------- 通用 ---------- */
+header.top{padding:20px 20px 12px;}
+h1{font-size:23px;margin:0 0 3px;letter-spacing:-.01em;}
+.sub{color:var(--text-secondary);font-size:16px;margin:0;}
+section{padding:0 20px 26px;}
+h2{font-size:19px;margin:26px 0 12px;letter-spacing:-.01em;}
+.card{background:var(--surface-1);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.hint{font-size:15px;color:var(--muted);line-height:1.6;}
+.divider{height:1px;background:var(--grid);margin:22px 0;}
+
+/* ---------- 今日训练 ---------- */
+.exercise{display:flex;align-items:center;gap:14px;padding:16px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:10px;background:var(--surface-1);}
+.exercise.done{background:#f4f8f2;border-color:#cfe4c8;}
+.ex-icon{width:52px;height:52px;border-radius:12px;background:var(--series-1-soft);
+  display:grid;place-items:center;flex:0 0 auto;}
+.exercise.done .ex-icon{background:#d9edd2;}
+.ex-body{flex:1;min-width:0;}
+.ex-name{font-size:19px;font-weight:600;line-height:1.35;}
+.ex-meta{font-size:15px;color:var(--text-secondary);margin-top:2px;}
+.ex-state{font-size:15px;font-weight:600;color:var(--good-text);flex:0 0 auto;}
+.chev{flex:0 0 auto;color:var(--muted);}
+
+/* ---------- 大按钮 ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:var(--tap);border-radius:var(--radius);border:0;
+  font-family:inherit;font-size:21px;font-weight:600;cursor:pointer;
+  background:var(--series-1);color:#fff;padding:0 18px;line-height:1.3;}
+.btn.ghost{background:#fff;color:var(--text-primary);
+  box-shadow:inset 0 0 0 2px var(--border);}
+.btn.quiet{background:#f0efec;color:var(--text-primary);font-size:19px;min-height:60px;}
+.btn:active{filter:brightness(.94);}
+.btn[disabled]{opacity:.4;}
+
+/* ---------- 计数器（单手可达） ---------- */
+.counter-wrap{padding:0 20px;}
+.count-big{font-size:88px;font-weight:700;text-align:center;line-height:1.05;
+  letter-spacing:-.03em;margin:14px 0 0;}
+.count-of{text-align:center;color:var(--text-secondary);font-size:18px;margin-bottom:6px;}
+.count-bar{height:12px;background:#eeedea;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
+.count-fill{height:100%;background:var(--series-1);border-radius:99px;
+  transition:width .25s ease;}
+.tapzone{margin-top:18px;}
+.tap-main{min-height:118px;font-size:26px;border-radius:18px;}
+.side-note{font-size:14px;color:var(--muted);text-align:center;margin-top:10px;}
+
+/* 健侧适配：偏瘫患者只有一只手可用，主按钮靠健侧对齐 */
+.app[data-hand="left"] .tapzone{padding-right:56px;}
+.app[data-hand="right"] .tapzone{padding-left:56px;}
+
+/* ---------- 安全提示 ---------- */
+.safety{display:flex;gap:11px;background:#fff8e8;border:1px solid #f5e2b0;
+  border-radius:12px;padding:13px 14px;font-size:16px;line-height:1.55;
+  color:#5a4a20;margin-bottom:12px;}
+.safety svg{flex:0 0 auto;margin-top:2px;}
+.stop{display:flex;gap:11px;background:#fdf1f1;border:1px solid #f2cccc;
+  border-radius:12px;padding:13px 14px;font-size:16px;line-height:1.55;
+  color:#7a2626;}
+
+/* ---------- 进步页 ---------- */
+.hero{text-align:center;padding:22px 16px 18px;border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;}
+.hero-num{font-size:64px;font-weight:700;line-height:1;letter-spacing:-.03em;}
+.hero-label{font-size:17px;color:var(--text-secondary);margin-top:8px;}
+.hero-never{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+figure{margin:0;}
+figcaption{font-size:17px;font-weight:600;margin-bottom:2px;}
+.fig-sub{font-size:15px;color:var(--text-secondary);margin-bottom:14px;}
+.chart{position:relative;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:150px;
+  border-bottom:2px solid var(--baseline);padding-bottom:0;}
+.bar-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;
+  align-items:center;height:100%;position:relative;cursor:default;}
+.bar-plot{width:100%;height:calc(100% - 22px);display:flex;align-items:flex-end;}
+.bar{width:100%;background:var(--series-1);border-radius:4px 4px 0 0;
+  min-height:3px;transition:opacity .15s;}
+.bar-col.partial .bar{background:var(--series-1-soft);}
+.bar-val{font-size:14px;font-weight:600;color:var(--text-primary);
+  height:22px;line-height:22px;font-variant-numeric:tabular-nums;}
+.xaxis{display:flex;gap:8px;margin-top:8px;}
+.xaxis div{flex:1;text-align:center;font-size:14px;color:var(--muted);}
+.tip{position:absolute;background:#2c2c2a;color:#fff;font-size:14px;
+  padding:7px 11px;border-radius:9px;pointer-events:none;opacity:0;
+  transform:translate(-50%,-100%);transition:opacity .12s;white-space:nowrap;z-index:5;}
+.tip.on{opacity:1;}
+
+.milestone{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--grid);}
+.milestone:last-child{border-bottom:0;}
+.ms-dot{width:14px;height:14px;border-radius:50%;background:var(--good);
+  flex:0 0 auto;margin-top:7px;box-shadow:0 0 0 4px #e7f5e7;}
+.ms-dot.next{background:#fff;box-shadow:inset 0 0 0 3px var(--baseline);}
+.ms-text{font-size:18px;font-weight:600;line-height:1.4;}
+.ms-date{font-size:15px;color:var(--text-secondary);margin-top:1px;}
+.ms-next .ms-text{color:var(--text-secondary);font-weight:500;}
+
+.table-toggle{background:none;border:0;color:var(--series-1);font-size:15px;
+  font-family:inherit;padding:8px 0;cursor:pointer;text-decoration:underline;}
+table{width:100%;border-collapse:collapse;font-size:16px;margin-top:6px;}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--grid);
+  font-variant-numeric:tabular-nums;}
+th{color:var(--text-secondary);font-weight:600;font-size:15px;}
+
+/* ---------- 家属 ---------- */
+.stat-row{display:flex;gap:10px;margin-bottom:14px;}
+.stat{flex:1;border:1px solid var(--border);border-radius:12px;padding:13px;}
+.stat-v{font-size:28px;font-weight:700;line-height:1.15;}
+.stat-l{font-size:14px;color:var(--text-secondary);margin-top:3px;line-height:1.35;}
+.care{background:#f4f7fb;border:1px solid #d9e6f5;border-radius:var(--radius);
+  padding:17px;font-size:17px;line-height:1.7;}
+.care strong{display:block;margin-bottom:6px;font-size:18px;}
+
+/* ---------- 康复师 ---------- */
+.rx{border:1px solid var(--border);border-radius:var(--radius);padding:15px;margin-bottom:10px;}
+.rx-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.rx-name{font-size:18px;font-weight:600;}
+.rx-dose{font-size:16px;color:var(--series-1);font-weight:600;white-space:nowrap;}
+.rx-note{font-size:15px;color:var(--text-secondary);margin-top:6px;line-height:1.55;}
+.tag{display:inline-block;font-size:13px;padding:3px 9px;border-radius:99px;
+  background:#eef2f7;color:var(--text-secondary);margin-right:6px;margin-top:8px;}
+
+/* ---------- 底部导航 ---------- */
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;
+  max-width:520px;background:var(--surface-1);border-top:1px solid var(--border);
+  display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:20;}
+nav button{flex:1;background:none;border:0;font-family:inherit;font-size:14px;
+  color:var(--muted);padding:8px 2px;cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;gap:3px;min-height:60px;justify-content:center;}
+nav button[aria-current="page"]{color:var(--series-1);font-weight:600;}
+
+/* ---------- 底部固定操作条 ---------- */
+.actionbar{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%);width:100%;max-width:520px;padding:12px 20px;
+  background:linear-gradient(to top,var(--surface-1) 72%,rgba(252,252,251,0));
+  z-index:15;}
+
+.disclaimer{font-size:13.5px;color:var(--muted);line-height:1.6;
+  padding:18px 20px 8px;border-top:1px solid var(--grid);margin-top:10px;}
+.hidden{display:none !important;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:14px 0;border-bottom:1px solid var(--grid);}
+.seg{display:flex;gap:6px;}
+.seg button{border:0;background:#f0efec;font-family:inherit;font-size:16px;
+  padding:11px 16px;border-radius:10px;cursor:pointer;color:var(--text-primary);}
+.seg button[aria-pressed="true"]{background:var(--series-1);color:#fff;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app" id="app" data-hand="left">
+
+  <!-- 仅为演示：真实使用中每个人只看到自己的那一个界面 -->
+  <div class="demobar">
+    <span>原型演示 · 切换角色查看</span>
+    <div class="roles">
+      <button data-role="patient" aria-pressed="true">患者</button>
+      <button data-role="family" aria-pressed="false">家属</button>
+      <button data-role="therapist" aria-pressed="false">康复师</button>
+    </div>
+  </div>
+
+  <!-- ==================== 患者：今日 ==================== -->
+  <div class="view" id="v-today">
+    <header class="top">
+      <h1>今天的训练</h1>
+      <p class="sub">李建国 · 康复第 68 天</p>
+    </header>
+    <section>
+      <div class="safety">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" stroke="#b8860b" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v3.6M10 14.3v.1" stroke="#b8860b" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div>训练时请有人在旁。感到<strong>头晕、胸闷、疼痛加重</strong>就立刻停下来。</div>
+      </div>
+
+      <div id="ex-list"></div>
+
+      <div class="card" style="margin-top:16px;text-align:center;">
+        <div style="font-size:17px;color:var(--text-secondary);">今天完成 <strong id="today-done" style="color:var(--text-primary);font-size:20px;">0</strong> / <span id="today-total">4</span> 项</div>
+        <div class="hint" style="margin-top:8px;">做不完也没关系。做多少，记多少。</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== 患者：训练执行 ==================== -->
+  <div class="view hidden" id="v-run">
+    <header class="top">
+      <button class="table-toggle" id="back-today" style="padding:0;margin-bottom:8px;">← 返回</button>
+      <h1 id="run-name">屈肘训练</h1>
+      <p class="sub" id="run-side">患侧（右）· 康复师处方</p>
+    </header>
+    <div class="counter-wrap">
+      <div class="safety" id="run-safety">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" stroke="#b8860b" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v3.6M10 14.3v.1" stroke="#b8860b" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div id="run-safety-text">坐稳，背靠椅背。动作要慢，不要甩。</div>
+      </div>
+
+      <div class="count-big" id="count">0</div>
+      <div class="count-of">目标 <span id="count-goal">15</span> 次</div>
+      <div class="count-bar"><div class="count-fill" id="count-fill" style="width:0%"></div></div>
+
+      <div class="tapzone">
+        <button class="btn tap-main" id="tap-add">完成一次</button>
+        <div class="side-note">按错了？<button class="table-toggle" id="tap-undo" style="font-size:14px;">退回一次</button></div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <button class="btn quiet" id="tap-done">今天这项就到这里</button>
+      </div>
+
+      <div class="stop" style="margin-top:14px;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#b04040" stroke-width="1.6"/><path d="M10 6v4.6M10 13.4v.1" stroke="#b04040" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div>出现说话不清、一侧无力加重、剧烈头痛——<strong>立即停止并就医</strong>。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 患者：进步 ==================== -->
+  <div class="view hidden" id="v-progress">
+    <header class="top">
+      <h1>你的变化</h1>
+      <p class="sub">从 5 月 12 日算起</p>
+    </header>
+    <section>
+      <div class="hero">
+        <div class="hero-num" id="cum-total">1,842</div>
+        <div class="hero-label">累计完成的训练次数</div>
+        <div class="hero-never">这个数字只会往上走。<br>漏练几天也不会清零。</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <figure>
+        <figcaption>每周训练次数</figcaption>
+        <div class="fig-sub">浅色是还没过完的这一周</div>
+        <div class="chart">
+          <div class="bars" id="bars"></div>
+          <div class="xaxis" id="xaxis"></div>
+          <div class="tip" id="tip"></div>
+        </div>
+        <button class="table-toggle" id="tbl-btn">查看数字表格</button>
+        <div id="tbl" class="hidden">
+          <table>
+            <thead><tr><th>周次</th><th>日期</th><th>训练次数</th></tr></thead>
+            <tbody id="tbl-body"></tbody>
+          </table>
+        </div>
+      </figure>
+
+      <div class="divider"></div>
+
+      <h2 style="margin-top:0;">你重新做到的事</h2>
+      <p class="hint" style="margin:-6px 0 14px;">由康复师在复诊时确认记录</p>
+      <div id="milestones"></div>
+    </section>
+  </div>
+
+  <!-- ==================== 家属 ==================== -->
+  <div class="view hidden" id="v-family">
+    <header class="top">
+      <h1>父亲今天</h1>
+      <p class="sub">李建国 · 8 月 19 日</p>
+    </header>
+    <section>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-v">3<span style="font-size:18px;color:var(--text-secondary);">/4</span></div><div class="stat-l">今天完成的项目</div></div>
+        <div class="stat"><div class="stat-v">42</div><div class="stat-l">今天训练次数</div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-v">5<span style="font-size:18px;color:var(--text-secondary);">/7</span></div><div class="stat-l">本周练过的天数</div></div>
+        <div class="stat"><div class="stat-v" style="color:var(--good-text);">↑ 18%</div><div class="stat-l">比上周的训练量</div></div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:17px;font-weight:600;margin-bottom:6px;">今天没做的一项</div>
+        <div class="hint">站立平衡训练。已经连续两天没做——如果是因为怕摔，可以在复诊时和王治疗师说一声，让他调整难度。</div>
+      </div>
+
+      <h2>提醒</h2>
+      <div class="card">
+        <div style="font-size:17px;font-weight:600;margin-bottom:6px;">8 月 24 日（周日）复诊</div>
+        <div class="hint">王治疗师门诊。建议带上这一个月的训练记录，可以在"进步"页导出。</div>
+      </div>
+      <div class="card">
+        <div style="font-size:17px;font-weight:600;margin-bottom:6px;">阿司匹林肠溶片 · 还剩 6 天</div>
+        <div class="hint">二级预防用药不要自行停。如果有不适，先联系医生再决定。</div>
+      </div>
+
+      <h2>也说给你听</h2>
+      <div class="care">
+        <strong>照顾人的那个人，也需要被照顾。</strong>
+        这一个月你陪着做了 21 天训练。父亲能重新自己拿杯子，你在里面的份量不比医生小。
+        <br><br>
+        如果你觉得撑不住了，那不是你不够好，那是这件事本来就很重。可以试着让家里另一个人接手两天。
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== 康复师 ==================== -->
+  <div class="view hidden" id="v-rx">
+    <header class="top">
+      <h1>康复处方</h1>
+      <p class="sub">李建国 · 男 · 68 岁 · 右侧偏瘫 · 恢复期</p>
+    </header>
+    <section>
+      <div class="safety">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" stroke="#b8860b" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v3.6M10 14.3v.1" stroke="#b8860b" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div>以下为<strong>原型示例内容</strong>，非真实处方。实际训练项目、次数、禁忌须由康复治疗师逐人制定。</div>
+      </div>
+
+      <div class="rx">
+        <div class="rx-top"><div class="rx-name">屈肘训练（患侧）</div><div class="rx-dose">15 次 × 2 组</div></div>
+        <div class="rx-note">坐位，背靠椅背。缓慢屈伸，避免代偿性耸肩。</div>
+        <div><span class="tag">上肢</span><span class="tag">每日</span><span class="tag">需陪同</span></div>
+      </div>
+      <div class="rx">
+        <div class="rx-top"><div class="rx-name">握力球抓握</div><div class="rx-dose">20 次 × 2 组</div></div>
+        <div class="rx-note">患侧手，慢握慢放。出现疼痛立即停止。</div>
+        <div><span class="tag">手功能</span><span class="tag">每日</span></div>
+      </div>
+      <div class="rx">
+        <div class="rx-top"><div class="rx-name">坐位重心转移</div><div class="rx-dose">10 次 × 2 组</div></div>
+        <div class="rx-note">双脚平放，左右缓慢移动重心，保持躯干直立。</div>
+        <div><span class="tag">平衡</span><span class="tag">每日</span><span class="tag">需陪同</span></div>
+      </div>
+      <div class="rx">
+        <div class="rx-top"><div class="rx-name">扶持站立平衡</div><div class="rx-dose">30 秒 × 5 组</div></div>
+        <div class="rx-note"><strong>必须有人在旁保护</strong>。扶稳固定物，地面防滑。近两日未完成，复诊时评估是否降低难度。</div>
+        <div><span class="tag">平衡</span><span class="tag">跌倒风险</span><span class="tag">需陪同</span></div>
+      </div>
+
+      <h2>依从性概览（近 4 周）</h2>
+      <div class="card">
+        <table>
+          <thead><tr><th>项目</th><th>处方</th><th>实际</th></tr></thead>
+          <tbody>
+            <tr><td>屈肘训练</td><td>840</td><td>792</td></tr>
+            <tr><td>握力球抓握</td><td>1120</td><td>1064</td></tr>
+            <tr><td>坐位重心转移</td><td>560</td><td>498</td></tr>
+            <tr><td>扶持站立平衡</td><td>140 组</td><td style="color:var(--critical);font-weight:600;">61 组</td></tr>
+          </tbody>
+        </table>
+        <div class="hint" style="margin-top:12px;">站立平衡完成率明显偏低，且集中在近两周。建议复诊时确认是否与跌倒恐惧相关。</div>
+      </div>
+
+      <h2>设置</h2>
+      <div class="setting-row">
+        <div><div style="font-size:17px;font-weight:600;">健侧（能用的那只手）</div><div class="hint">决定患者端按钮放在哪一侧</div></div>
+      </div>
+      <div class="seg" style="margin-top:10px;">
+        <button data-hand="left" aria-pressed="true">左手</button>
+        <button data-hand="right" aria-pressed="false">右手</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="disclaimer">
+    本工具用于<strong>记录和提醒</strong>康复师已经制定的训练计划，不提供诊断、不生成治疗方案、不评估疗效，也不能替代康复治疗师的指导与面诊。训练内容须由专业康复治疗师制定，训练时请遵循其安全指导。
+    <br><br>
+    原型演示版本 · 示例数据 · 不可用于真实临床。
+  </div>
+
+  <div class="actionbar hidden" id="actionbar"></div>
+
+  <nav id="nav">
+    <button data-view="today" aria-current="page">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      今天</button>
+    <button data-view="progress">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 19.5V11M10 19.5V5.5M16 19.5v-6M21 19.5H3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      变化</button>
+  </nav>
+</div>
+
+<script>
+(function(){
+  const app = document.getElementById('app');
+
+  /* ---------- 数据（示例） ---------- */
+  const exercises = [
+    {id:'a', name:'屈肘训练',      side:'患侧（右）', goal:15, note:'坐稳，背靠椅背。动作要慢，不要甩。', done:15},
+    {id:'b', name:'握力球抓握',    side:'患侧（右）', goal:20, note:'慢握慢放。手指或手腕疼就停下来。', done:20},
+    {id:'c', name:'坐位重心转移',  side:'',          goal:10, note:'双脚踩实地面。身体不要塌，慢慢左右移。', done:7},
+    {id:'d', name:'扶持站立平衡',  side:'',          goal:5,  note:'必须有人在旁边扶着。地面不能滑。', done:0}
+  ];
+
+  const weeks = [
+    {w:'第6周', d:'7/07–7/13', v:238}, {w:'第7周', d:'7/14–7/20', v:261},
+    {w:'第8周', d:'7/21–7/27', v:204}, {w:'第9周', d:'7/28–8/03', v:279},
+    {w:'第10周',d:'8/04–8/10', v:296}, {w:'第11周',d:'8/11–8/17', v:311},
+    {w:'本周',  d:'8/18–8/24', v:88, partial:true}
+  ];
+
+  const milestones = [
+    {t:'能自己用患侧手拿起水杯', d:'8 月 11 日 · 王治疗师确认', done:true},
+    {t:'能扶着床沿自己坐起来',   d:'7 月 26 日 · 王治疗师确认', done:true},
+    {t:'能自己把饭送到嘴里',     d:'7 月 3 日 · 王治疗师确认',  done:true},
+    {t:'下一个目标：扶着扶手走 5 步', d:'和康复师一起定的', done:false}
+  ];
+
+  /* ---------- 今日列表 ---------- */
+  const listEl = document.getElementById('ex-list');
+  function renderList(){
+    listEl.innerHTML = '';
+    exercises.forEach(ex=>{
+      const full = ex.done >= ex.goal;
+      const el = document.createElement('div');
+      el.className = 'exercise' + (full ? ' done' : '');
+      el.innerHTML =
+        '<div class="ex-icon">'+
+          (full
+            ? '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#2c6b22" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            : '<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#2a78d6" stroke-width="2"/><path d="M12 8v4.4l2.8 1.7" stroke="#2a78d6" stroke-width="2" stroke-linecap="round"/></svg>')+
+        '</div>'+
+        '<div class="ex-body"><div class="ex-name">'+ex.name+'</div>'+
+        '<div class="ex-meta">'+(ex.side?ex.side+' · ':'')+ex.done+' / '+ex.goal+' 次</div></div>'+
+        (full ? '<div class="ex-state">已完成</div>'
+              : '<div class="chev"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>');
+      el.addEventListener('click', ()=> openRun(ex.id));
+      listEl.appendChild(el);
+    });
+    const doneCount = exercises.filter(e=>e.done>=e.goal).length;
+    document.getElementById('today-done').textContent = doneCount;
+    document.getElementById('today-total').textContent = exercises.length;
+  }
+
+  /* ---------- 训练执行 ---------- */
+  let current = null;
+  function openRun(id){
+    current = exercises.find(e=>e.id===id);
+    document.getElementById('run-name').textContent = current.name;
+    document.getElementById('run-side').textContent = (current.side? current.side+' · ':'') + '康复师处方';
+    document.getElementById('run-safety-text').innerHTML = current.note;
+    document.getElementById('count-goal').textContent = current.goal;
+    syncCount();
+    show('run');
+  }
+  function syncCount(){
+    document.getElementById('count').textContent = current.done;
+    const pct = Math.min(100, Math.round(current.done / current.goal * 100));
+    document.getElementById('count-fill').style.width = pct + '%';
+  }
+  document.getElementById('tap-add').addEventListener('click', ()=>{
+    current.done++; syncCount();
+    if(navigator.vibrate) navigator.vibrate(18);
+  });
+  document.getElementById('tap-undo').addEventListener('click', ()=>{
+    if(current.done>0){ current.done--; syncCount(); }
+  });
+  document.getElementById('tap-done').addEventListener('click', ()=>{ renderList(); show('today'); });
+  document.getElementById('back-today').addEventListener('click', ()=>{ renderList(); show('today'); });
+
+  /* ---------- 图表 ---------- */
+  const max = Math.max.apply(null, weeks.map(w=>w.v));
+  const barsEl = document.getElementById('bars');
+  const xEl = document.getElementById('xaxis');
+  const tip = document.getElementById('tip');
+  weeks.forEach((wk,i)=>{
+    const col = document.createElement('div');
+    col.className = 'bar-col' + (wk.partial ? ' partial' : '');
+    const showVal = wk.partial || i===0 || wk.v===max;
+    col.innerHTML = '<div class="bar-val">'+(showVal ? wk.v : '')+'</div>' +
+                    '<div class="bar-plot"><div class="bar" style="height:'+
+                    (wk.v/max*100).toFixed(1)+'%"></div></div>';
+    col.addEventListener('mouseenter', e=>{
+      tip.textContent = wk.w+' · '+wk.d+' · '+wk.v+' 次'+(wk.partial?'（进行中）':'');
+      const r = col.getBoundingClientRect(), p = barsEl.getBoundingClientRect();
+      tip.style.left = (r.left - p.left + r.width/2) + 'px';
+      tip.style.top  = (r.top - p.top - 8) + 'px';
+      tip.classList.add('on');
+    });
+    col.addEventListener('mouseleave', ()=> tip.classList.remove('on'));
+    barsEl.appendChild(col);
+    const x = document.createElement('div');
+    x.textContent = wk.partial ? '本周' : wk.w.replace('第','').replace('周','');
+    xEl.appendChild(x);
+  });
+  document.getElementById('tbl-body').innerHTML = weeks.map(w=>
+    '<tr><td>'+w.w+'</td><td>'+w.d+'</td><td>'+w.v+(w.partial?'（进行中）':'')+'</td></tr>').join('');
+  document.getElementById('tbl-btn').addEventListener('click', function(){
+    const t = document.getElementById('tbl');
+    const open = t.classList.toggle('hidden');
+    this.textContent = open ? '查看数字表格' : '收起表格';
+  });
+
+  /* ---------- 里程碑 ---------- */
+  document.getElementById('milestones').innerHTML = milestones.map(m=>
+    '<div class="milestone'+(m.done?'':' ms-next')+'">'+
+      '<div class="ms-dot'+(m.done?'':' next')+'"></div>'+
+      '<div><div class="ms-text">'+m.t+'</div><div class="ms-date">'+m.d+'</div></div>'+
+    '</div>').join('');
+
+  /* ---------- 视图切换 ---------- */
+  const views = {today:'v-today', run:'v-run', progress:'v-progress', family:'v-family', rx:'v-rx'};
+  function show(name){
+    Object.values(views).forEach(id=>document.getElementById(id).classList.add('hidden'));
+    document.getElementById(views[name]).classList.remove('hidden');
+    document.querySelectorAll('#nav button').forEach(b=>{
+      if(b.dataset.view===name) b.setAttribute('aria-current','page');
+      else b.removeAttribute('aria-current');
+    });
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll('#nav button').forEach(b=>
+    b.addEventListener('click', ()=> show(b.dataset.view)));
+
+  /* ---------- 角色切换（仅演示） ---------- */
+  document.querySelectorAll('.demobar [data-role]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.demobar [data-role]').forEach(x=>x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      const r = b.dataset.role;
+      document.getElementById('nav').style.display = (r==='patient') ? 'flex' : 'none';
+      if(r==='patient') show('today');
+      else if(r==='family') show('family');
+      else show('rx');
+    });
+  });
+
+  /* ---------- 健侧设置 ---------- */
+  document.querySelectorAll('.seg [data-hand]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.seg [data-hand]').forEach(x=>x.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');
+      app.dataset.hand = b.dataset.hand;
+    });
+  });
+
+  renderList();
+})();
+</script>
+</body>
+</html>
