@@ -1,0 +1,67 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <!-- ========== 全部做完：给照护者一个「下班」的时刻 ========== -->
+  <block wx:if="{{finished}}">
+    <view class="ds">
+      <view class="ds-tick">
+        <image src="/images/nav/today.svg" mode="aspectFit" />
+      </view>
+      <view class="ds-t">今天的都做完了</view>
+      <view class="ds-s">今天 {{total}} 件都完成了。</view>
+      <view class="ds-s">累计 {{cum}} 件事 —— 这个数字只会往上走。</view>
+      <view class="ds-s" wx:if="{{careDays > 0}}">这个月，你陪着做了 {{careDays}} 天。</view>
+
+      <view class="ds-box">
+        <view class="ds-lb">今天他怎么样？（可以不写）</view>
+        <textarea class="ds-ta" value="{{note}}" bindinput="onNote" maxlength="80"
+                  placeholder="比如：今天自己扣上了两颗扣子" placeholder-class="ph"
+                  auto-height show-confirm-bar="{{false}}" />
+      </view>
+
+      <view class="btn ok hit" bindtap="finish">收起，明天见</view>
+      <view class="ds-rest">剩下的时间，给你自己。</view>
+      <view class="ds-back hit" bindtap="reopen">还想改一下今天的记录</view>
+    </view>
+  </block>
+
+  <!-- ========== 清单 ========== -->
+  <block wx:else>
+    <view class="h1">今天要做的</view>
+    <view class="lead">做完一件点一下。做不完不要紧 —— 这里没有「中断」，只有「一共做了多少」。</view>
+
+    <view class="prog">
+      <view class="prog-bar"><view class="prog-in" style="width:{{total ? done*100/total : 0}}%"></view></view>
+      <view class="prog-n">{{done}} / {{total}}</view>
+    </view>
+
+    <view class="sec">照护 —— 这几件每天都要做</view>
+    <view class="grid">
+      <view class="cell" wx:for="{{care}}" wx:key="id">
+        <view class="tk hit {{item.full ? 'on' : ''}}" data-id="{{item.id}}" data-target="{{item.target}}" bindtap="tap">
+          <image class="tki" src="{{item.icon}}" mode="aspectFit" />
+          <view class="tkl">{{item.label}}</view>
+          <view class="tkt">{{item.line}}</view>
+          <view class="tks" wx:if="{{item.sub}}">{{item.sub}}</view>
+          <view class="tkc">{{item.full ? '✓' : ''}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="sec">让他自己做的 —— 日常本身就是训练</view>
+    <view class="tip">每一件他自己完成的事，都是一次真正的康复训练。帮他做完，不如陪他慢慢做。做不动就换下一件。</view>
+    <view class="grid">
+      <view class="cell" wx:for="{{train}}" wx:key="id">
+        <view class="tk hit {{item.full ? 'on' : ''}}" data-id="{{item.id}}" data-target="{{item.target}}" bindtap="tap">
+          <image class="tki" src="{{item.icon}}" mode="aspectFit" />
+          <view class="tkl">{{item.label}}</view>
+          <view class="tkt">{{item.line}}</view>
+          <view class="tks" wx:if="{{item.sub}}">{{item.sub}}</view>
+          <view class="tkc">{{item.full ? '✓' : ''}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tip mt">累了就停。高龄患者容易疲劳，硬撑没有好处。</view>
+  </block>
+
+</view>

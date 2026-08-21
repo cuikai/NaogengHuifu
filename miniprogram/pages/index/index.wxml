@@ -1,0 +1,66 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="hero">
+    <view class="hero-t">脑梗恢复</view>
+    <view class="hero-s">第 {{day}} 天 · {{date}}</view>
+  </view>
+
+  <view class="echo" wx:if="{{echo}}">
+    <view class="echo-l">
+      <text wx:if="{{echo.done >= echo.total}}">昨天 {{echo.total}} 件都做完了。</text>
+      <text wx:else>昨天做了 {{echo.done}} 件。</text>
+      <text wx:if="{{cum > 0}}">　累计已经完成 {{cum}} 件事。</text>
+    </view>
+    <view class="echo-q" wx:if="{{echo.note}}">你昨天记下：「{{echo.note}}」</view>
+  </view>
+
+  <view class="grid">
+    <view class="tile hit" data-url="/pages/today/today" bindtap="go">
+      <view class="in">
+        <image class="ti" src="/images/nav/today.svg" mode="aspectFit" />
+        <view class="tt">今天要做的</view>
+        <view class="ts {{todayDone >= todayTotal ? 'on' : ''}}">{{todayDone >= todayTotal ? '都做完了' : todayDone + ' / ' + todayTotal + ' 件'}}</view>
+      </view>
+    </view>
+
+    <view class="tile hit" data-url="/pages/train/train" bindtap="go">
+      <view class="in">
+        <image class="ti" src="/images/nav/train.svg" mode="aspectFit" />
+        <view class="tt">今天的训练</view>
+        <view class="ts {{trainDone >= trainTotal ? 'on' : ''}}">{{trainDone >= trainTotal ? '都做完了' : trainDone + ' / ' + trainTotal + ' 个动作'}}</view>
+      </view>
+    </view>
+
+    <view class="tile hit" data-url="/pages/know/know" bindtap="go">
+      <view class="in">
+        <image class="ti" src="/images/nav/know.svg" mode="aspectFit" />
+        <view class="tt">请一定要知道</view>
+        <view class="ts">{{cardCount}} 条 · 最要命的在前面</view>
+      </view>
+    </view>
+
+    <view class="tile hit" data-url="/pages/record/record" bindtap="go">
+      <view class="in">
+        <image class="ti" src="/images/nav/record.svg" mode="aspectFit" />
+        <view class="tt">记录</view>
+        <view class="ts">第 {{day}} 天 · 累计 {{cum}} 件</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bar hit" data-url="/pages/card/card?id=again" bindtap="go">
+    <view class="bar-n">120</view>
+    <view class="bar-b">
+      <view class="bar-t">万一复发，怎么认</view>
+      <view class="bar-d">认得出来，就能少损失很多</view>
+    </view>
+    <view class="bar-a">›</view>
+  </view>
+
+  <view class="about hit" data-url="/pages/about/about" bindtap="go">
+    <image class="ai" src="/images/nav/about.svg" mode="aspectFit" />
+    <view class="lbl">关于这些内容 · 出处 · 我们不做什么</view>
+    <view class="bar-a">›</view>
+  </view>
+
+</view>

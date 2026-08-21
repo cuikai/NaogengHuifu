@@ -1,0 +1,143 @@
+page {
+  --ink: #2c2c2a;
+  --ink2: #5a5a54;
+  --muted: #8a8578;
+  --bg: #f5f5f2;
+  --card: #ffffff;
+  --line: #e6e2d5;
+  --blue: #2a78d6;
+  --blue-soft: #eaf1f9;
+  --blue-ink: #23527c;
+  --ok: #1a9c4a;
+  --ok-soft: #eaf6ec;
+  --ok-line: #9fd0a8;
+  --no: #c62f2f;
+  --no-soft: #fdeded;
+  --no-line: #eab5b5;
+  --warn: #e88a3c;
+  --warn-soft: #fff8e8;
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 字号系数由 app.js 按屏宽算出来，写在根节点的 --fs 上 */
+.pg {
+  --fs: 1;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 28rpx;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}
+
+.f-xs { font-size: calc(24rpx * var(--fs)); }
+.f-sm { font-size: calc(28rpx * var(--fs)); }
+.f-md { font-size: calc(32rpx * var(--fs)); }
+.f-lg { font-size: calc(36rpx * var(--fs)); }
+.f-xl { font-size: calc(44rpx * var(--fs)); }
+
+/* ---------- 通用块 ---------- */
+.card {
+  background: var(--card);
+  border: 2rpx solid var(--line);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-bottom: 22rpx;
+}
+
+.h1 {
+  font-size: calc(48rpx * var(--fs));
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 30rpx 0 8rpx;
+}
+.lead {
+  font-size: calc(32rpx * var(--fs));
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-bottom: 26rpx;
+}
+.sec {
+  font-size: calc(30rpx * var(--fs));
+  font-weight: 700;
+  color: var(--muted);
+  margin: 34rpx 0 14rpx;
+}
+
+/* ---------- 等比图片盒（不依赖 aspect-ratio，老设备也稳） ---------- */
+.imgbox {
+  position: relative;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 20rpx;
+}
+.imgbox > image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- 要点列表 ---------- */
+.pt {
+  display: flex;
+  gap: 22rpx;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid var(--line);
+}
+.pt:last-child { border-bottom: 0; }
+.pt .n {
+  width: 60rpx; height: 60rpx; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  font-size: calc(30rpx * var(--fs)); font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; margin-top: 2rpx;
+}
+.pt .n.bad { background: var(--no); }
+.pt .p { font-size: calc(33rpx * var(--fs)); font-weight: 600; line-height: 1.5; }
+.pt .q { font-size: calc(27rpx * var(--fs)); color: var(--muted); line-height: 1.5; margin-top: 6rpx; }
+
+/* ---------- 停止信号 ---------- */
+.stop {
+  background: var(--no-soft);
+  border: 2rpx solid var(--no-line);
+  border-radius: 24rpx;
+  padding: 26rpx;
+  margin-top: 30rpx;
+}
+.stop .t { font-size: calc(32rpx * var(--fs)); font-weight: 700; color: var(--no); margin-bottom: 12rpx; }
+.stop .r { font-size: calc(29rpx * var(--fs)); color: #7c2b2b; line-height: 1.6; margin-top: 10rpx; }
+.stop .r .k { font-weight: 700; }
+
+/* ---------- 出处 ---------- */
+.why {
+  background: var(--warn-soft);
+  border: 2rpx solid #f0dfae;
+  border-radius: 24rpx;
+  padding: 26rpx;
+  margin-top: 30rpx;
+  font-size: calc(29rpx * var(--fs));
+  color: #5a4a20;
+  line-height: 1.7;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  min-height: 108rpx;
+  border-radius: 26rpx;
+  display: flex; align-items: center; justify-content: center;
+  font-size: calc(34rpx * var(--fs)); font-weight: 700;
+  border: 3rpx solid var(--line);
+  background: var(--card); color: var(--ink);
+}
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+.btn.ghost { color: var(--ink2); }
+.btn.dis { opacity: 0.4; }
+
+.hit { transition: opacity .12s; }
+.hit:active { opacity: .55; }

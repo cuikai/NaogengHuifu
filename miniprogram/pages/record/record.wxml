@@ -1,0 +1,43 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">记录</view>
+  <view class="lead">这里没有失败态。数字只会往上走。</view>
+
+  <view class="nums">
+    <view class="nm">
+      <view class="nv">{{day}}</view>
+      <view class="nl">第几天</view>
+    </view>
+    <view class="nm">
+      <view class="nv">{{cum}}</view>
+      <view class="nl">累计做的事</view>
+    </view>
+    <view class="nm">
+      <view class="nv">{{careDays}}</view>
+      <view class="nl">这个月陪了几天</view>
+    </view>
+  </view>
+
+  <view class="me">这个月，你陪着做了 {{careDays}} 天。{{'\n'}}这句话和他恢复得快不快没有关系 —— 是对你的。</view>
+
+  <view class="sec">他能做的事在变多</view>
+  <view class="tip">这十件事来自改良 Barthel 指数，是康复师也在用的条目。{{'\n'}}这里只记「哪天第一次做到」，不打分、不下结论 —— 那属于医生。</view>
+
+  <view class="ms hit {{item.on ? 'on' : ''}}" wx:for="{{ms}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleMs">
+    <view class="mck">{{item.on ? '✓' : ''}}</view>
+    <view class="mb">
+      <view class="mt">{{item.t}}</view>
+      <view class="mw" wx:if="{{item.on}}">{{item.when}} 第一次做到</view>
+    </view>
+  </view>
+
+  <view class="sec" wx:if="{{notes.length}}">你写下来的话</view>
+  <view class="note" wx:for="{{notes}}" wx:key="d">
+    <view class="nd">{{item.d}}</view>
+    <view class="nt">{{item.t}}</view>
+  </view>
+  <view class="tip" wx:if="{{!notes.length}}">每天全部做完之后，可以写一句话。{{'\n'}}三个月后翻回来看，比任何图表都有说服力。</view>
+
+  <view class="foot">从 {{start}} 开始。所有记录只存在这台手机上，不会上传。</view>
+
+</view>

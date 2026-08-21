@@ -1,0 +1,18 @@
+.it {
+  display: flex; align-items: center;
+  background: var(--card);
+  border: 2rpx solid var(--line);
+  border-radius: 28rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+.th {
+  width: 176rpx; flex: 0 0 auto; margin-right: 24rpx;
+  background: var(--blue-soft); border-radius: 20rpx; overflow: hidden;
+  display: flex; align-items: center;
+}
+.th .imgbox { border-radius: 0; }
+.b { flex: 1; min-width: 0; }
+.t { font-size: calc(38rpx * var(--fs)); font-weight: 700; line-height: 1.25; }
+.d { font-size: calc(28rpx * var(--fs)); color: var(--ink2); margin-top: 8rpx; line-height: 1.45; }
+.a { color: var(--muted); font-size: calc(40rpx * var(--fs)); flex: 0 0 auto; margin-left: 12rpx; }

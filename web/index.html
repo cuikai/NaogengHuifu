@@ -143,11 +143,23 @@ h2{font-size:17px;color:var(--muted);font-weight:600;margin:26px 0 10px;
 .mvcard .md{font-size:15px;color:var(--ink2);margin-top:2px;}
 .mvcard .dosemini{font-size:14px;font-weight:600;color:#23527c;background:#eaf1f9;
   border-radius:99px;padding:5px 11px;white-space:nowrap;}
-.mvcard .mvck{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);
-  flex:0 0 auto;display:grid;place-items:center;background:#fff;}
+.mvcard .mvck{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);
+  flex:0 0 auto;display:grid;place-items:center;background:#fff;
+  font-size:17px;font-weight:700;color:var(--muted);}
+.mvcard .mvck.part{border-color:var(--blue);color:var(--blue);border-width:3px;}
 .mvcard.done .mvck{background:var(--ok);border-color:var(--ok);}
-.mvcard .mvck svg{display:none;width:22px;height:22px;}
+.mvcard .mvck svg{display:none;width:24px;height:24px;}
 .mvcard.done .mvck svg{display:block;}
+.mvcard.done .mvck b{display:none;}
+.mvcard .mvprog{font-size:15px;font-weight:600;color:#23527c;margin-top:4px;}
+.mvcard.done .mvprog{color:var(--ok);}
+.setrow{display:flex;gap:9px;padding:0 18px;margin-top:14px;}
+.setrow button{flex:1;min-height:60px;border-radius:14px;font-family:inherit;
+  font-size:18px;font-weight:700;cursor:pointer;border:2px solid var(--line);
+  background:var(--card);color:var(--ink);}
+.setrow button.main{border-color:var(--blue);background:var(--blue);color:#fff;}
+.setrow button.main.full{border-color:var(--ok);background:var(--ok);}
+.setnote{text-align:center;font-size:16px;color:var(--ink2);margin-top:10px;}
 .mvcard .detail-hint{font-size:13px;color:var(--muted);padding:0 14px 11px;
   display:flex;align-items:center;gap:4px;}
 
@@ -1121,49 +1133,49 @@ const STOP = '<div class="stopbox"><b>什么时候必须停</b>' +
   '第二天如果比平时更累，说明昨天做多了，减量。</div>';
 
 const moves = [
-  {id:'mk', name:'踝泵', sub:'勾脚尖、绷脚尖', svg:MV.ankle,
+  {id:'mk', target:3, unit:'组', name:'踝泵', sub:'勾脚尖、绷脚尖', svg:MV.ankle,
    dose:['20 次 / 组','3 组','一天 3 次'],
    why:'这是全套里最安全、也最该每天做的一个。长期卧床容易在腿部形成血栓，踝泵能推动血液回流。',
    steps:['脚尖用力往回勾，勾到最大，停 2 秒','再用力往下绷，绷到最大，停 2 秒','慢慢来，一次一次数'],
    note:'好的那条腿也一起做。'},
 
-  {id:'mg', name:'握拳伸展', sub:'张开、握紧', svg:MV.grip,
+  {id:'mg', target:3, unit:'组', name:'握拳伸展', sub:'张开、握紧', svg:MV.grip,
    dose:['20 次 / 组','3 组','一天 2～3 次'],
    why:'手指长时间攥着会慢慢僵死，掰不开。每天张开握紧，是最直接的预防。',
    steps:['五指尽量张开，撑到最大','再慢慢握成拳','如果他自己做不了，用你的手帮他一根一根轻轻掰开——不要硬掰'],
    note:'掰的时候只用很轻的力。掰不动就停，不要较劲。'},
 
-  {id:'mw', name:'腕关节屈伸', sub:'手腕上下摆', svg:MV.wrist,
+  {id:'mw', target:2, unit:'组', name:'腕关节屈伸', sub:'手腕上下摆', svg:MV.wrist,
    dose:['20 次 / 组','2～3 组','一天 2 次'],
    why:'手腕僵住会让整只手都用不上。',
    steps:['前臂放在桌上或床上垫稳','手腕往上翘起来，再往下垂','动作范围到有点紧就够，不要压到疼'],
    note:'是上下摆，不是转圈。手腕不适合大幅度旋转。'},
 
-  {id:'me', name:'肘关节屈伸', sub:'弯起来、伸直', svg:MV.elbow,
+  {id:'me', target:2, unit:'组', name:'肘关节屈伸', sub:'弯起来、伸直', svg:MV.elbow,
    dose:['15 次 / 组','2～3 组','一天 2 次'],
    why:'肘部容易屈曲挛缩——弯久了就伸不直了。',
    steps:['手臂放平，慢慢弯到手碰到肩膀附近','再慢慢完全伸直','伸直这一下更重要，别偷懒'],
    note:'全程托着他的手腕和肘部，不要只拉着手。'},
 
-  {id:'mn', name:'膝关节屈伸', sub:'脚贴着床往回滑', svg:MV.knee,
+  {id:'mn', target:2, unit:'组', name:'膝关节屈伸', sub:'脚贴着床往回滑', svg:MV.knee,
    dose:['15 次 / 组','2～3 组','一天 2 次'],
    why:'为以后能坐、能站做准备，也防止膝关节僵硬。',
    steps:['平躺，脚掌贴着床面','慢慢把脚往屁股方向滑，膝盖立起来','再慢慢滑回去伸直'],
    note:'脚不要离开床面。这样最省力也最安全。'},
 
-  {id:'mb', name:'桥式运动', sub:'抬起屁股，停 5 秒', svg:MV.bridge,
+  {id:'mb', target:3, unit:'组', name:'桥式运动', sub:'抬起屁股，停 5 秒', svg:MV.bridge,
    dose:['10 个 / 组','3 组','一天 1～2 次'],
    why:'练的是腰臀的力量。能做好这个，翻身、坐起、用便盆都会轻松很多，也能减轻你的负担。',
    steps:['平躺，两腿屈膝，脚掌踩实床面','收紧屁股，把臀部抬起来，身体成一条斜线','维持 5 秒，正常呼吸，不要憋气','慢慢放下来'],
    note:'抬不起来就先只做「用力想抬」的动作，也有用。抬得低一点没关系。'},
 
-  {id:'mo', name:'双手叉握上举', sub:'十指交叉，患侧拇指在上', svg:MV.bobath,
+  {id:'mo', target:2, unit:'组', name:'双手叉握上举', sub:'十指交叉，患侧拇指在上', svg:MV.bobath,
    dose:['10 次 / 组','2 组','一天 2 次'],
    why:'用好手带着患手动，让患侧的肩胛骨跟着活动起来。这是家里最推荐的上肢动作，因为力度由他自己控制。',
    steps:['十指交叉相握，<b>患侧的拇指压在健侧拇指上面</b>','用好的那只手带着，把两只手一起慢慢举起来','<b>举到胸口高度就够了</b>，先不要往头顶举','慢慢放下'],
    note:'这是全套里唯一需要特别当心的动作。肩膀一旦有疼，马上停。'},
 
-  {id:'mr', name:'吹气球 / 缩唇呼吸', sub:'慢慢吹，把气吐长', svg:MV.breathe,
+  {id:'mr', target:3, unit:'次', name:'吹气球 / 缩唇呼吸', sub:'慢慢吹，把气吐长', svg:MV.breathe,
    dose:['15 分钟','一天 3～4 次'],
    why:'长期卧床最怕坠积性肺炎。把气吐深、把痰咳出来，比什么都管用。而且这个动作没有任何风险。',
    steps:['用鼻子慢慢吸气','嘴唇像吹蜡烛一样撮起来，慢慢把气吐出去','吐气的时间要比吸气长一倍','或者直接吹气球、吹纸片，更有意思'],
@@ -1181,6 +1193,7 @@ const state = {
 };
 const allTasks = careList.concat(trainList);
 allTasks.forEach(t=> state.progress[t.id]=0);
+moves.forEach(m=> state.progress['mv_'+m.id]=0);
 const totalTasks = allTasks.length;
 function doneCount(){ return allTasks.filter(t=> state.progress[t.id] >= t.target).length; }
 
@@ -1488,20 +1501,32 @@ function mvDone(){ return moves.filter(m=> state.progress['mv_'+m.id]).length; }
 const TICKSM = '<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.5l4 4 8-9" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 /* 首页内联渲染 8 个训练动作，动画直接可见，不用点进去 */
+function bumpMove(id){
+  const m = moves.find(x=>x.id===id);
+  const n = state.progress['mv_'+id]||0;
+  if(n >= m.target){ state.progress['mv_'+id] = 0; }
+  else { state.progress['mv_'+id] = n+1; state.cum++;
+         if(navigator.vibrate) navigator.vibrate(20); }
+}
+
 function renderMoves(){
   const host = document.getElementById('mv-list');
   host.innerHTML = '';
   moves.forEach(m=>{
-    const on = state.progress['mv_'+m.id];
+    const n = state.progress['mv_'+m.id]||0, full = n >= m.target;
     const el = document.createElement('div');
-    el.className = 'mvcard'+(on?' done':'');
+    el.className = 'mvcard'+(full?' done':'');
     el.innerHTML =
       '<div class="banner">'+m.svg+'</div>'+
       '<div class="row" data-open="'+m.id+'">'+
         '<div style="flex:1;min-width:0"><div class="mt">'+m.name+'</div>'+
-        '<div class="md">'+m.sub+'</div></div>'+
+        '<div class="md">'+m.sub+'</div>'+
+        '<div class="mvprog">'+(full?('今天 '+m.target+' '+m.unit+'都做完了')
+                                    :('今天 '+n+' / '+m.target+' '+m.unit))+'</div></div>'+
         '<div class="dosemini">'+m.dose[0]+'</div>'+
-        '<div class="mvck" data-check="'+m.id+'">'+TICKSM+'</div>'+
+        '<div class="mvck'+(n>0&&!full?' part':'')+'" data-check="'+m.id+'" '+
+          'title="'+(full?'点一下清零':'做完一'+m.unit+'，点一下')+'">'+
+          TICKSM+'<b>'+(n>0?n:'')+'</b></div>'+
       '</div>'+
       '<div class="detail-hint" data-open="'+m.id+'">点这里看做法和「什么时候必须停」 ›</div>';
     host.appendChild(el);
@@ -1509,9 +1534,7 @@ function renderMoves(){
   host.querySelectorAll('[data-check]').forEach(c=>{
     c.addEventListener('click', e=>{
       e.stopPropagation();
-      const id = c.dataset.check, was = state.progress['mv_'+id];
-      state.progress['mv_'+id] = was ? 0 : 1;
-      if(!was){ state.cum++; if(navigator.vibrate) navigator.vibrate(20); }
+      bumpMove(c.dataset.check);
       renderMoves(); renderAll();
     });
   });
@@ -1520,8 +1543,8 @@ function renderMoves(){
   });
 }
 
-function openMoveDetail(m){
-  const on = state.progress['mv_'+m.id];
+function openMoveDetail(m, keepScroll){
+  const on = state.progress['mv_'+m.id]||0, full = on >= m.target;
   document.getElementById('mvbody').innerHTML =
     '<h3>'+m.name+'</h3><p class="lead">'+m.sub+'</p>'+
     '<div class="big"><div class="mv-wrap">'+m.svg+'</div></div>'+
@@ -1531,15 +1554,34 @@ function openMoveDetail(m){
       '<div class="point"><div class="n">'+(i+1)+'</div><div><div class="p">'+t+'</div></div></div>').join('')+
       '<div class="point"><div class="n bad">!</div><div><div class="p">'+m.note+'</div></div></div>'+
     '</div>' + STOP +
-    '<div style="padding:18px"><button class="btn-quiet" id="mvtoggle">'+
-      (on?'取消勾选':'今天这个做完了')+'</button></div>';
+    '<div class="setrow">'+
+      '<button id="mvminus"'+(on>0?'':' disabled style="opacity:.4"')+'>− 撤销一'+m.unit+'</button>'+
+      '<button class="main'+(full?' full':'')+'" id="mvplus">'+
+        (full ? '今天做完了 ✓' : '＋ 做完一'+m.unit)+'</button>'+
+    '</div>'+
+    '<div class="setnote">'+(full
+        ? ('今天 '+m.target+' '+m.unit+'都做完了。做得动可以再来一轮，不用记。<br>点绿色按钮可以清零重记。')
+        : ('今天已经做了 <b>'+on+' / '+m.target+'</b> '+m.unit))+'</div>'+
+    '<div style="height:22px"></div>';
   document.getElementById('mvsheet').classList.add('on');
   document.body.style.overflow='hidden';
-  document.getElementById('mvsheet').scrollTop = 0;
-  document.getElementById('mvtoggle').addEventListener('click', ()=>{
-    state.progress['mv_'+m.id] = on ? 0 : 1;
-    if(!on){ state.cum++; if(navigator.vibrate) navigator.vibrate(20); }
-    closeMvSheet();
+  if(!keepScroll) document.getElementById('mvsheet').scrollTop = 0;
+  document.getElementById('mvplus').addEventListener('click', ()=>{
+    if(full){ state.progress['mv_'+m.id] = 0; }
+    else { state.progress['mv_'+m.id] = on+1; state.cum++;
+           if(navigator.vibrate) navigator.vibrate(20); }
+    const y = document.getElementById('mvsheet').scrollTop;
+    openMoveDetail(m, true);
+    document.getElementById('mvsheet').scrollTop = y;
+    renderMoves(); renderAll();
+  });
+  document.getElementById('mvminus').addEventListener('click', ()=>{
+    if(on<=0) return;
+    state.progress['mv_'+m.id] = on-1; if(state.cum>0) state.cum--;
+    const y = document.getElementById('mvsheet').scrollTop;
+    openMoveDetail(m, true);
+    document.getElementById('mvsheet').scrollTop = y;
+    renderMoves(); renderAll();
   });
 }
 

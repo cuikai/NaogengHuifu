@@ -1,0 +1,36 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">今天的训练</view>
+  <view class="lead">做完一组点一下右边的圈。不用一次做完才能记。</view>
+
+  <view class="prog">
+    <view class="prog-bar"><view class="prog-in" style="width:{{done*100/total}}%"></view></view>
+    <view class="prog-n">{{done}} / {{total}}</view>
+  </view>
+
+  <view class="mv {{item.full ? 'on' : ''}}" wx:for="{{list}}" wx:key="id">
+    <view class="banner hit" data-id="{{item.id}}" bindtap="open">
+      <view class="imgbox" style="padding-top:{{item.pad}}">
+        <image src="{{item.gif}}" mode="aspectFit" lazy-load />
+      </view>
+    </view>
+
+    <view class="row">
+      <view class="rowl hit" data-id="{{item.id}}" bindtap="open">
+        <view class="mt">{{item.name}}</view>
+        <view class="md">{{item.sub}}</view>
+        <view class="mp">{{item.line}}</view>
+      </view>
+      <view class="dose">{{item.dose[0]}}</view>
+      <view class="ck hit {{item.n > 0 && !item.full ? 'part' : ''}}" data-id="{{item.id}}" bindtap="tap">
+        <text wx:if="{{item.full}}">✓</text>
+        <text wx:elif="{{item.n > 0}}">{{item.n}}</text>
+      </view>
+    </view>
+
+    <view class="hint hit" data-id="{{item.id}}" bindtap="open">点这里看做法和「什么时候必须停」 ›</view>
+  </view>
+
+  <view class="tip">累了就停。第二天如果比平时更累，说明昨天做多了，减量。</view>
+
+</view>
