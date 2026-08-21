@@ -2,7 +2,7 @@ const app = getApp();
 const store = require('../../utils/store.js');
 
 Page({
-  data: { ui: { fs: 1 }, repo: 'github.com/cuikai/NaogengKangfuXunlian' },
+  data: { ui: { fs: 1 }, repo: 'github.com/cuikai/NaogengHuifu' },
 
   onLoad() { this.setData({ ui: app.globalData.ui }); },
 

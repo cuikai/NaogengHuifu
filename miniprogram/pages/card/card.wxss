@@ -34,12 +34,21 @@
 
 .pts { margin-top: 30rpx; }
 
-.nav { display: flex; margin-top: 40rpx; }
-.nb {
-  flex: 1; background: var(--card); border: 2rpx solid var(--line);
-  border-radius: 24rpx; padding: 22rpx; margin-right: 16rpx; min-width: 0;
+.why-t {
+  font-size: calc(29rpx * var(--fs)); font-weight: 700;
+  color: #7a5a10; margin-bottom: 10rpx;
 }
-.nb.right { margin-right: 0; text-align: right; }
-.nb:only-child { margin-right: 0; }
+.why-p { margin-top: 10rpx; }
+.why-p:first-of-type { margin-top: 0; }
+
+.nav { display: flex; align-items: stretch; margin-top: 40rpx; }
+.nb {
+  flex: 1 1 0; width: 0; min-width: 0;
+  box-sizing: border-box;
+  background: var(--card); border: 2rpx solid var(--line);
+  border-radius: 24rpx; padding: 22rpx;
+}
+.nb + .nb { margin-left: 16rpx; }
+.nb.right { text-align: right; }
 .nl { font-size: calc(25rpx * var(--fs)); color: var(--muted); }
 .nt { font-size: calc(31rpx * var(--fs)); font-weight: 700; margin-top: 6rpx; line-height: 1.3; }

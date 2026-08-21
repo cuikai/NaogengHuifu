@@ -37,7 +37,7 @@
     <view class="btn ghost hit {{n <= 0 ? 'dis' : ''}}" bindtap="minus">− 撤销一{{m.unit}}</view>
     <view class="btn hit {{full ? 'ok' : 'primary'}}" bindtap="plus">{{full ? '今天做完了 ✓' : '＋ 做完一' + m.unit}}</view>
   </view>
-  <view class="setnote" wx:if="{{full}}">今天 {{m.target}} {{m.unit}}都做完了。做得动可以再来一轮，不用记。{{'\n'}}点绿色按钮可以清零重记。</view>
+  <view class="setnote" wx:if="{{full}}">今天 {{m.target}} {{m.unit}}都做完了。做得动可以再来一轮。</view>
   <view class="setnote" wx:else>今天已经做了 {{n}} / {{m.target}} {{m.unit}}</view>
 
 </view>

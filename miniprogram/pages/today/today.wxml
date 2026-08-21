@@ -8,7 +8,7 @@
       </view>
       <view class="ds-t">今天的都做完了</view>
       <view class="ds-s">今天 {{total}} 件都完成了。</view>
-      <view class="ds-s">累计 {{cum}} 件事 —— 这个数字只会往上走。</view>
+      <view class="ds-s">累计 {{cum}} 件事。</view>
       <view class="ds-s" wx:if="{{careDays > 0}}">这个月，你陪着做了 {{careDays}} 天。</view>
 
       <view class="ds-box">
@@ -27,7 +27,7 @@
   <!-- ========== 清单 ========== -->
   <block wx:else>
     <view class="h1">今天要做的</view>
-    <view class="lead">做完一件点一下。做不完不要紧 —— 这里没有「中断」，只有「一共做了多少」。</view>
+    <view class="lead">做不完不要紧，做了多少就算多少。</view>
 
     <view class="prog">
       <view class="prog-bar"><view class="prog-in" style="width:{{total ? done*100/total : 0}}%"></view></view>

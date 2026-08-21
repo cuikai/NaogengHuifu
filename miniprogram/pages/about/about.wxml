@@ -17,22 +17,15 @@
   </view>
 
   <view class="blk warn">
-    <view class="bt">我们刻意不做的三件事</view>
-    <view class="bp"><text class="k">站立与步行训练</text> —— 跌倒导致的髋部骨折，对高龄患者是致命的。</view>
-    <view class="bp"><text class="k">吞咽训练</text> —— 误吸可以直接致命。这里只讲进食安全，不讲吞咽训练。</view>
-    <view class="bp"><text class="k">根据打卡自动加量</text> —— 那需要评估肌张力和心肺功能。软件判断不了，也不该替你判断。</view>
-    <view class="bp">前两件在没有专业人在场时风险太高。要不要加量、加什么，让康复师定。</view>
-  </view>
-
-  <view class="blk">
-    <view class="bt">你的记录在哪</view>
-    <view class="bp">全部存在这台手机本地，不会上传到任何服务器。换手机或清空缓存就没了。</view>
+    <view class="bt">这里不涉及的两件事</view>
+    <view class="bp"><text class="k">站立与步行训练</text> —— 跌倒导致的髋部骨折，对高龄患者是致命的，需要专业人在场。</view>
+    <view class="bp"><text class="k">吞咽训练</text> —— 误吸可以直接致命。这里只讲进食安全。</view>
   </view>
 
   <view class="blk">
     <view class="bt">源码与讨论</view>
-    <view class="bp">全部代码、图示和文献依据都是公开的。欢迎康复治疗师和医生来纠错 —— 这比什么都重要。</view>
-    <view class="lnk hit" bindtap="copyRepo">{{repo}}　（点一下复制）</view>
+    <view class="bp">全部代码、图示和文献依据都是公开的。</view>
+    <view class="lnk hit" bindtap="copyRepo">{{repo}}　（点击复制）</view>
   </view>
 
   <view class="danger hit" bindtap="clear">清空全部记录</view>

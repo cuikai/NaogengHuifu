@@ -54,7 +54,11 @@
     </view>
   </view>
 
-  <rich-text class="why" wx:if="{{c.why}}" nodes="{{c.why}}"></rich-text>
+  <!-- 依据 -->
+  <view class="why" wx:if="{{c.why}}">
+    <view class="why-t" wx:if="{{c.why.t}}">{{c.why.t}}</view>
+    <view class="why-p" wx:for="{{c.why.p}}" wx:key="*this">{{item}}</view>
+  </view>
 
   <!-- 上一条 / 下一条 -->
   <view class="nav">

@@ -8,7 +8,6 @@ const careList = [
   { id: 'm',  icon: 'meal',  label: '坐直了喂饭', times: '每一餐',     target: 1 },
   { id: 't',  icon: 'turn',  label: '翻身',       times: '每 2 小时',  target: 1 },
   { id: 'p',  icon: 'pill',  label: '吃药',       times: '按医嘱',     target: 1 },
-  { id: 's',  icon: 'pos',   label: '摆好姿势',   times: '每次躺下',   target: 1 },
   { id: 'bp', icon: 'bp',    label: '量血压',     times: '每天记下来', target: 1 }
 ];
 

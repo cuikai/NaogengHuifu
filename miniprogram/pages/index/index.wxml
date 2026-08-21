@@ -59,7 +59,7 @@
 
   <view class="about hit" data-url="/pages/about/about" bindtap="go">
     <image class="ai" src="/images/nav/about.svg" mode="aspectFit" />
-    <view class="lbl">关于这些内容 · 出处 · 我们不做什么</view>
+    <view class="lbl">关于这些内容 · 出处</view>
     <view class="bar-a">›</view>
   </view>
 
