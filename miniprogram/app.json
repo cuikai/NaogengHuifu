@@ -10,10 +10,10 @@
     "pages/about/about"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#f5f5f2",
+    "navigationBarBackgroundColor": "#faf6ee",
     "navigationBarTitleText": "脑梗恢复",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f5f5f2",
+    "backgroundColor": "#faf6ee",
     "backgroundTextStyle": "dark",
     "enablePullDownRefresh": false
   },

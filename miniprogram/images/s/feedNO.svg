@@ -30,6 +30,6 @@
   </g>
 
   <!-- 仰着头，食物直接灌向气管 -->
-  <path d="M99 76 Q104 92 111 106" stroke="#c62f2f" stroke-width="4.5" stroke-dasharray="7 7"/>
-  <path d="M104 104 l8 8 5 -10" stroke="#c62f2f" stroke-width="4.5"/>
+  <path d="M99 76 Q104 92 111 106" stroke="#c8382f" stroke-width="4.5" stroke-dasharray="7 7"/>
+  <path d="M104 104 l8 8 5 -10" stroke="#c8382f" stroke-width="4.5"/>
 </svg>

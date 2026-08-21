@@ -18,8 +18,8 @@
         fill="#e9eef4" stroke="#7d8794" stroke-width="4"/>
   <path d="M112 68 q18 12 36 0" stroke="#7d8794" stroke-width="3.4"/>
 
-  <circle cx="46" cy="140" r="16" fill="#e88a3c"/>
+  <circle cx="46" cy="140" r="16" fill="#d98f3f"/>
   <text x="38" y="148" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">1</text>
-  <circle cx="214" cy="140" r="16" fill="#2a78d6"/>
+  <circle cx="214" cy="140" r="16" fill="#4f9a76"/>
   <text x="206" y="148" font-size="21" font-weight="700" fill="#fff" font-family="system-ui">2</text>
 </svg>

@@ -35,6 +35,6 @@
   <circle cx="179" cy="70" r="15" fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
 
   <!-- 肩膀被拉伤 -->
-  <circle cx="110" cy="94" r="17" fill="#fdeded" stroke="#c62f2f" stroke-width="4.5"/>
-  <path d="M103 87 l14 14 M117 87 l-14 14" stroke="#c62f2f" stroke-width="4.5"/>
+  <circle cx="110" cy="94" r="17" fill="#fdefec" stroke="#c8382f" stroke-width="4.5"/>
+  <path d="M103 87 l14 14 M117 87 l-14 14" stroke="#c8382f" stroke-width="4.5"/>
 </svg>

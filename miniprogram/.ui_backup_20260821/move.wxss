@@ -1,0 +1,29 @@
+.frame {
+  background: var(--card);
+  border: 2rpx solid var(--line);
+  border-radius: 28rpx;
+  padding: 18rpx;
+  overflow: hidden;
+}
+
+.dose { display: flex; flex-wrap: wrap; margin: 22rpx -6rpx 0; }
+.chip {
+  font-size: calc(28rpx * var(--fs)); font-weight: 600;
+  color: var(--blue-ink); background: var(--blue-soft);
+  border-radius: 99rpx; padding: 12rpx 24rpx; margin: 0 6rpx 12rpx;
+}
+
+.pts { margin-top: 26rpx; }
+
+.setrow { display: flex; margin-top: 34rpx; }
+.setrow .btn { flex: 1; }
+.setrow .btn:first-child { margin-right: 16rpx; }
+
+.setnote {
+  text-align: center;
+  font-size: calc(28rpx * var(--fs));
+  color: var(--ink2);
+  line-height: 1.6;
+  margin-top: 18rpx;
+  white-space: pre-line;
+}

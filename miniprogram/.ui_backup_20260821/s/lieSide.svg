@@ -1,0 +1,63 @@
+<svg width="340" height="235" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 235" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="0" y="200" width="340" height="22" rx="9" fill="#ded9c9"/>
+
+  <!-- ④ 头下的枕头 / 背后靠的枕头 -->
+  <rect x="12" y="118" width="92" height="46" rx="20" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+  <rect x="152" y="84" width="116" height="46" rx="20" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+
+  <!-- ③ 患侧腿：在后面（贴床），自然伸直 -->
+  <path d="M222 182 L312 188" stroke="#cf7d2c" stroke-width="30"/>
+  <path d="M222 182 L312 188" stroke="#f0a862" stroke-width="22"/>
+  <path d="M310 176 q25 4 24 15 q-1 13 -17 13 h-17 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- 脖子 -->
+  <path d="M88 124 h52 v46 h-52 Z" fill="#eab993"/>
+
+  <!-- 躯干：肩—腰—髋，看得出是侧躺 -->
+  <path d="M114 150 Q116 118 140 112 Q182 102 226 112 Q244 116 246 142 Q248 174 232 186
+           Q200 200 168 196 Q130 192 118 176 Q112 166 114 150 Z"
+        fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+
+  <!-- 头：侧脸朝前上方（不是趴着） -->
+  <g transform="rotate(-10 64 124)">
+    <circle cx="64" cy="124" r="30" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+    <path d="M38 106 Q40 82 66 82 Q94 82 94 118 L81 124 Q84 100 68 96 Q50 92 38 106 Z" fill="#4a4038"/>
+    <path d="M36 120 l-10 6 10 5 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="3"/>
+    <circle cx="45" cy="116" r="3.4" fill="#4a4038"/>
+    <path d="M39 138 q9 5 15 1" stroke="#c9885c" stroke-width="3"/>
+    <ellipse cx="76" cy="130" rx="6" ry="8" fill="#e6b590" stroke="#c9885c" stroke-width="2.4"/>
+  </g>
+
+  <!-- ① 患侧肩往前送、手臂往前伸出来，手心朝上，手指张开 -->
+  <circle cx="132" cy="166" r="22" fill="#f0a862" stroke="#cf7d2c" stroke-width="4"/>
+  <path d="M132 166 L72 190" stroke="#cf7d2c" stroke-width="30"/>
+  <path d="M132 166 L72 190" stroke="#f0a862" stroke-width="22"/>
+  <path d="M70 180 q-25 6 -27 19 q-2 11 10 12 q13 1 18 -9 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <g stroke="#c9885c" stroke-width="3.6" fill="none">
+    <path d="M46 186 q-14 -3 -17 5"/><path d="M52 178 q-13 -6 -18 1"/><path d="M59 171 q-11 -9 -17 -4"/>
+  </g>
+
+  <!-- 健侧手臂：搭在身上 -->
+  <path d="M154 120 Q180 142 202 160" stroke="#6f9bd0" stroke-width="28"/>
+  <path d="M154 120 Q180 142 202 160" stroke="#a9c9ea" stroke-width="21"/>
+  <circle cx="208" cy="166" r="13" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <!-- ② 健侧腿：在前面，膝盖弯曲，下面垫枕头 -->
+  <rect x="238" y="140" width="84" height="34" rx="15" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M228 158 L292 138 L302 176" stroke="#6f9bd0" stroke-width="32" fill="none"/>
+  <path d="M228 158 L292 138 L302 176" stroke="#a9c9ea" stroke-width="24" fill="none"/>
+  <path d="M294 172 q18 10 11 21 q-8 12 -20 4 l-10 -9 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <g font-family="system-ui" font-weight="700" font-size="20" fill="#fff">
+    <path d="M44 208 L58 196" stroke="#e88a3c" stroke-width="4"/>
+    <circle cx="36" cy="214" r="15" fill="#e88a3c"/><text x="29" y="221">1</text>
+    <path d="M294 92 L288 128" stroke="#2a78d6" stroke-width="4"/>
+    <circle cx="296" cy="78" r="15" fill="#2a78d6"/><text x="289" y="85">2</text>
+    <path d="M236 210 L252 196" stroke="#e88a3c" stroke-width="4"/>
+    <circle cx="228" cy="216" r="15" fill="#e88a3c"/><text x="221" y="223">3</text>
+    <path d="M28 70 L22 112" stroke="#8a8578" stroke-width="4"/>
+    <circle cx="30" cy="56" r="15" fill="#8a8578"/><text x="23" y="63">4</text>
+    <path d="M196 48 L204 80" stroke="#8a8578" stroke-width="4"/>
+    <circle cx="194" cy="34" r="15" fill="#8a8578"/><text x="187" y="41">4</text>
+  </g>
+</svg>

@@ -21,11 +21,11 @@
   <path d="M70 90 q7 5 14 0" stroke="#c9885c" stroke-width="3"/>
 
   <!-- 翻身方向 -->
-  <path d="M112 20 A62 62 0 0 1 196 20" stroke="#1a9c4a" stroke-width="6"/>
-  <path d="M186 8 l12 12 -13 10" stroke="#1a9c4a" stroke-width="6"/>
+  <path d="M112 20 A62 62 0 0 1 196 20" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M186 8 l12 12 -13 10" stroke="#3f8f5f" stroke-width="6"/>
 
   <!-- 每 2 小时 -->
-  <circle cx="278" cy="72" r="34" fill="#eaf6ec" stroke="#1a9c4a" stroke-width="6"/>
-  <path d="M278 50 V72 h16" stroke="#1a9c4a" stroke-width="6"/>
-  <text x="234" y="134" font-size="25" font-weight="700" fill="#1a9c4a" font-family="system-ui">每 2 小时</text>
+  <circle cx="278" cy="72" r="34" fill="#eaf4ec" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M278 50 V72 h16" stroke="#3f8f5f" stroke-width="6"/>
+  <text x="234" y="134" font-size="25" font-weight="700" fill="#3f8f5f" font-family="system-ui">每 2 小时</text>
 </svg>

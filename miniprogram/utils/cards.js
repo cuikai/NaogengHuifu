@@ -124,7 +124,7 @@ module.exports = [
     thumb: I('dressOK', 0.635),
     lead: '瘫的那侧不听使唤，所以穿的时候先让它进去，脱的时候最后出来。',
     big: I('dressOK', 0.635),
-    caption: '穿上衣：<span style="color:#e88a3c;font-weight:700">患侧先进</span>，<span style="color:#2a78d6;font-weight:700">健侧后进</span>',
+    caption: '穿上衣：<span style="color:#d98f3f;font-weight:700">患侧先进</span>，<span style="color:#357054;font-weight:700">健侧后进</span>',
     big2: I('stair', 0.5938), caption2: '上楼梯健腿先上，下楼梯患腿先下',
     points: [
       { n: '1', p: '穿上衣：先穿患侧，再穿健侧', q: '脱的时候反过来，先脱健侧' },

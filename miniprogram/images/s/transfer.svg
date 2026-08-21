@@ -4,14 +4,14 @@
   <text x="52" y="166" font-size="21" font-weight="700" fill="#8a8578" font-family="system-ui">床</text>
 
   <g transform="rotate(45 228 84)">
-    <rect x="196" y="52" width="64" height="64" rx="12" fill="#eef4e9" stroke="#1a9c4a" stroke-width="5"/>
-    <rect x="182" y="48" width="15" height="72" rx="7" fill="#1a9c4a"/>
-    <path d="M204 116 v12 M252 116 v12" stroke="#1a9c4a" stroke-width="6"/>
+    <rect x="196" y="52" width="64" height="64" rx="12" fill="#eef4e9" stroke="#3f8f5f" stroke-width="5"/>
+    <rect x="182" y="48" width="15" height="72" rx="7" fill="#3f8f5f"/>
+    <path d="M204 116 v12 M252 116 v12" stroke="#3f8f5f" stroke-width="6"/>
   </g>
-  <text x="176" y="166" font-size="21" font-weight="700" fill="#1a9c4a" font-family="system-ui">椅子放健侧</text>
+  <text x="176" y="166" font-size="21" font-weight="700" fill="#3f8f5f" font-family="system-ui">椅子放健侧</text>
 
-  <path d="M134 84 h42" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="8 7"/>
-  <path d="M134 84 L166 52" stroke="#1a9c4a" stroke-width="4" stroke-dasharray="8 7"/>
-  <path d="M168 84 A34 34 0 0 0 158 60" stroke="#1a9c4a" stroke-width="4"/>
-  <text x="142" y="34" font-size="23" font-weight="700" fill="#1a9c4a" font-family="system-ui">45°</text>
+  <path d="M134 84 h42" stroke="#3f8f5f" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M134 84 L166 52" stroke="#3f8f5f" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M168 84 A34 34 0 0 0 158 60" stroke="#3f8f5f" stroke-width="4"/>
+  <text x="142" y="34" font-size="23" font-weight="700" fill="#3f8f5f" font-family="system-ui">45°</text>
 </svg>
