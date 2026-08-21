@@ -20,7 +20,7 @@ Page({
   data: {
     ui: { fs: 1 },
     care: [], train: [],
-    done: 0, total: 0, finished: false,
+    done: 0, total: 0, pct: 0, finished: false,
     cum: 0, careDays: 0,
     note: ''
   },
@@ -38,6 +38,7 @@ Page({
       train: deco(trainList),
       done: done,
       total: total,
+      pct: total ? done * 100 / total : 0,
       finished: done >= total,
       cum: S.cum,
       careDays: store.careDaysThisMonth(),

@@ -43,7 +43,72 @@
   },
   "simulatorPluginLibVersion": {},
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "glob",
+        "value": "**/.DS_Store"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.md"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.map"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.psd"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.sketch"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.ai"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.xd"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.zip"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.log"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.bak"
+      },
+      {
+        "type": "glob",
+        "value": "**/*.orig"
+      },
+      {
+        "type": "folder",
+        "value": ".git"
+      },
+      {
+        "type": "folder",
+        "value": ".vscode"
+      },
+      {
+        "type": "folder",
+        "value": "docs"
+      },
+      {
+        "type": "folder",
+        "value": "design"
+      },
+      {
+        "type": "folder",
+        "value": "node_modules"
+      }
+    ],
     "include": []
   }
 }

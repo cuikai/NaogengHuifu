@@ -30,7 +30,7 @@
     <view class="lead">做不完不要紧，做了多少就算多少。</view>
 
     <view class="prog">
-      <view class="prog-bar"><view class="prog-in" style="width:{{total ? done*100/total : 0}}%"></view></view>
+      <view class="prog-bar"><view class="prog-in" style="{{'width:' + pct + '%'}}"></view></view>
       <view class="prog-n">{{done}} / {{total}}</view>
     </view>
 
