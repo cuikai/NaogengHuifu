@@ -1,0 +1,27 @@
+<view class="pg flat" style="--fs:{{ui.fs}}">
+
+  <view class="prog">
+    <view wx:for="{{quiz}}" wx:key="id" class="{{index <= qi ? 'on' : ''}}"></view>
+  </view>
+  <view class="kicker">第 {{qi + 1}} / {{quiz.length}} 题　·　大约 3 分钟</view>
+
+  <view class="h1">{{q.q}}</view>
+  <view class="lead" wx:if="{{q.hint}}">{{q.hint}}</view>
+  <view class="lead" wx:else>选最接近的那一个就行。</view>
+
+  <view class="opt hit {{item.on ? 'on' : ''}}" wx:for="{{opts}}" wx:key="i"
+        data-i="{{item.i}}" bindtap="pick">
+    <view class="bx">{{item.on ? '✓' : ''}}</view>
+    <view>{{item.t}}</view>
+  </view>
+
+  <view class="why" wx:if="{{qi === 0}}">
+    这几个问题只用来帮你筛出跟他有关的内容。我们不做诊断、不打分、不下结论 —— 那是医生的事。答案只存在你自己手机里。
+  </view>
+
+</view>
+
+<view class="dock">
+  <view class="btn ghost narrow hit" wx:if="{{qi > 0}}" bindtap="back">上一题</view>
+  <view class="btn primary hit {{canNext ? '' : 'dis'}}" bindtap="next">{{last ? '看结果' : '下一题'}}</view>
+</view>

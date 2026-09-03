@@ -1,0 +1,35 @@
+<svg width="260" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="170" width="248" height="20" rx="9" fill="#ded9c9"/>
+  <path d="M156 166 L82 90" stroke="#cdc7b4" stroke-width="22" stroke-linecap="round"/>
+
+  <path d="M130 140 L214 146 Q228 147 229 158 Q230 171 217 172 L134 173 Q120 172 120 156 Q120 141 130 140 Z"
+        fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M222 144 q19 -2 21 12 q2 15 -13 16 h-10 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <g transform="rotate(-42 152 168)">
+    <path d="M143 60 h22 v32 h-22 Z" fill="#eab993"/>
+    <path d="M132 168 Q126 128 130 98 Q132 82 152 80 Q174 78 178 96 Q184 130 182 168 Z"
+          fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+    <g transform="rotate(-28 158 46)">
+      <circle cx="158" cy="46" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+      <path d="M133 45 Q134 21 158 21 Q182 21 183 43 Q172 31 156 32 Q142 33 133 45 Z" fill="#4a4038"/>
+      <path d="M182 43 l7 5 -7 3 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="2.6"/>
+      <circle cx="173" cy="38" r="3" fill="#4a4038"/>
+      <ellipse cx="177" cy="60" rx="7.5" ry="6" fill="#b8615a" stroke="#c9885c" stroke-width="2.6"/>
+      <ellipse cx="146" cy="50" rx="3.6" ry="4.8" fill="#e6b590" stroke="#c9885c" stroke-width="1.8"/>
+    </g>
+    <path d="M146 98 Q170 108 188 126 Q197 135 188 143 Q179 151 171 140 Q156 122 138 112 Z"
+          fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  </g>
+
+  <!-- 勺子往上送、食物顺着仰头灌进去 -->
+  <g transform="rotate(-30 104 50)">
+    <ellipse cx="104" cy="50" rx="14" ry="8.5" fill="#dfe4ea" stroke="#8d97a4" stroke-width="3"/>
+    <path d="M117 51 L150 56" stroke="#8d97a4" stroke-width="5"/>
+    <path d="M146 42 q24 -2 26 13 q2 15 -15 16 q-17 1 -20 -11 Z" fill="#f5cba6" stroke="#c9885c" stroke-width="4"/>
+  </g>
+
+  <!-- 仰着头，食物直接灌向气管 -->
+  <path d="M99 76 Q104 92 111 106" stroke="#c8382f" stroke-width="4.5" stroke-dasharray="7 7"/>
+  <path d="M104 104 l8 8 5 -10" stroke="#c8382f" stroke-width="4.5"/>
+</svg>

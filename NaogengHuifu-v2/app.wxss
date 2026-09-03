@@ -1,0 +1,222 @@
+page {
+  /* ---------- 文字 ---------- */
+  --ink: #151F1B;
+  --ink2: #495A54;
+  --muted: #7B8B84;
+
+  /* ---------- 底色与纸面（偏冷的中性，比暖米对比度更高） ---------- */
+  --bg: #F4F6F4;
+  --bg2: #EAEFEC;
+  --card: #FFFFFF;
+  --line: #DEE5E1;
+  --line2: #EAEFEC;
+
+  /* ---------- 主色：深青绿 ---------- */
+  --blue: #0E6B58;
+  --blue-soft: #E1EFE9;
+  --blue-ink: #0A4B3E;
+
+  /* ---------- 完成 ---------- */
+  --ok: #0E6B58;
+  --ok-soft: #E1EFE9;
+  --ok-line: #A8D2C4;
+
+  /* ---------- 警示 ---------- */
+  --no: #BC352B;
+  --no-soft: #FBEAE7;
+  --no-line: #EEB9B0;
+
+  /* ---------- 提醒：琥珀（也是动画里的高亮色） ---------- */
+  --warn: #B96F14;
+  --warn-soft: #FBF1DF;
+  --warn-line: #EBD6AE;
+  --warn-ink: #6B5320;
+
+  --sh: 0 4rpx 16rpx rgba(21, 31, 27, 0.05);
+  --sh2: 0 10rpx 28rpx rgba(21, 31, 27, 0.09);
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 字号系数由 app.js 按屏宽算出来 —— 让正文的物理大小在各种手机上接近一致 */
+.pg {
+  --fs: 1;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0 28rpx;
+  padding-bottom: calc(56rpx + env(safe-area-inset-bottom));
+}
+.pg.flat { padding-bottom: calc(180rpx + env(safe-area-inset-bottom)); }
+
+.f-xs { font-size: calc(24rpx * var(--fs)); }
+.f-sm { font-size: calc(28rpx * var(--fs)); }
+.f-md { font-size: calc(32rpx * var(--fs)); }
+.f-lg { font-size: calc(36rpx * var(--fs)); }
+.f-xl { font-size: calc(44rpx * var(--fs)); }
+
+/* ---------- 通用块 ---------- */
+.card {
+  background: var(--card);
+  border: 0;
+  box-shadow: var(--sh);
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 20rpx;
+}
+
+.h1 {
+  font-size: calc(50rpx * var(--fs));
+  font-weight: 700;
+  line-height: 1.32;
+  letter-spacing: -0.5rpx;
+  margin: 32rpx 0 10rpx;
+}
+.lead {
+  font-size: calc(30rpx * var(--fs));
+  color: var(--ink2);
+  line-height: 1.72;
+  margin-bottom: 24rpx;
+}
+.kicker {
+  font-size: calc(25rpx * var(--fs));
+  color: var(--muted);
+  letter-spacing: 2rpx;
+  font-weight: 600;
+  margin-top: 28rpx;
+}
+.sec {
+  font-size: calc(26rpx * var(--fs));
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 2rpx;
+  margin: 40rpx 0 14rpx;
+  display: flex;
+  align-items: center;
+}
+.sec::after {
+  content: '';
+  flex: 1;
+  height: 2rpx;
+  background: var(--line);
+  margin-left: 16rpx;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  min-height: 108rpx;
+  border-radius: 28rpx;
+  display: flex; align-items: center; justify-content: center;
+  font-size: calc(34rpx * var(--fs)); font-weight: 700;
+  border: 0;
+  background: var(--card); color: var(--ink);
+  box-shadow: var(--sh);
+}
+.btn.primary { background: var(--blue); color: #fff; box-shadow: 0 8rpx 20rpx rgba(14, 107, 88, 0.22); }
+.btn.ok { background: var(--ok); color: #fff; box-shadow: 0 8rpx 20rpx rgba(14, 107, 88, 0.22); }
+.btn.ghost { color: var(--ink2); background: var(--card); box-shadow: inset 0 0 0 2rpx var(--line); }
+.btn.dis { opacity: 0.35; }
+
+/* 固定在底部的操作条 */
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding: 20rpx 28rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg);
+  border-top: 2rpx solid var(--line);
+  display: flex; gap: 16rpx;
+  z-index: 10;
+}
+.dock .btn { flex: 1; }
+.dock .btn.narrow { flex: 0 0 150rpx; }
+
+.hit { transition: opacity .14s, transform .14s; }
+.hit:active { opacity: .72; transform: scale(.985); }
+
+/* ---------- 选项（快筛用） ---------- */
+.opt {
+  display: flex; align-items: center; gap: 22rpx;
+  background: var(--card);
+  border-radius: 26rpx;
+  padding: 30rpx 28rpx;
+  margin-bottom: 16rpx;
+  box-shadow: inset 0 0 0 2rpx var(--line);
+  font-size: calc(35rpx * var(--fs));
+  line-height: 1.4;
+}
+.opt .bx {
+  width: 44rpx; height: 44rpx; border-radius: 50%;
+  box-shadow: inset 0 0 0 4rpx var(--line);
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: calc(26rpx * var(--fs));
+}
+.opt.on { box-shadow: inset 0 0 0 4rpx var(--blue); background: var(--blue-soft); }
+.opt.on .bx { background: var(--blue); box-shadow: none; }
+
+/* ---------- 进度 ---------- */
+.prog { display: flex; gap: 8rpx; margin: 24rpx 0 8rpx; }
+.prog i { flex: 1; height: 6rpx; border-radius: 3rpx; background: var(--line); }
+.prog i.on { background: var(--blue); }
+
+/* ---------- 能力标尺 ---------- */
+.axis { background: var(--card); border-radius: 32rpx; padding: 30rpx; margin-bottom: 20rpx; box-shadow: var(--sh); }
+.axis .t { font-size: calc(26rpx * var(--fs)); color: var(--muted); font-weight: 600; letter-spacing: 2rpx; }
+.rung { display: flex; gap: 12rpx; margin: 20rpx 0; }
+.rung i { flex: 1; height: 14rpx; border-radius: 7rpx; background: var(--line); }
+.rung i.on { background: var(--blue); }
+.rung i.now { background: var(--warn); }
+.axis .now-t { font-size: calc(38rpx * var(--fs)); font-weight: 700; line-height: 1.4; }
+.axis .nxt { font-size: calc(28rpx * var(--fs)); color: var(--ink2); margin-top: 8rpx; }
+
+/* ---------- 停止信号 / 出处 ---------- */
+.stop {
+  background: var(--no-soft);
+  border: 2rpx solid var(--no-line);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-top: 24rpx;
+}
+.stop .t { font-size: calc(31rpx * var(--fs)); font-weight: 700; color: var(--no); margin-bottom: 10rpx; }
+.stop .r { font-size: calc(28rpx * var(--fs)); color: #8a3a30; line-height: 1.7; margin-top: 10rpx; }
+.stop .r .k { font-weight: 700; }
+
+.why {
+  background: var(--warn-soft);
+  border: 2rpx solid var(--warn-line);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-top: 24rpx;
+  font-size: calc(28rpx * var(--fs));
+  color: var(--warn-ink);
+  line-height: 1.75;
+}
+
+/* ---------- 要点列表 ---------- */
+.pt { display: flex; gap: 22rpx; padding: 24rpx 0; border-bottom: 2rpx solid var(--line2); }
+.pt:last-child { border-bottom: 0; }
+.pt .n {
+  width: 56rpx; height: 56rpx; border-radius: 50%;
+  background: var(--blue-soft); color: var(--blue-ink);
+  font-size: calc(28rpx * var(--fs)); font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; margin-top: 2rpx;
+}
+.pt .n.bad { background: var(--no-soft); color: var(--no); }
+.pt .p { font-size: calc(32rpx * var(--fs)); font-weight: 600; line-height: 1.6; }
+.pt .q { font-size: calc(26rpx * var(--fs)); color: var(--muted); line-height: 1.6; margin-top: 6rpx; }
+
+/* ---------- 等比图片盒（不依赖 aspect-ratio，老设备也稳） ---------- */
+.imgbox { position: relative; width: 100%; height: 0; overflow: hidden; border-radius: 24rpx; }
+.imgbox > image { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+
+/* ---------- 小标签 ---------- */
+.chip {
+  display: inline-block;
+  font-size: calc(26rpx * var(--fs)); font-weight: 600;
+  padding: 8rpx 18rpx; border-radius: 14rpx;
+  background: var(--blue-soft); color: var(--blue-ink);
+  margin-right: 12rpx; margin-bottom: 12rpx;
+}
+.chip.warn { background: var(--warn-soft); color: var(--warn-ink); }
+.chip.no { background: var(--no-soft); color: var(--no); }

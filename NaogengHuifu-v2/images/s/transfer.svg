@@ -1,0 +1,17 @@
+<svg width="300" height="180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="10" y="26" width="120" height="112" rx="14" fill="#ded9c9"/>
+  <rect x="20" y="36" width="44" height="50" rx="12" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="3"/>
+  <text x="52" y="166" font-size="21" font-weight="700" fill="#8a8578" font-family="system-ui">床</text>
+
+  <g transform="rotate(45 228 84)">
+    <rect x="196" y="52" width="64" height="64" rx="12" fill="#eef4e9" stroke="#3f8f5f" stroke-width="5"/>
+    <rect x="182" y="48" width="15" height="72" rx="7" fill="#3f8f5f"/>
+    <path d="M204 116 v12 M252 116 v12" stroke="#3f8f5f" stroke-width="6"/>
+  </g>
+  <text x="176" y="166" font-size="21" font-weight="700" fill="#3f8f5f" font-family="system-ui">椅子放健侧</text>
+
+  <path d="M134 84 h42" stroke="#3f8f5f" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M134 84 L166 52" stroke="#3f8f5f" stroke-width="4" stroke-dasharray="8 7"/>
+  <path d="M168 84 A34 34 0 0 0 158 60" stroke="#3f8f5f" stroke-width="4"/>
+  <text x="142" y="34" font-size="23" font-weight="700" fill="#3f8f5f" font-family="system-ui">45°</text>
+</svg>

@@ -1,0 +1,19 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">请一定要知道</view>
+  <view class="lead">这些不用天天看，看一次、记住就够。最要命的排在前面。</view>
+
+  <view class="it hit" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="open">
+    <view class="th">
+      <view class="imgbox" style="padding-top:{{item.pad}}">
+        <image src="{{item.src}}" mode="aspectFit" lazy-load />
+      </view>
+    </view>
+    <view class="b">
+      <view class="t">{{item.t}}</view>
+      <view class="d">{{item.d}}</view>
+    </view>
+    <view class="a">›</view>
+  </view>
+
+</view>

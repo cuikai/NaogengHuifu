@@ -1,0 +1,26 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">今天的训练</view>
+  <view class="lead">{{done}} / {{list.length}} 个已完成。做不完不要紧，做了多少算多少 —— 分两三次做完更好。</view>
+
+  <view class="prog">
+    <view wx:for="{{list}}" wx:key="id" class="{{item.fbDone ? 'on' : ''}}"></view>
+  </view>
+
+  <view class="mv hit {{item.fbDone ? 'on' : ''}}" wx:for="{{list}}" wx:key="id"
+        data-id="{{item.id}}" bindtap="open">
+    <figure class="fg" move="{{item.id}}" thumb="{{true}}"></figure>
+    <view class="b">
+      <view class="n">{{item.name}}</view>
+      <view class="d">{{item.sub}}</view>
+      <view class="dose">{{item.stepLabel}}　·　{{item.sets}} 组</view>
+    </view>
+    <view class="ck">{{item.fbDone ? '✓' : (item.n > 0 ? item.n : '')}}</view>
+  </view>
+
+  <view class="why">
+    指南推荐每天至少 45 分钟的康复训练，按体力分 2～3 次做完。累了就停 ——
+    第二天如果比平时更累，说明昨天做多了，明天会自动给你减量。
+  </view>
+
+</view>

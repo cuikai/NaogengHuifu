@@ -1,0 +1,31 @@
+<svg width="340" height="160" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 床（俯视） -->
+  <rect x="10" y="26" width="212" height="116" rx="16" fill="#ded9c9"/>
+  <rect x="22" y="38" width="52" height="60" rx="14" fill="#f4f1e8" stroke="#cdc7b4" stroke-width="3"/>
+
+  <!-- 人（俯视，头在左） -->
+  <path d="M92 66 h30 v28 h-30 Z" fill="#eab993" stroke="#c9885c" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M118 52 h58 q12 0 12 12 v34 q0 12 -12 12 h-58 q-12 0 -12 -12 V64 q0 -12 12 -12 Z"
+        fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+  <path d="M176 62 L206 68" stroke="#6f9bd0" stroke-width="20"/>
+  <path d="M176 62 L206 68" stroke="#a9c9ea" stroke-width="13"/>
+  <path d="M176 100 L206 94" stroke="#6f9bd0" stroke-width="20"/>
+  <path d="M176 100 L206 94" stroke="#a9c9ea" stroke-width="13"/>
+  <path d="M118 58 L104 44" stroke="#c9885c" stroke-width="17"/>
+  <path d="M118 58 L104 44" stroke="#f0c4a0" stroke-width="11"/>
+  <path d="M118 104 L104 118" stroke="#c9885c" stroke-width="17"/>
+  <path d="M118 104 L104 118" stroke="#f0c4a0" stroke-width="11"/>
+  <circle cx="76" cy="80" r="24" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M62 62 Q76 52 92 62 Q84 68 76 68 Q68 68 62 62 Z" fill="#4a4038"/>
+  <circle cx="70" cy="74" r="3" fill="#4a4038"/><circle cx="84" cy="74" r="3" fill="#4a4038"/>
+  <path d="M70 90 q7 5 14 0" stroke="#c9885c" stroke-width="3"/>
+
+  <!-- 翻身方向 -->
+  <path d="M112 20 A62 62 0 0 1 196 20" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M186 8 l12 12 -13 10" stroke="#3f8f5f" stroke-width="6"/>
+
+  <!-- 每 2 小时 -->
+  <circle cx="278" cy="72" r="34" fill="#eaf4ec" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M278 50 V72 h16" stroke="#3f8f5f" stroke-width="6"/>
+  <text x="234" y="134" font-size="25" font-weight="700" fill="#3f8f5f" font-family="system-ui">每 2 小时</text>
+</svg>

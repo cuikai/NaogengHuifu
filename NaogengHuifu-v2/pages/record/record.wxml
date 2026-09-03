@@ -1,0 +1,53 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">他能做到的事在变多</view>
+  <view class="lead">每周重问三道关键的题，画出来。复诊时这一页可以直接给医生看。</view>
+
+  <view class="card chart" wx:if="{{bars.length > 1}}">
+    <view class="ct">能力趋势（站起 · 走路 · 患手）</view>
+    <view class="cn">
+      <text class="cv">{{latest}}</text>
+      <text class="cd" wx:if="{{delta > 0}}">比第一次多了 {{delta}} 档</text>
+      <text class="cd flat" wx:elif="{{delta === 0}}">和第一次持平</text>
+      <text class="cd down" wx:else>比第一次低了 {{-delta}} 档，去问一下医生</text>
+    </view>
+    <view class="bars">
+      <view class="col" wx:for="{{bars}}" wx:key="d">
+        <view class="bar {{index === bars.length - 1 ? '' : 'soft'}}" style="height:{{item.h}}%"></view>
+        <view class="cap">{{item.d}}</view>
+      </view>
+    </view>
+    <view class="base"></view>
+  </view>
+  <view class="card" wx:else>
+    <view class="ct">能力趋势</view>
+    <view class="lead" style="margin:12rpx 0 0">再复评一次就能画出曲线了。{{nextWeek}}</view>
+  </view>
+
+  <view class="nums">
+    <view class="nm"><view class="nv">{{day}}</view><view class="nl">第几天</view></view>
+    <view class="nm"><view class="nv">{{msCount}}</view><view class="nl">已做到的事</view></view>
+    <view class="nm"><view class="nv">{{careDays}}</view><view class="nl">这个月陪了几天</view></view>
+  </view>
+
+  <view class="sec">第一次做到</view>
+  <view class="lead">这十件事来自改良 Barthel 指数。只记他哪天第一次做到，不算分、不下结论。</view>
+
+  <view class="ms hit {{item.on ? 'on' : ''}}" wx:for="{{ms}}" wx:key="id"
+        data-id="{{item.id}}" bindtap="toggleMs">
+    <view class="mck">{{item.on ? '✓' : ''}}</view>
+    <view class="mb">
+      <view class="mt">{{item.t}}</view>
+      <view class="mw" wx:if="{{item.on}}">{{item.when}} 第一次做到</view>
+    </view>
+  </view>
+
+  <view class="sec" wx:if="{{notes.length}}">你写下来的话</view>
+  <view class="note" wx:for="{{notes}}" wx:key="d">
+    <view class="nd">{{item.d}}</view>
+    <view class="nt">{{item.t}}</view>
+  </view>
+
+  <view class="foot">从 {{start}} 开始。</view>
+
+</view>

@@ -1,0 +1,11 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-top: 100%;          /* 站姿：方构图 */
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: var(--blue-soft);
+}
+.wrap.wide { padding-top: 75%; }   /* 卧姿：横构图 */
+.cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }

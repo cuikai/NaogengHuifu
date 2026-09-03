@@ -1,0 +1,40 @@
+<svg width="260" height="215" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 215" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="150" width="150" height="18" rx="8" fill="#ded9c9"/>
+  <path d="M18 168 v32 M140 168 v32" stroke="#cdc7b4" stroke-width="8"/>
+
+  <!-- ===== 家属：站着往上拽 ===== -->
+  <path d="M204 168 v34 M234 168 v34" stroke="#c8b493" stroke-width="17" stroke-linecap="round"/>
+  <path d="M210 66 h18 v22 h-18 Z" fill="#eab993"/>
+  <path d="M198 104 Q192 138 196 170 L244 170 Q246 136 242 102 Q240 82 219 80 Q200 80 198 104 Z"
+        fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
+  <circle cx="219" cy="56" r="22" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M197 56 Q197 34 219 34 Q241 34 241 54 Q231 44 219 44 Q206 44 197 56 Z" fill="#59493c"/>
+  <circle cx="210" cy="58" r="2.6" fill="#4a4038"/><circle cx="226" cy="58" r="2.6" fill="#4a4038"/>
+
+  <!-- ===== 患者：被拽得歪过去 ===== -->
+  <g transform="rotate(9 94 150)">
+    <path d="M72 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+    <path d="M99 138 h23 v48 q0 9 -11.5 9 q-11.5 0 -11.5 -9 Z" fill="#a9c9ea" stroke="#6f9bd0" stroke-width="4"/>
+    <path d="M84 64 h20 v22 h-20 Z" fill="#eab993"/>
+    <path d="M66 150 Q62 118 66 98 Q69 80 94 78 Q119 76 122 96 Q127 120 124 150 Z"
+          fill="#bcd6f2" stroke="#6f9bd0" stroke-width="4"/>
+    <circle cx="94" cy="54" r="25" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+    <path d="M69 53 Q70 27 94 27 Q118 27 119 51 Q108 39 94 39 Q80 39 69 53 Z" fill="#4a4038"/>
+    <circle cx="85" cy="55" r="3" fill="#4a4038"/><circle cx="103" cy="55" r="3" fill="#4a4038"/>
+    <path d="M78 46 l11 4 M110 46 l-11 4" stroke="#4a4038" stroke-width="3"/>
+    <ellipse cx="94" cy="69" rx="6.5" ry="5" fill="#b8615a" stroke="#c9885c" stroke-width="2.4"/>
+  </g>
+
+  <!-- 患侧手臂被硬拽起来 -->
+  <path d="M116 94 L168 70" stroke="#cf7d2c" stroke-width="27" fill="none"/>
+  <path d="M116 94 L168 70" stroke="#f0a862" stroke-width="20" fill="none"/>
+  <circle cx="174" cy="67" r="13" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <!-- 家属抓着手腕往上拉 -->
+  <path d="M202 112 L182 76" stroke="#bb9a68" stroke-width="26" fill="none"/>
+  <path d="M202 112 L182 76" stroke="#ecdcc0" stroke-width="19" fill="none"/>
+  <circle cx="179" cy="70" r="15" fill="#ecdcc0" stroke="#bb9a68" stroke-width="4"/>
+
+  <!-- 肩膀被拉伤 -->
+  <circle cx="110" cy="94" r="17" fill="#fdefec" stroke="#c8382f" stroke-width="4.5"/>
+  <path d="M103 87 l14 14 M117 87 l-14 14" stroke="#c8382f" stroke-width="4.5"/>
+</svg>

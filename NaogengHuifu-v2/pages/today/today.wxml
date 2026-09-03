@@ -1,0 +1,47 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <block wx:if="{{finished}}">
+    <view class="ds">
+      <view class="ds-tick">✓</view>
+      <view class="ds-t">今天的都做完了</view>
+      <view class="ds-s">今天 {{total}} 件都完成了。</view>
+      <view class="ds-s" wx:if="{{careDays > 0}}">这个月，你陪着做了 {{careDays}} 天。</view>
+
+      <view class="ds-box">
+        <view class="ds-lb">今天他怎么样？（可以不写）</view>
+        <textarea class="ds-ta" value="{{note}}" bindinput="onNote" maxlength="80"
+                  placeholder="比如：今天自己扣上了两颗扣子" placeholder-class="ph"
+                  auto-height show-confirm-bar="{{false}}" />
+      </view>
+
+      <view class="btn ok hit" bindtap="finish">收起，明天见</view>
+      <view class="ds-rest">剩下的时间，给你自己。</view>
+      <view class="ds-back hit" bindtap="reopen">还想改一下今天的记录</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="h1">今天让他自己做</view>
+    <view class="lead">{{note0}}</view>
+
+    <view class="prog">
+      <view wx:for="{{list}}" wx:key="id" class="{{item.full ? 'on' : ''}}"></view>
+    </view>
+
+    <view class="tk hit {{item.full ? 'on' : ''}}" wx:for="{{list}}" wx:key="id"
+          data-id="{{item.id}}" data-target="{{item.target}}" bindtap="tap">
+      <image class="ic" src="{{item.icon}}" mode="aspectFit" />
+      <view class="b">
+        <view class="n">{{item.label}}</view>
+        <view class="d">{{item.line}}</view>
+      </view>
+      <view class="ck">{{item.full ? '✓' : (item.n > 0 ? item.n : '')}}</view>
+    </view>
+
+    <view class="why">
+      每一件他自己完成的事，都是一次真正的康复训练。帮他做完，不如陪他慢慢做 ——
+      慢一点没关系，代劳才是真的耽误。累了就停，高龄患者容易疲劳，硬撑没有好处。
+    </view>
+  </block>
+
+</view>

@@ -1,0 +1,88 @@
+<view class="pg flat" style="--fs:{{ui.fs}}" wx:if="{{m}}">
+
+  <view class="h1">{{m.name}}</view>
+  <view class="lead">{{m.sub}}</view>
+
+  <view class="frame">
+    <block wx:if="{{cmp && m.compare}}">
+      <view class="pair">
+        <view class="col">
+          <figure move="{{m.id}}" speed="{{speed}}" mirror="{{mirror}}"></figure>
+          <view class="cap ok">✓ 标准动作</view>
+        </view>
+        <view class="col">
+          <figure move="{{m.id}}" speed="{{speed}}" mirror="{{mirror}}" cmp="{{true}}"></figure>
+          <view class="cap no">✕ {{m.compare.label}}</view>
+        </view>
+      </view>
+    </block>
+    <figure wx:else move="{{m.id}}" speed="{{speed}}" mirror="{{mirror}}" bindtick="onTick"></figure>
+
+    <view class="bar" wx:if="{{!m.gif}}">
+      <view class="seg" wx:for="{{phases}}" wx:key="label">
+        <view class="fill" style="width:{{item.pct}}%"></view>
+      </view>
+    </view>
+    <view class="phase" wx:if="{{!m.gif}}">{{phaseText}}</view>
+
+    <view class="ctl" wx:if="{{!m.gif}}">
+      <view class="c hit {{speed === 0.5 ? 'on' : ''}}" bindtap="slow">0.5×　慢放</view>
+      <view class="c hit {{mirror ? 'on' : ''}}" bindtap="flip">镜像患侧</view>
+      <view class="c hit {{cmp ? 'on' : ''}}" wx:if="{{m.compare}}" bindtap="toggleCmp">对照常见错误</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="lead" style="margin:0">{{m.purpose}}</view>
+    <view style="margin-top:16rpx">
+      <text class="chip">{{stepLabel}}</text>
+      <text class="chip">{{sets}} 组</text>
+      <text class="chip warn">{{m.dose}}</text>
+    </view>
+  </view>
+
+  <view class="stop" wx:if="{{m.compare}}">
+    <view class="t">常见错误：{{m.compare.label}}</view>
+    <view class="r">{{m.compare.why}}</view>
+  </view>
+
+  <view class="sec">怎么做</view>
+  <view class="card">
+    <view class="pt" wx:for="{{m.phases}}" wx:key="label">
+      <view class="n">{{index + 1}}</view>
+      <view><view class="p">{{item.label}}</view></view>
+    </view>
+  </view>
+
+  <view class="sec">什么时候必须停</view>
+  <view class="card">
+    <view class="pt" wx:for="{{m.cautions}}" wx:key="*this">
+      <view class="n bad">!</view>
+      <view><view class="p">{{item}}</view></view>
+    </view>
+  </view>
+  <view class="stop">
+    <view class="t">这几样出现就立刻停</view>
+    <view class="r" wx:for="{{stop}}" wx:key="k">
+      <text class="k">{{item.k}}</text> —— {{item.v}}
+    </view>
+  </view>
+
+  <view class="sec">练完了，告诉我一句</view>
+  <view class="lead">这一下点击决定明天给他多少量 —— 不点，明天就还是今天这个量。</view>
+  <view class="fb">
+    <view class="f hit {{fb === 0 ? 'on' : ''}}" data-f="0" bindtap="rate">很轻松</view>
+    <view class="f hit {{fb === 1 ? 'on' : ''}}" data-f="1" bindtap="rate">有点吃力</view>
+    <view class="f hit {{fb === 2 ? 'on' : ''}}" data-f="2" bindtap="rate">做不到 / 疼</view>
+  </view>
+  <view class="tomorrow" wx:if="{{fbMsg}}">
+    <view class="tt">明天：{{fbMsg}}</view>
+    <view class="td" wx:if="{{seeDoctor}}">这一条不要拖 —— 挂康复科或者神经内科都行。</view>
+  </view>
+
+</view>
+
+<view class="dock">
+  <view class="btn ghost narrow hit {{n <= 0 ? 'dis' : ''}}" bindtap="minus">−</view>
+  <view class="btn hit {{full ? 'ok' : 'primary'}}" bindtap="plus">{{full ? '今天做完了 ✓' : '做完一组　' + n + ' / ' + sets}}</view>
+</view>

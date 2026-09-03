@@ -1,0 +1,25 @@
+<svg width="320" height="190" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <text x="10" y="28" font-size="25" font-weight="700" fill="#4f9a76" font-family="system-ui">上：健腿先</text>
+  <path d="M14 172 V148 h32 V122 h32 V96 h32 v76 Z" fill="#ece4d3" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M30 92 V58" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M22 66 l8 -10 8 10" stroke="#3f8f5f" stroke-width="6"/>
+  <path d="M94 40 V78" stroke="#6f9bd0" stroke-width="24"/>
+  <path d="M94 40 V78" stroke="#a9c9ea" stroke-width="17"/>
+  <path d="M90 78 q20 -2 22 9 q2 9 -10 9 h-12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M62 66 V104" stroke="#cf7d2c" stroke-width="24"/>
+  <path d="M62 66 V104" stroke="#f0a862" stroke-width="17"/>
+  <path d="M58 104 q20 -2 22 9 q2 9 -10 9 h-12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+
+  <path d="M160 44 V176" stroke="#ece4d3" stroke-width="3"/>
+
+  <text x="182" y="28" font-size="25" font-weight="700" fill="#d98f3f" font-family="system-ui">下：患腿先</text>
+  <path d="M306 172 V148 h-32 V122 h-32 V96 h-32 v76 Z" fill="#ece4d3" stroke="#cdc7b4" stroke-width="4"/>
+  <path d="M290 58 V92" stroke="#d98f3f" stroke-width="6"/>
+  <path d="M282 84 l8 10 8 -10" stroke="#d98f3f" stroke-width="6"/>
+  <path d="M226 40 V78" stroke="#6f9bd0" stroke-width="24"/>
+  <path d="M226 40 V78" stroke="#a9c9ea" stroke-width="17"/>
+  <path d="M230 78 q-20 -2 -22 9 q-2 9 10 9 h12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+  <path d="M258 66 V104" stroke="#cf7d2c" stroke-width="24"/>
+  <path d="M258 66 V104" stroke="#f0a862" stroke-width="17"/>
+  <path d="M262 104 q-20 -2 -22 9 q-2 9 10 9 h12 Z" fill="#f0c4a0" stroke="#c9885c" stroke-width="4"/>
+</svg>

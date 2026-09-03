@@ -1,0 +1,24 @@
+<svg width="300" height="150" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 一周药盒 -->
+  <rect x="12" y="54" width="164" height="52" rx="10" fill="#eaf2fb" stroke="#6f9bd0" stroke-width="4"/>
+  <g stroke="#6f9bd0" stroke-width="3">
+    <path d="M35 56 V104 M58 56 V104 M81 56 V104 M104 56 V104 M127 56 V104 M150 56 V104"/>
+  </g>
+  <g fill="#f0a862" stroke="#cf7d2c" stroke-width="3">
+    <rect x="17" y="72" width="13" height="16" rx="6.5"/><rect x="40" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="63" y="72" width="13" height="16" rx="6.5"/><rect x="86" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="109" y="72" width="13" height="16" rx="6.5"/><rect x="132" y="72" width="13" height="16" rx="6.5"/>
+    <rect x="155" y="72" width="13" height="16" rx="6.5"/>
+  </g>
+  <circle cx="168" cy="46" r="19" fill="#3f8f5f"/>
+  <path d="M159 46 l6 7 12 -14" stroke="#fff" stroke-width="5"/>
+  <text x="30" y="140" font-size="24" font-weight="700" fill="#3f8f5f" font-family="system-ui">按时吃</text>
+
+  <!-- 自己停药 -->
+  <rect x="212" y="46" width="52" height="62" rx="10" fill="#fdf6f6" stroke="#c8382f" stroke-width="4"/>
+  <rect x="220" y="30" width="36" height="16" rx="5" fill="#c8382f"/>
+  <path d="M224 68 h28 M224 86 h28" stroke="#c8382f" stroke-width="4"/>
+  <circle cx="268" cy="40" r="21" fill="#fdefec" stroke="#c8382f" stroke-width="5"/>
+  <path d="M260 32 l16 16 M276 32 l-16 16" stroke="#c8382f" stroke-width="5"/>
+  <text x="200" y="140" font-size="24" font-weight="700" fill="#c8382f" font-family="system-ui">自己停</text>
+</svg>

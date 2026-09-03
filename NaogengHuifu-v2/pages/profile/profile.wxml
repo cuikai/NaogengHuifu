@@ -1,0 +1,52 @@
+<view class="pg flat" style="--fs:{{ui.fs}}">
+
+  <view class="h1">{{weekly ? '这一周的变化' : '这是他现在的位置'}}</view>
+  <view class="lead">下面的内容都是按你刚才勾的情况筛出来的。这不是医生的诊断，也不是评分。</view>
+
+  <view class="axis">
+    <view class="t">走 · 移动</view>
+    <view class="rung">
+      <view wx:for="{{mRung}}" wx:key="*this" class="{{item}}"></view>
+    </view>
+    <view class="now-t">{{mLabel}}</view>
+    <view class="nxt">{{mNext}}</view>
+  </view>
+
+  <view class="axis">
+    <view class="t">手 · 上肢</view>
+    <view class="rung">
+      <view wx:for="{{hRung}}" wx:key="*this" class="{{item}}"></view>
+    </view>
+    <view class="now-t">{{hLabel}}</view>
+    <view class="nxt">{{hNext}}</view>
+  </view>
+
+  <block wx:if="{{rules.length}}">
+    <view class="sec">要特别注意的</view>
+    <view class="stop" wx:for="{{rules}}" wx:key="t">
+      <view class="t">{{item.t}}</view>
+      <view class="r">{{item.d}}</view>
+    </view>
+  </block>
+
+  <view class="sec">今天适合练的</view>
+  <view class="card">
+    <view class="pt" wx:for="{{plan}}" wx:key="id">
+      <view class="n">{{index + 1}}</view>
+      <view>
+        <view class="p">{{item.name}}</view>
+        <view class="q">{{item.sub}}　·　{{item.dose}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="why">
+    这些内容来自公开的康复指南与共识，每一条剂量都能核到出处。软件只负责按你勾的情况把相关的挑出来，
+    不评估疗效、不生成治疗方案。有治疗师在带的，以治疗师说的为准。
+  </view>
+
+</view>
+
+<view class="dock">
+  <view class="btn primary hit" bindtap="go">开始今天的训练</view>
+</view>

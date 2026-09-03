@@ -1,0 +1,50 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="h1">关于</view>
+  <view class="lead">脑梗恢复是一个开源的公益项目。不收费、没有广告、不卖任何东西。所有记录只存在你自己手机里，不上传。</view>
+
+  <view class="blk">
+    <view class="bt">这些内容是从哪来的</view>
+    <view class="bp">照护要点和训练动作，都来自国内公开的康复指南、专家共识，以及三甲医院、国家级康复机构的公开科普。每一条剂量都有出处，且经过多个来源交叉核对。</view>
+    <view class="src">
+      <view class="si">中国脑血管病临床管理指南（第 2 版）· 康复管理</view>
+      <view class="si">中国脑卒中患者远程康复管理专家共识（2025）</view>
+      <view class="si">脑卒中患者居家康复环境评估与改造实践指南（2025 ICF 版）</view>
+      <view class="si">中国高龄脑卒中患者康复治疗技术专家共识（2019）</view>
+      <view class="si">改良 Barthel 指数（MBI）条目</view>
+    </view>
+  </view>
+
+  <view class="blk">
+    <view class="bt">开头那几个问题是干什么的</view>
+    <view class="bp">只用来把跟他有关的内容挑出来。已经能自己走路的人，不该还在看「怎么翻身」；还起不来的人，也不该看「上下楼梯」。</view>
+    <view class="bp"><text class="k">我们不做诊断、不打分、不分期、不评估疗效，也不提供在线问诊。</text>这些是医疗判断，软件不能做，也不该做。有治疗师在带的，一律以治疗师说的为准。</view>
+    <view class="lnk hit" bindtap="redo">重新做一次快筛</view>
+  </view>
+
+  <view class="blk warn">
+    <view class="bt">站立和步行这部分，条件是什么</view>
+    <view class="bp">跌倒导致的髋部骨折，对高龄患者是致命的。所以这些动作只会出现在「已经能站起来」之后，而且必须同时满足：</view>
+    <view class="bp"><text class="k">旁边有人</text> —— 不是在隔壁房间，是伸手能扶到。</view>
+    <view class="bp"><text class="k">手边有扶手</text> —— 稳固的椅背、墙上扶手、助行器都行，别用带轮子的。</view>
+    <view class="bp"><text class="k">第一次让专业人看过</text> —— 请护士或康复师当面示范一遍，用手机拍下来。</view>
+    <view class="bp"><text class="k">地面不滑、没有门槛</text>。</view>
+    <view class="bp">做不到这四条，就先只做坐位和卧位的动作。</view>
+  </view>
+
+  <view class="blk warn">
+    <view class="bt">这里始终不做的一件事</view>
+    <view class="bp"><text class="k">吞咽训练</text> —— 误吸可以直接致命，必须由言语或吞咽治疗师评估后指导。这里只讲进食安全（坐直、小口、慢喂）。</view>
+  </view>
+
+  <view class="blk">
+    <view class="bt">源码与讨论</view>
+    <view class="bp">全部代码、动作数据和文献依据都是公开的。</view>
+    <view class="lnk hit" bindtap="copyRepo">{{repo}}　（点击复制）</view>
+  </view>
+
+  <view class="danger hit" bindtap="clear">清空全部记录</view>
+
+  <view class="ver">脑梗恢复 · v2.0.0</view>
+
+</view>

@@ -1,0 +1,73 @@
+<view class="pg" style="--fs:{{ui.fs}}" wx:if="{{c}}">
+
+  <view class="h1">{{c.t}}</view>
+  <view class="lead">{{c.lead}}</view>
+
+  <!-- 对错并排 -->
+  <view class="cmp" wx:if="{{c.compare}}">
+    <view class="pn {{item.ok ? 'yes' : 'no'}}" wx:for="{{c.compare}}" wx:key="tag">
+      <view class="imgbox" style="padding-top:{{item.pad}}">
+        <image src="{{item.img.src}}" mode="aspectFit" />
+      </view>
+      <view class="ptag">{{item.ok ? '✓' : '✕'}} {{item.tag}}</view>
+    </view>
+  </view>
+
+  <!-- 大图 -->
+  <block wx:if="{{c.big}}">
+    <view class="frame">
+      <view class="imgbox" style="padding-top:{{c.bigPad}}">
+        <image src="{{c.big.src}}" mode="aspectFit" />
+      </view>
+    </view>
+    <rich-text class="cap" wx:if="{{c.caption}}" nodes="{{c.caption}}"></rich-text>
+  </block>
+
+  <block wx:if="{{c.big2}}">
+    <view class="frame mt">
+      <view class="imgbox" style="padding-top:{{c.big2Pad}}">
+        <image src="{{c.big2.src}}" mode="aspectFit" />
+      </view>
+    </view>
+    <rich-text class="cap" wx:if="{{c.caption2}}" nodes="{{c.caption2}}"></rich-text>
+  </block>
+
+  <!-- FAST 三格 -->
+  <view class="fast" wx:if="{{c.fast}}">
+    <view class="fc" wx:for="{{c.fast}}" wx:key="t">
+      <view class="imgbox" style="padding-top:{{item.pad}}">
+        <image src="{{item.img.src}}" mode="aspectFit" />
+      </view>
+      <view class="ft">{{item.t}}</view>
+      <view class="fq">{{item.q}}</view>
+    </view>
+  </view>
+
+  <!-- 要点 -->
+  <view class="pts">
+    <view class="pt" wx:for="{{c.points}}" wx:key="p">
+      <view class="n {{item.bad ? 'bad' : ''}}">{{item.n}}</view>
+      <view>
+        <view class="p">{{item.p}}</view>
+        <view class="q" wx:if="{{item.q}}">{{item.q}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 依据 -->
+  <view class="why" wx:if="{{c.why}}">
+    <view class="why-t" wx:if="{{c.why.t}}">{{c.why.t}}</view>
+    <view class="why-p" wx:for="{{c.why.p}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <!-- 上一条 / 下一条 -->
+  <view class="nav">
+    <view class="nb hit {{prev ? '' : 'dis'}}" data-id="{{prev.id}}" bindtap="jump" wx:if="{{prev}}">
+      <view class="nl">上一条</view><view class="nt">{{prev.t}}</view>
+    </view>
+    <view class="nb hit right" data-id="{{next.id}}" bindtap="jump" wx:if="{{next}}">
+      <view class="nl">下一条</view><view class="nt">{{next.t}}</view>
+    </view>
+  </view>
+
+</view>

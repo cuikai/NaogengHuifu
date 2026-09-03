@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/assess/assess",
+    "pages/profile/profile",
+    "pages/plan/plan",
+    "pages/move/move",
+    "pages/today/today",
+    "pages/know/know",
+    "pages/card/card",
+    "pages/record/record",
+    "pages/about/about"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F4F6F4",
+    "navigationBarTitleText": "脑梗恢复",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F6F4",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "darkmode": false
+}

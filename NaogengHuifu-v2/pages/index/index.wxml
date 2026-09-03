@@ -1,0 +1,67 @@
+<view class="pg" style="--fs:{{ui.fs}}">
+
+  <view class="kicker">第 {{day}} 天　·　{{date}}</view>
+  <view class="h1">{{planCount ? '今天练这 ' + planCount + ' 个' : '先花 3 分钟，认识一下他'}}</view>
+  <view class="lead" wx:if="{{planCount}}">{{mLabel}}。这些是按他现在的情况筛出来的，大约 20 分钟，分两次做完也行。</view>
+  <view class="lead" wx:else>回答 8 个问题，我们才知道该给他什么内容。不答的话，给出来的东西大概率跟他没关系。</view>
+
+  <view class="echo" wx:if="{{echo}}">
+    <text wx:if="{{echo.done >= echo.total}}">昨天 {{echo.total}} 个动作都做完了。</text>
+    <text wx:else>昨天做了 {{echo.done}} 个动作。</text>
+  </view>
+
+  <!-- 没做过快筛：整屏只有一件事可做 -->
+  <view class="btn primary hit big" wx:if="{{!assessed}}" bindtap="toAssess">开始</view>
+
+  <block wx:else>
+    <view class="tile hit" data-url="/pages/plan/plan" bindtap="go">
+      <view class="thumbs">
+        <figure wx:for="{{thumbs}}" wx:key="*this" class="th" move="{{item}}" thumb="{{true}}"></figure>
+      </view>
+      <view class="tb">
+        <view class="tt">今天的训练</view>
+        <view class="ts {{planDone >= planCount ? 'on' : ''}}">{{planDone >= planCount ? '都做完了' : planDone + ' / ' + planCount + ' 个已完成'}}</view>
+      </view>
+      <view class="ar">›</view>
+    </view>
+
+    <view class="tile hit" data-url="/pages/today/today" bindtap="go">
+      <view class="tb wide">
+        <view class="tt">今天让他自己做</view>
+        <view class="ts {{adlDone >= adlTotal ? 'on' : ''}}">{{adlDone}} / {{adlTotal}} 件</view>
+      </view>
+      <view class="ar">›</view>
+    </view>
+
+    <view class="rev hit" wx:if="{{needWeekly}}" bindtap="toWeekly">
+      <view class="rt">该复评了 —— 三道题，半分钟</view>
+      <view class="rd">上次是 {{lastWeek}}。他这一周有没有变化，重问一遍就知道。</view>
+    </view>
+
+    <view class="row">
+      <view class="half hit" data-url="/pages/record/record" bindtap="go">
+        <view class="tt">记录</view>
+        <view class="ts">已做到 {{msCount}} 件</view>
+      </view>
+      <view class="half hit" data-url="/pages/know/know" bindtap="go">
+        <view class="tt">请一定要知道</view>
+        <view class="ts">{{cardCount}} 条</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="bar hit" data-url="/pages/card/card?id=again" bindtap="go">
+    <view class="bar-n">120</view>
+    <view class="bar-b">
+      <view class="bar-t">万一复发，怎么认</view>
+      <view class="bar-d">认得出来，就能少损失很多</view>
+    </view>
+    <view class="ar">›</view>
+  </view>
+
+  <view class="about hit" data-url="/pages/about/about" bindtap="go">
+    <view class="lbl">关于这些内容 · 出处 · 重新做一次快筛</view>
+    <view class="ar">›</view>
+  </view>
+
+</view>

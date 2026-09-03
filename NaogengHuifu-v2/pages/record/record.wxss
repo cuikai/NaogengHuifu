@@ -1,0 +1,40 @@
+.chart .ct { font-size: calc(26rpx * var(--fs)); color: var(--muted); font-weight: 600; letter-spacing: 1rpx; }
+.cn { display: flex; align-items: baseline; gap: 14rpx; margin-top: 6rpx; }
+.cv { font-size: calc(64rpx * var(--fs)); font-weight: 700; line-height: 1.1; }
+.cd { font-size: calc(27rpx * var(--fs)); color: var(--ok); font-weight: 600; }
+.cd.flat { color: var(--muted); }
+.cd.down { color: var(--no); }
+
+.bars { display: flex; align-items: flex-end; gap: 14rpx; height: 200rpx; margin-top: 22rpx; }
+.bars .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 10rpx; height: 100%; }
+.bars .bar { width: 100%; background: var(--blue); border-radius: 8rpx 8rpx 4rpx 4rpx; min-height: 6rpx; }
+.bars .bar.soft { background: var(--blue-soft); }
+.bars .cap { font-size: calc(22rpx * var(--fs)); color: var(--muted); }
+.base { height: 2rpx; background: var(--line); margin-top: 4rpx; }
+
+.nums { display: flex; gap: 18rpx; margin-top: 8rpx; }
+.nm { flex: 1; background: var(--card); border-radius: 28rpx; padding: 26rpx 20rpx; box-shadow: var(--sh); text-align: center; }
+.nv { font-size: calc(48rpx * var(--fs)); font-weight: 700; line-height: 1.2; }
+.nl { font-size: calc(24rpx * var(--fs)); color: var(--muted); margin-top: 6rpx; }
+
+.ms {
+  display: flex; align-items: center; gap: 20rpx;
+  background: var(--card); border-radius: 26rpx;
+  padding: 26rpx 24rpx; margin-bottom: 14rpx; box-shadow: var(--sh);
+}
+.ms.on { background: var(--ok-soft); box-shadow: none; }
+.mck {
+  width: 52rpx; height: 52rpx; border-radius: 50%;
+  box-shadow: inset 0 0 0 4rpx var(--line);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: calc(26rpx * var(--fs)); flex: 0 0 auto;
+}
+.ms.on .mck { background: var(--ok); box-shadow: none; }
+.mb { flex: 1; }
+.mt { font-size: calc(33rpx * var(--fs)); font-weight: 600; line-height: 1.45; }
+.mw { font-size: calc(25rpx * var(--fs)); color: var(--ok); margin-top: 4rpx; font-weight: 600; }
+
+.note { background: var(--card); border-radius: 26rpx; padding: 24rpx; margin-bottom: 14rpx; box-shadow: var(--sh); }
+.nd { font-size: calc(24rpx * var(--fs)); color: var(--muted); }
+.nt { font-size: calc(31rpx * var(--fs)); line-height: 1.6; margin-top: 6rpx; }
+.foot { font-size: calc(26rpx * var(--fs)); color: var(--muted); text-align: center; margin-top: 40rpx; }
