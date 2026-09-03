@@ -7,5 +7,5 @@
   overflow: hidden;
   background: var(--blue-soft);
 }
-.wrap.wide { padding-top: 75%; }   /* 卧姿：横构图 */
+.wrap.wide { padding-top: 34%; }   /* 卧姿：横构图 —— 人躺着占的是宽，不是高 */
 .cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }

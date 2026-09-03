@@ -1,78 +1,161 @@
 /* ===========================================================================
  * figure.js —— 人体骨骼渲染器
  *
- * 一套渲染器 + 每个动作一份关节角度数据。新增动作 = 加一份 JSON，
- * 不需要再画图、不需要导 GIF。品质天然统一，包体几乎不增加。
+ * 一套渲染器 + 每个动作一份关节角度数据。新增动作 = 加一份关键帧，
+ * 不需要画图、不需要导 GIF。品质天然统一，包体几乎不增加。
  *
- * 角度约定（全部为「世界绝对角」，authoring 时不用推算父子关系）：
- *   trunk / head  —— 从「正上方」量起，正 = 向前（+X，人物面朝的方向）倾
- *   四肢各段      —— 从「正下方」量起，正 = 向前（+X）
- *                    例：uarm=0 手臂自然下垂；uarm=90 手臂水平前举
- *                        thigh=90 大腿水平前伸（坐位）；shank=0 小腿垂直
- *                        foot=90 脚掌水平朝前（站立）
- *   每段角描述的是「该段从近端指向远端」的方向。
+ * ── 角度约定：全部是「关节角」，也就是康复科口头说的那个角度 ──
+ *   trunk   躯干前倾（世界角，0 = 直立，+ = 前倾，-90 = 平躺）
+ *   neck    颈（相对躯干，+ = 低头）
+ *   hip     屈髋（+ = 大腿抬向身体前方）
+ *   knee    屈膝（+ = 小腿向后折；永远 ≥ 0，膝盖不可能向前反折）
+ *   ankle   踝（+ = 背屈/勾脚尖，- = 跖屈/绷脚尖，0 = 中立位）
+ *   sho     肩前屈（+ = 手臂前举）
+ *   elb     屈肘（+ = 前臂向前折；永远 ≥ 0）
+ *   wri     腕（+ = 背伸）
+ *   带 F 后缀 = 远侧（画在身体后面的那半边）
  *
- * 世界坐标：地面 y = 0，向上为负。单位 = 1 个头高 h。
- * 站立成人 ≈ 7.5h 高。
+ * 所有角度进渲染器前都过一遍 LIM 生理活动度限制 —— 数据写错也画不出
+ * 反折的膝盖、拧断的脚踝。这是「看起来像个人」的底线。
+ *
+ * 世界坐标：地面 y = 0，向下为正（画布坐标）。单位 = 1 个头高。
+ * 站立成人 ≈ 6.9 个头高。
  * =========================================================================== */
 
 var SEG = {
-  headR: 0.42,   // 头半径
-  neck:  0.30,
-  spine: 2.35,   // 骨盆 → 肩
-  uarm:  1.32,
-  farm:  1.08,
-  hand:  0.40,
-  thigh: 1.85,
-  shank: 1.75,
-  foot:  0.82
+  headRx: 0.44, headRy: 0.50,   // 头（椭圆，不是圆）
+  neck:   0.28,
+  spine:  2.15,                 // 骨盆 → 肩
+  uarm:   1.30, farm: 1.08, hand: 0.46,
+  thigh:  1.80, shank: 1.68, foot: 0.78,
+  shoW:   0.80,                 // 正视：肩半宽
+  hipW:   0.46                  // 正视：髋半宽
+};
+
+/* 生理活动度上下限（度）—— 超出的一律夹回来 */
+var LIM = {
+  trunk: [-180, 180],        // 躯干是世界朝向，不是关节，不设生理上限
+  neck:  [-32, 46],
+  hip:   [-26, 132],
+  knee:  [0, 146],
+  ankle: [-46, 28],
+  sho:   [-58, 176],
+  elb:   [0, 150],
+  wri:   [-72, 72],
+  abd:   [-8, 172]              // 正视用：外展
 };
 
 var RAD = Math.PI / 180;
 
-/* ---------- 正向运动学：由角度算出所有关节点 ---------- */
+function clamp(v, r) { return v < r[0] ? r[0] : (v > r[1] ? r[1] : v); }
+function num(v, d) { return v == null ? d : v; }
 
-function up(p, a, L)  { return { x: p.x + L * Math.sin(a * RAD), y: p.y - L * Math.cos(a * RAD) }; }
-function dn(p, a, L)  { return { x: p.x + L * Math.sin(a * RAD), y: p.y + L * Math.cos(a * RAD) }; }
+/* 「朝下为 0、向前为正」的单位向量（画布坐标，y 向下） */
+function vec(a) { return { x: Math.sin(a * RAD), y: Math.cos(a * RAD) }; }
+function dn(p, a, L) { return { x: p.x + L * Math.sin(a * RAD), y: p.y + L * Math.cos(a * RAD) }; }
+function up(p, a, L) { return { x: p.x + L * Math.sin(a * RAD), y: p.y - L * Math.cos(a * RAD) }; }
+
+/* ---------- 关节角 → 世界角（顺便夹进生理范围） ---------- */
+
+function world(p) {
+  var t = clamp(num(p.trunk, 0), LIM.trunk);
+  var o = { trunk: t, head: t + clamp(num(p.neck, 0), LIM.neck) };
+
+  function side(sfx) {
+    var hip   = clamp(num(p['hip' + sfx],   num(p.hip, 0)),   LIM.hip);
+    var knee  = clamp(num(p['knee' + sfx],  num(p.knee, 0)),  LIM.knee);
+    var ank   = num(p['ankle' + sfx], num(p.ankle, 0));
+    var sho   = clamp(num(p['sho' + sfx],   num(p.sho, 0)),   LIM.sho);
+    var elb   = clamp(num(p['elb' + sfx],   num(p.elb, 0)),   LIM.elb);
+    var wri   = clamp(num(p['wri' + sfx],   num(p.wri, 0)),   LIM.wri);
+    var thigh = hip - t;
+    var shank = thigh - knee;          // 屈膝只能让小腿往后走
+    // flat = 1 表示「这只脚平踩在支撑面上」—— 踝角由几何反推，脚不会插进地里、
+    // 也不会踮着走。数值来自其它关节，所以关键帧里改屈膝屈髋，脚自动跟着对。
+    var fl = num(p['flat' + sfx], num(p.flat, 0));
+    if (fl > 0) ank = ank + (-shank - ank) * (fl > 1 ? 1 : fl);
+    ank = clamp(ank, LIM.ankle);
+    var foot  = shank + 90 + ank;      // 中立位 = 与小腿成 90°
+    var uarm  = sho - t;
+    var farm  = uarm + elb;            // 屈肘只能让前臂往前折
+    o['thigh' + sfx] = thigh; o['shank' + sfx] = shank; o['foot' + sfx] = foot;
+    o['uarm' + sfx]  = uarm;  o['farm' + sfx]  = farm;  o['hand' + sfx] = farm + wri;
+  }
+  side(''); side('F');
+  return o;
+}
+
+/* ---------- 正向运动学 ---------- */
 
 function solve(pose) {
-  var P = {};
+  var a = world(pose);
+  var P = { ang: a, plant: pose.plant };
+
   P.pelvis   = { x: 0, y: 0 };
-  P.chest    = up(P.pelvis, pose.trunk, SEG.spine * 0.60);
-  P.shoulder = up(P.pelvis, pose.trunk, SEG.spine);
-  P.neckTop  = up(P.shoulder, pose.head, SEG.neck);
-  P.headC    = up(P.shoulder, pose.head, SEG.neck + SEG.headR);
+  P.waist    = up(P.pelvis, a.trunk, SEG.spine * 0.34);
+  P.chest    = up(P.pelvis, a.trunk, SEG.spine * 0.68);
+  P.shoulder = up(P.pelvis, a.trunk, SEG.spine);
+  P.neckTop  = up(P.shoulder, a.head, SEG.neck);
+  P.headC    = up(P.neckTop, a.head, SEG.headRy * 0.94);
 
-  // 近侧（默认 = 患侧，画在前面）
-  P.elbow = dn(P.shoulder, pose.uarm, SEG.uarm);
-  P.wrist = dn(P.elbow,    pose.farm, SEG.farm);
-  P.hand  = dn(P.wrist,    pose.hand != null ? pose.hand : pose.farm, SEG.hand);
-  P.knee  = dn(P.pelvis,   pose.thigh, SEG.thigh);
-  P.ankle = dn(P.knee,     pose.shank, SEG.shank);
-  P.toe   = dn(P.ankle,    pose.foot,  SEG.foot);
+  // 远侧（后面那半边）整体往身后错一点点 —— 一眼分得出前后，不会看成只有一条腿。
+  // 只在水平方向错开：竖直方向一动，躺着的时候远侧那只脚就会陷进床里。
+  var shF = { x: P.shoulder.x - 0.15, y: P.shoulder.y };
+  var hpF = { x: P.pelvis.x - 0.13, y: P.pelvis.y };
+  P.shoulderF = shF; P.pelvisF = hpF;
 
-  // 远侧
-  var uF = pose.uarmF  != null ? pose.uarmF  : pose.uarm;
-  var fF = pose.farmF  != null ? pose.farmF  : pose.farm;
-  var tF = pose.thighF != null ? pose.thighF : pose.thigh;
-  var sF = pose.shankF != null ? pose.shankF : pose.shank;
-  var oF = pose.footF  != null ? pose.footF  : pose.foot;
-  P.elbowF = dn(P.shoulder, uF, SEG.uarm);
-  P.wristF = dn(P.elbowF,   fF, SEG.farm);
-  P.handF  = dn(P.wristF,   fF, SEG.hand);
-  P.kneeF  = dn(P.pelvis,   tF, SEG.thigh);
-  P.ankleF = dn(P.kneeF,    sF, SEG.shank);
-  P.toeF   = dn(P.ankleF,   oF, SEG.foot);
+  P.knee  = dn(P.pelvis, a.thigh, SEG.thigh);
+  P.ankle = dn(P.knee,   a.shank, SEG.shank);
+  P.toe   = dn(P.ankle,  a.foot,  SEG.foot);
+  P.kneeF  = dn(hpF,     a.thighF, SEG.thigh);
+  P.ankleF = dn(P.kneeF, a.shankF, SEG.shank);
+  P.toeF   = dn(P.ankleF, a.footF, SEG.foot);
+
+  P.elbow = dn(P.shoulder, a.uarm, SEG.uarm);
+  P.wrist = dn(P.elbow,    a.farm, SEG.farm);
+  P.hand  = dn(P.wrist,    a.hand, SEG.hand);
+  P.elbowF = dn(shF,       a.uarmF, SEG.uarm);
+  P.wristF = dn(P.elbowF,  a.farmF, SEG.farm);
+  P.handF  = dn(P.wristF,  a.handF, SEG.hand);
+
+  // 鞋底触地点 —— 用来把人「放」在地面上，脚不浮空也不陷进去
+  P.heel  = sole(P.ankle,  a.foot,  -0.30, 0.17);
+  P.tip   = sole(P.ankle,  a.foot,   0.84, 0.17);
+  P.heelF = sole(P.ankleF, a.footF, -0.30, 0.17);
+  P.tipF  = sole(P.ankleF, a.footF,  0.84, 0.17);
   return P;
 }
 
-/* 把整个人平移，使 anchor 关节落在指定世界坐标 —— 脚不会浮空也不会陷进地面 */
-function place(P, anchor, ax, ay) {
-  var key = anchor;
-  if (anchor === 'auto') key = (P.ankle.y >= P.ankleF.y) ? 'ankle' : 'ankleF';
-  var a = P[key] || P.pelvis;
-  var dx = ax - a.x, dy = ay - a.y;
-  for (var k in P) { P[k] = { x: P[k].x + dx, y: P[k].y + dy }; }
+/* 足部局部坐标 (u 沿脚掌朝前，v 垂直于脚掌朝鞋底) → 世界坐标 */
+function sole(ank, fa, u, v) {
+  var d = vec(fa), n = vec(fa - 90);
+  return { x: ank.x + (d.x * u + n.x * v) * SEG.foot,
+           y: ank.y + (d.y * u + n.y * v) * SEG.foot };
+}
+
+/* 把整个人平移到位。'ground' = 最低的那个触地点落在地面上 */
+function place(P, track) {
+  var dx, dy, ay = track.ay != null ? track.ay : 0, ax = track.ax || 0;
+  var anchor = track.anchor || 'ground';
+  if (anchor === 'ground' || anchor === 'feet') {
+    // 最低的那个触地点落在支撑面上 —— 脚既不浮空也不陷进去，
+    // 骨盆的起伏（走路的上下、坐站的升起）就自动是对的。
+    var low = Math.max(P.heel.y, P.tip.y, P.heelF.y, P.tipF.y);
+    // 横向的参照物：plant=0 骨盆不动（屁股坐在椅子上，动的是脚），
+    // plant=1 脚不动（离座之后身体绕着脚走）。坐站转移正好要在两者之间过渡。
+    var plant = P.plant != null ? P.plant : (anchor === 'feet' ? 1 : 0);
+    var dxP = ax - P.pelvis.x;
+    var dxF = (track.axFoot != null ? track.axFoot : ax) - P.heel.x;
+    dx = dxP + (dxF - dxP) * plant;
+    dy = ay - low;
+  } else {
+    var a = P[anchor] || P.pelvis;
+    dx = ax - a.x; dy = ay - a.y;
+  }
+  for (var k in P) {
+    if (k === 'ang' || k === 'plant' || !P[k] || P[k].x == null) continue;
+    P[k] = { x: P[k].x + dx, y: P[k].y + dy };
+  }
   return P;
 }
 
@@ -85,12 +168,14 @@ var EASE = {
   hold:   function ()  { return 0; }
 };
 
-var POSE_KEYS = ['trunk','head','uarm','farm','hand','thigh','shank','foot',
-                 'uarmF','farmF','thighF','shankF','footF',
-                 'lean','hipL','hipR','liftL','liftR','armL','armR','bend'];
+var KEYS = ['trunk','neck','hip','knee','ankle','sho','elb','wri','flat','plant',
+            'hipF','kneeF','ankleF','shoF','elbF','wriF','flatF',
+            'lean','sway','hipL','hipR','kneeL','kneeR','abdL','abdR',
+            'shoL','shoR','elbL','elbR','armAbdL','armAbdR','riseL','riseR'];
 
 function sample(track, t) {
   var kf = track.keyframes;
+  if (!kf || !kf.length) return merge(track.base, {});
   if (t <= kf[0].t) return merge(track.base, kf[0]);
   if (t >= kf[kf.length - 1].t) return merge(track.base, kf[kf.length - 1]);
   var i = 0;
@@ -99,9 +184,8 @@ function sample(track, t) {
   var u = (b.t - a.t) > 0 ? (t - a.t) / (b.t - a.t) : 0;
   u = (EASE[b.ease || 'inout'] || EASE.inout)(u);
   var A = merge(track.base, a), B = merge(track.base, b), out = {};
-  for (var j = 0; j < POSE_KEYS.length; j++) {
-    var k = POSE_KEYS[j];
-    var va = A[k], vb = B[k];
+  for (var j = 0; j < KEYS.length; j++) {
+    var k = KEYS[j], va = A[k], vb = B[k];
     if (va == null && vb == null) continue;
     if (va == null) va = vb;
     if (vb == null) vb = va;
@@ -111,282 +195,50 @@ function sample(track, t) {
 }
 
 function merge(base, kf) {
-  var o = {};
-  var i;
+  var o = {}, i;
   for (i in base) o[i] = base[i];
-  var src = kf.pose || kf;
-  for (i in src) { if (i !== 't' && i !== 'ease' && i !== 'pose') o[i] = src[i]; }
+  for (i in kf) { if (i !== 't' && i !== 'ease') o[i] = kf[i]; }
   return o;
 }
 
 /* ---------- 绘制基元 ---------- */
 
-/* 带锥度的圆头肢体段 */
-function limb(ctx, p0, p1, w0, w1) {
+/* 带锥度的圆头肢体段（两圆外公切线）。
+ * capsuleTo 只往当前路径里加一个子路径 —— 多段拼成一条肢体时要用它，
+ * 不能用会重置路径的 capsule。 */
+function capsuleTo(ctx, p0, p1, w0, w1) {
   var dx = p1.x - p0.x, dy = p1.y - p0.y;
   var L = Math.sqrt(dx * dx + dy * dy) || 0.0001;
-  var a = Math.atan2(dy, dx);
-  var r0 = w0 / 2, r1 = w1 / 2;
-  ctx.beginPath();
-  // 两个圆之间的外公切线
+  var a = Math.atan2(dy, dx), r0 = w0 / 2, r1 = w1 / 2;
   var d = (r0 - r1) / L;
-  if (Math.abs(d) > 1) d = Math.sign(d);
+  if (d > 1) d = 1; if (d < -1) d = -1;
   var th = Math.acos(d);
+  ctx.moveTo(p0.x + r0 * Math.cos(a + th), p0.y + r0 * Math.sin(a + th));
   ctx.arc(p0.x, p0.y, r0, a + th, a - th + 2 * Math.PI);
   ctx.arc(p1.x, p1.y, r1, a - th, a + th);
   ctx.closePath();
 }
-
-function torso(ctx, pelvis, chest, shoulder, wHip, wChest, wSh) {
+function capsule(ctx, p0, p1, w0, w1) {
   ctx.beginPath();
-  var pts = [
-    { p: pelvis, w: wHip }, { p: chest, w: wChest }, { p: shoulder, w: wSh }
-  ];
-  // 左右两条边
-  var left = [], right = [];
-  for (var i = 0; i < pts.length; i++) {
-    var prev = pts[Math.max(0, i - 1)].p, next = pts[Math.min(pts.length - 1, i + 1)].p;
-    var dx = next.x - prev.x, dy = next.y - prev.y;
-    var L = Math.sqrt(dx * dx + dy * dy) || 1;
-    var nx = -dy / L, ny = dx / L;
-    var r = pts[i].w / 2;
-    left.push({ x: pts[i].p.x + nx * r, y: pts[i].p.y + ny * r });
-    right.push({ x: pts[i].p.x - nx * r, y: pts[i].p.y - ny * r });
+  capsuleTo(ctx, p0, p1, w0, w1);
+}
+
+/* 过点的光滑闭合曲线（中点二次贝塞尔） */
+function smooth(ctx, pts) {
+  var n = pts.length;
+  var m = { x: (pts[n - 1].x + pts[0].x) / 2, y: (pts[n - 1].y + pts[0].y) / 2 };
+  ctx.beginPath();
+  ctx.moveTo(m.x, m.y);
+  for (var i = 0; i < n; i++) {
+    var a = pts[i], b = pts[(i + 1) % n];
+    ctx.quadraticCurveTo(a.x, a.y, (a.x + b.x) / 2, (a.y + b.y) / 2);
   }
-  ctx.moveTo(left[0].x, left[0].y);
-  ctx.quadraticCurveTo(left[1].x, left[1].y, left[2].x, left[2].y);
-  ctx.lineTo(right[2].x, right[2].y);
-  ctx.quadraticCurveTo(right[1].x, right[1].y, right[0].x, right[0].y);
   ctx.closePath();
-}
-
-/* ---------- 主渲染 ---------- */
-
-/**
- * @param ctx    canvas 2d context
- * @param W,H    画布 CSS 像素尺寸
- * @param track  动作定义（见 poses.js）
- * @param t      0..1 归一化时间
- * @param opt    { theme, mirror, layers:{trail,highlight,plumb}, ghost }
- */
-function draw(ctx, W, H, track, t, opt) {
-  opt = opt || {};
-  var C = opt.theme || THEME.light;
-  var view = track.view || { cx: 0, cy: -3.6, span: 8.8 };
-  var s = H / (view.span * (opt.zoom || 1));   // 1 头高 = s 像素
-  var mir = opt.mirror ? -1 : 1;
-
-  function X(wx) { return W / 2 + (wx - view.cx) * s * mir; }
-  function Y(wy) { return H / 2 + (wy - view.cy) * s; }
-  function pt(p) { return { x: X(p.x), y: Y(p.y) }; }
-
-  ctx.clearRect(0, 0, W, H);
-
-  if (track.view3 === 'front') return drawFront(ctx, W, H, track, t, opt, C, s, X, Y);
-
-  var pose = sample(track, t);
-  var P = place(solve(pose), track.anchor || 'auto', track.ax || 0, track.ay != null ? track.ay : -0.30);
-
-  drawProps(ctx, track.props, X, Y, s, C, 'back');
-
-  // 运动轨迹：把整个周期里目标点的路径画出来 —— 视频给不了的信息层
-  if (track.trail && opt.layers !== false && (!opt.layers || opt.layers.trail !== false)) {
-    ctx.save();
-    ctx.strokeStyle = C.trail;
-    ctx.lineWidth = Math.max(1.5, s * 0.055);
-    ctx.setLineDash([s * 0.16, s * 0.14]);
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    for (var i = 0; i <= 48; i++) {
-      var pp = place(solve(sample(track, i / 48)), track.anchor || 'auto', track.ax || 0, track.ay != null ? track.ay : -0.30);
-      var q = pt(pp[track.trail]);
-      if (i === 0) ctx.moveTo(q.x, q.y); else ctx.lineTo(q.x, q.y);
-    }
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  var lw = s * 0.05;
-  ctx.lineJoin = 'round';
-
-  function seg(a, b, w0, w1, fill, stroke) {
-    limb(ctx, pt(a), pt(b), w0 * s, w1 * s);
-    ctx.fillStyle = fill; ctx.fill();
-    ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke();
-  }
-
-  // 远侧肢体：降饱和 —— 一眼分出前后，不会再看成「只有一条腿」
-  seg(P.pelvis, P.kneeF, 0.62, 0.46, C.skinF, C.lineF);
-  seg(P.kneeF, P.ankleF, 0.44, 0.30, C.skinF, C.lineF);
-  seg(P.ankleF, P.toeF, 0.30, 0.20, C.shoeF, C.lineF);
-  seg(P.shoulder, P.elbowF, 0.42, 0.34, C.skinF, C.lineF);
-  seg(P.elbowF, P.wristF, 0.33, 0.26, C.skinF, C.lineF);
-  seg(P.wristF, P.handF, 0.28, 0.24, C.skinF, C.lineF);
-
-  // 躯干
-  torso(ctx, pt(P.pelvis), pt(P.chest), pt(P.shoulder), 0.90 * s, 1.02 * s, 0.94 * s);
-  ctx.fillStyle = C.cloth; ctx.fill();
-  ctx.lineWidth = lw; ctx.strokeStyle = C.clothLine; ctx.stroke();
-
-  // 头
-  var hc = pt(P.headC), hr = SEG.headR * s;
-  seg(P.shoulder, P.neckTop, 0.34, 0.32, C.skin, C.line);
-  ctx.beginPath(); ctx.arc(hc.x, hc.y, hr, 0, 6.2832);
-  ctx.fillStyle = C.skin; ctx.fill();
-  ctx.lineWidth = lw; ctx.strokeStyle = C.line; ctx.stroke();
-  // 朝向：鼻梁 + 发际
-  var fa = (sample(track, t).head || 0);
-  var upA = fa * RAD - Math.PI / 2;            // 头顶方向（画布角）
-  var fwd = mir;                               // 面朝方向
-  var nA = upA + fwd * Math.PI / 2;
-  var nx = hc.x + Math.cos(nA) * hr * 0.94, ny = hc.y + Math.sin(nA) * hr * 0.94;
-  ctx.beginPath(); ctx.arc(nx, ny, hr * 0.15, 0, 6.2832);
-  ctx.fillStyle = C.skin; ctx.fill(); ctx.strokeStyle = C.line; ctx.lineWidth = lw * 0.75; ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(hc.x, hc.y, hr * 0.995, upA - fwd * Math.PI * 0.52, upA + fwd * 0.34, fwd < 0);
-  ctx.lineWidth = hr * 0.36; ctx.strokeStyle = C.hair; ctx.lineCap = 'butt'; ctx.stroke();
-
-  // 近侧肢体
-  seg(P.pelvis, P.knee, 0.66, 0.48, C.skin, C.line);
-  seg(P.knee, P.ankle, 0.46, 0.31, C.skin, C.line);
-  seg(P.ankle, P.toe, 0.31, 0.21, C.shoe, C.line);
-  seg(P.shoulder, P.elbow, 0.44, 0.35, C.skin, C.line);
-  seg(P.elbow, P.wrist, 0.34, 0.27, C.skin, C.line);
-  seg(P.wrist, P.hand, 0.29, 0.25, C.skin, C.line);
-
-  drawProps(ctx, track.props, X, Y, s, C, 'front');
-
-  // 目标关节高亮 —— 「哪里该动」，视频拍不出来
-  if (track.focus && (!opt.layers || opt.layers.highlight !== false)) {
-    var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
-    for (var f = 0; f < track.focus.length; f++) {
-      var jp = P[track.focus[f]]; if (!jp) continue;
-      var g = pt(jp);
-      ctx.beginPath(); ctx.arc(g.x, g.y, s * (0.40 + 0.10 * pulse), 0, 6.2832);
-      ctx.strokeStyle = C.focus; ctx.lineWidth = s * 0.075; ctx.globalAlpha = 0.30 + 0.35 * (1 - pulse);
-      ctx.stroke(); ctx.globalAlpha = 1;
-      ctx.beginPath(); ctx.arc(g.x, g.y, s * 0.13, 0, 6.2832);
-      ctx.fillStyle = C.focus; ctx.fill();
-    }
-  }
-  return P;
-}
-
-/* ---------- 正视图（平衡、重心类动作用） ---------- */
-
-function drawFront(ctx, W, H, track, t, opt, C, s, X, Y) {
-  var p = sample(track, t);
-  var lean = p.lean || 0, py = -3.86;
-  var pelvis = { x: (p.bend || 0) + lean * 0.030, y: py };
-  var lw = s * 0.05;
-  function pt(q) { return { x: X(q.x), y: Y(q.y) }; }
-  function seg(a, b, w0, w1, fill, stroke) {
-    limb(ctx, pt(a), pt(b), w0 * s, w1 * s);
-    ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke();
-  }
-  var shoulder = { x: pelvis.x + lean * 0.052, y: py - SEG.spine };
-  var chest = { x: pelvis.x + lean * 0.031, y: py - SEG.spine * 0.60 };
-  var headC = { x: shoulder.x + lean * 0.020, y: shoulder.y - SEG.neck - SEG.headR };
-
-  drawProps(ctx, track.props, X, Y, s, C, 'back');
-
-  var legs = [
-    { sgn: -1, hip: p.hipL || 0, lift: p.liftL || 0 },
-    { sgn:  1, hip: p.hipR || 0, lift: p.liftR || 0 }
-  ];
-  var feet = [];
-  for (var i = 0; i < 2; i++) {
-    var g = legs[i];
-    var hip = { x: pelvis.x + g.sgn * 0.40, y: py + 0.10 };
-    var fore = 1 - g.lift * 0.52;                       // 抬腿 = 透视缩短
-    var knee = { x: hip.x + g.sgn * Math.sin(g.hip * RAD) * SEG.thigh * fore,
-                 y: hip.y + Math.cos(g.hip * RAD) * SEG.thigh * fore };
-    var ank  = { x: knee.x + g.sgn * 0.04 - g.sgn * g.lift * 0.42, y: knee.y + SEG.shank * (1 - g.lift * 0.62) };
-    feet.push(ank);
-    var far = g.lift > 0.05;
-    seg(hip, knee, 0.60, 0.44, far ? C.skinF : C.skin, far ? C.lineF : C.line);
-    seg(knee, ank, 0.44, 0.30, far ? C.skinF : C.skin, far ? C.lineF : C.line);
-    var toe = { x: ank.x + g.sgn * 0.30, y: ank.y + 0.24 };
-    seg(ank, toe, 0.30, 0.26, far ? C.shoeF : C.shoe, far ? C.lineF : C.line);
-  }
-
-  torso(ctx, pt(pelvis), pt(chest), pt(shoulder), 1.02 * s, 1.14 * s, 1.16 * s);
-  ctx.fillStyle = C.cloth; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = C.clothLine; ctx.stroke();
-
-  var arms = [{ sgn: -1, a: p.armL || 0 }, { sgn: 1, a: p.armR || 0 }];
-  for (var j = 0; j < 2; j++) {
-    var sh = { x: shoulder.x + arms[j].sgn * 0.64, y: shoulder.y + 0.12 };
-    var el = { x: sh.x + arms[j].sgn * Math.sin(arms[j].a * RAD) * SEG.uarm,
-               y: sh.y + Math.cos(arms[j].a * RAD) * SEG.uarm };
-    var wr = { x: el.x + arms[j].sgn * Math.sin(arms[j].a * RAD * 1.1) * SEG.farm,
-               y: el.y + Math.cos(arms[j].a * RAD * 1.1) * SEG.farm };
-    seg(sh, el, 0.42, 0.34, C.skin, C.line);
-    seg(el, wr, 0.33, 0.27, C.skin, C.line);
-  }
-
-  var hc = pt(headC), hr = SEG.headR * s;
-  ctx.beginPath(); ctx.arc(hc.x, hc.y, hr, 0, 6.2832);
-  ctx.fillStyle = C.skin; ctx.fill(); ctx.lineWidth = lw; ctx.strokeStyle = C.line; ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(hc.x, hc.y, hr * 0.99, Math.PI * 1.06, Math.PI * 1.94);
-  ctx.lineWidth = hr * 0.44; ctx.strokeStyle = C.hair; ctx.lineCap = 'round'; ctx.stroke();
-  ctx.lineCap = 'butt';
-
-  // 重心线：从头顶垂下来，落在哪只脚上一目了然
-  if (track.plumb && (!opt.layers || opt.layers.plumb !== false)) {
-    var a = pt({ x: headC.x, y: headC.y - 0.5 }), b = pt({ x: headC.x, y: 0.15 });
-    ctx.save();
-    ctx.setLineDash([s * 0.14, s * 0.12]);
-    ctx.strokeStyle = C.focus; ctx.lineWidth = Math.max(1.5, s * 0.05);
-    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-    ctx.restore();
-    ctx.beginPath(); ctx.arc(b.x, b.y, s * 0.13, 0, 6.2832);
-    ctx.fillStyle = C.focus; ctx.fill();
-  }
-  drawProps(ctx, track.props, X, Y, s, C, 'front');
-}
-
-/* ---------- 道具：床、椅子、地面、扶手、目标物 ---------- */
-
-function drawProps(ctx, props, X, Y, s, C, layer) {
-  if (!props) return;
-  for (var i = 0; i < props.length; i++) {
-    var o = props[i];
-    if ((o.layer || 'back') !== layer) continue;
-    ctx.save();
-    if (o.k === 'floor') {
-      ctx.fillStyle = C.floor;
-      ctx.fillRect(0, Y(0), 4000, Math.max(2, s * 0.13));
-      ctx.fillStyle = C.floorSoft;
-      ctx.fillRect(0, Y(0) + Math.max(2, s * 0.13), 4000, s * 0.5);
-    } else if (o.k === 'bed') {
-      var by = Y(o.y || 0);
-      ctx.fillStyle = C.prop;
-      roundRect(ctx, X(o.x0), by, (o.x1 - o.x0) * s, s * 0.70, s * 0.10);
-      ctx.fill();
-      ctx.fillStyle = C.propLine;
-      ctx.fillRect(X(o.x0), by, (o.x1 - o.x0) * s, Math.max(1.5, s * 0.05));
-    } else if (o.k === 'chair') {
-      ctx.fillStyle = C.prop;
-      roundRect(ctx, X(o.x0), Y(o.seat), (o.x1 - o.x0) * s, s * 0.20, s * 0.07); ctx.fill();
-      roundRect(ctx, X(o.x0), Y(o.seat) + s * 0.18, s * 0.20, (0 - o.seat) * s - s * 0.18, s * 0.05); ctx.fill();
-      roundRect(ctx, X(o.x1) - s * 0.20, Y(o.seat) + s * 0.18, s * 0.20, (0 - o.seat) * s - s * 0.18, s * 0.05); ctx.fill();
-      if (o.back) { roundRect(ctx, X(o.x0), Y(o.seat - 1.5), s * 0.20, s * 1.5, s * 0.06); ctx.fill(); }
-    } else if (o.k === 'rail') {
-      ctx.fillStyle = C.prop;
-      roundRect(ctx, X(o.x) - s * 0.10, Y(o.y), s * 0.20, (0 - o.y) * s, s * 0.06); ctx.fill();
-      roundRect(ctx, X(o.x) - s * 0.55, Y(o.y) - s * 0.10, s * 1.1, s * 0.20, s * 0.08); ctx.fill();
-    } else if (o.k === 'target') {
-      ctx.fillStyle = C.accentSoft; ctx.strokeStyle = C.accent; ctx.lineWidth = Math.max(1.5, s * 0.05);
-      roundRect(ctx, X(o.x) - s * 0.22, Y(o.y) - s * 0.26, s * 0.44, s * 0.52, s * 0.08);
-      ctx.fill(); ctx.stroke();
-    }
-    ctx.restore();
-  }
 }
 
 function roundRect(ctx, x, y, w, h, r) {
   if (h < 0) { y += h; h = -h; }
+  if (w < 0) { x += w; w = -w; }
   r = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -397,29 +249,615 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+/* ---------- 主渲染 ---------- */
+
+function draw(ctx, W, H, track, t, opt) {
+  opt = opt || {};
+  var C = opt.theme || THEME.light;
+  var view = track.view || { cx: 0, cy: -3.4, span: 8.6 };
+  var s = H / (view.span / (opt.zoom || 1));
+  var mir = opt.mirror ? -1 : 1;
+
+  var G = {
+    s: s, mir: mir, C: C,
+    X: function (wx) { return W / 2 + (wx - view.cx) * s * mir; },
+    Y: function (wy) { return H / 2 + (wy - view.cy) * s; }
+  };
+  G.pt = function (p) { return { x: G.X(p.x), y: G.Y(p.y) }; };
+  G.lw = Math.max(1, s * 0.042);
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'butt';
+
+  if (track.front) return drawFront(ctx, W, H, track, t, opt, G);
+  return drawSide(ctx, W, H, track, t, opt, G);
+}
+
+/* ---------- 侧视图 ---------- */
+
+function drawSide(ctx, W, H, track, t, opt, G) {
+  var C = G.C, s = G.s, pt = G.pt;
+  var P = place(solve(sample(track, t)), track);
+
+  props(ctx, track.props, G, 'back');
+  shadow(ctx, G, [P.heel, P.tip, P.heelF, P.tipF]);
+
+  // 运动轨迹：整个周期里目标点走过的路 —— 视频给不了的信息层
+  if (track.trail && (!opt.layers || opt.layers.trail !== false)) {
+    var path = trailPath(track);
+    ctx.save();
+    ctx.strokeStyle = C.trail;
+    ctx.lineWidth = Math.max(1.4, s * 0.05);
+    ctx.setLineDash([s * 0.16, s * 0.15]);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (var i = 0; i < path.length; i++) {
+      var q = pt(path[i]);
+      if (i === 0) ctx.moveTo(q.x, q.y); else ctx.lineTo(q.x, q.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+    ctx.lineCap = 'butt';
+  }
+
+  var F = { skin: C.skinF, line: C.lineF, shirt: C.shirtF, shirtL: C.shirtLF,
+            pants: C.pantsF, pantsL: C.pantsLF, shoe: C.shoeF, shoeL: C.shoeLF, hair: C.hairF };
+  var N = { skin: C.skin, line: C.line, shirt: C.shirt, shirtL: C.shirtL,
+            pants: C.pants, pantsL: C.pantsL, shoe: C.shoe, shoeL: C.shoeL, hair: C.hair };
+
+  // 远侧：手臂 + 腿
+  arm(ctx, G, P.shoulderF, P.elbowF, P.wristF, P.handF, P.ang.handF, F);
+  leg(ctx, G, P.pelvisF, P.kneeF, P.ankleF, P.ang.footF, F);
+  // 仰卧时手臂贴在身体两侧 —— 画在躯干后面，不然一条胳膊横在肚子上
+  if (track.armBack) arm(ctx, G, P.shoulder, P.elbow, P.wrist, P.hand, P.ang.hand, N);
+  // 近侧腿
+  leg(ctx, G, P.pelvis, P.knee, P.ankle, P.ang.foot, N);
+  // 短裤（盖住两条大腿根，人才有胯）
+  shorts(ctx, G, P, F, N);
+  // 躯干
+  trunkShape(ctx, G, P, N);
+  // 颈 + 头
+  neckHead(ctx, G, P, N, C);
+  // 近侧手臂（最前面）
+  if (!track.armBack) arm(ctx, G, P.shoulder, P.elbow, P.wrist, P.hand, P.ang.hand, N);
+
+  props(ctx, track.props, G, 'front');
+  focusRing(ctx, G, track, P, t, opt);
+  return P;
+}
+
+/* 手臂：整条一次画完（上臂+前臂+手+拇指），再套上短袖 */
+function arm(ctx, G, sh, el, wr, hd, handAng, K) {
+  var d = vec(handAng), n = vec(handAng - 90 * G.mir);
+  var thumb = { x: wr.x + (d.x * 0.20 + n.x * 0.16) * SEG.hand,
+                y: wr.y + (d.y * 0.20 + n.y * 0.16) * SEG.hand };
+  limb(ctx, G, [[sh, el, 0.40, 0.32], [el, wr, 0.32, 0.25], [wr, hd, 0.25, 0.27]],
+       K.skin, K.line, [[thumb, 0.105]]);
+  cloth(ctx, G, sh, el, 0.52, 0.47, 0.40, K.shirt, K.shirtL);
+}
+
+/* 腿：大腿 + 小腿一条画完，再穿鞋 */
+function leg(ctx, G, hip, kn, ank, footAng, K) {
+  limb(ctx, G, [[hip, kn, 0.62, 0.44], [kn, ank, 0.44, 0.27]], K.skin, K.line);
+  shoe(ctx, G, ank, footAng, K);
+}
+
+function shoe(ctx, G, ank, fa, K) {
+  var L = [
+    [-0.34, -0.14], [-0.33, 0.10], [-0.24, 0.19], [0.24, 0.21],
+    [0.72, 0.19], [0.86, 0.09], [0.84, -0.02], [0.48, -0.15],
+    [0.16, -0.34], [-0.18, -0.33]
+  ];
+  var pts = [];
+  for (var i = 0; i < L.length; i++) pts.push(G.pt(sole(ank, fa, L[i][0], L[i][1])));
+  smooth(ctx, pts);
+  ctx.fillStyle = K.shoe; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = K.shoeL; ctx.stroke();
+}
+
+function fillSeg(ctx, G, a, b, w0, w1, fill, line) {
+  capsule(ctx, G.pt(a), G.pt(b), w0 * G.s, w1 * G.s);
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = line; ctx.stroke();
+}
+
+/* 一条肢体 = 若干段拼起来的一个整体。
+ * 先用两倍线宽把整条路径描一遍，再把并集填上 —— 内部的接缝被填色盖掉，
+ * 只剩下最外面半条描边。这样肘、膝就不会各挂一个圆圈，看着才像一条胳膊。 */
+function limb(ctx, G, segs, fill, line, dots) {
+  var i;
+  ctx.beginPath();
+  for (i = 0; i < segs.length; i++) {
+    var g = segs[i];
+    capsuleTo(ctx, G.pt(g[0]), G.pt(g[1]), g[2] * G.s, g[3] * G.s);
+  }
+  for (i = 0; dots && i < dots.length; i++) {
+    var d = G.pt(dots[i][0]);
+    ctx.moveTo(d.x + dots[i][1] * G.s, d.y);
+    ctx.arc(d.x, d.y, dots[i][1] * G.s, 0, 6.2832);
+  }
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.strokeStyle = line; ctx.lineWidth = G.lw * 2; ctx.stroke();
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.lineCap = 'butt';
+}
+
+/* 袖口 / 裤脚：只填色不描边，再在袖口画一条边线 —— 衣服和肩膀连成一体 */
+function cloth(ctx, G, a, b, f, w0, w1, fill, line) {
+  var m = { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
+  capsule(ctx, G.pt(a), G.pt(m), w0 * G.s, w1 * G.s);
+  ctx.fillStyle = fill; ctx.fill();
+  var d = { x: b.x - a.x, y: b.y - a.y };
+  var L = Math.sqrt(d.x * d.x + d.y * d.y) || 1;
+  var nx = -d.y / L * w1 / 2, ny = d.x / L * w1 / 2;
+  var p0 = G.pt({ x: m.x + nx, y: m.y + ny }), p1 = G.pt({ x: m.x - nx, y: m.y - ny });
+  ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
+  ctx.strokeStyle = line; ctx.lineWidth = G.lw; ctx.lineCap = 'round'; ctx.stroke();
+  ctx.lineCap = 'butt';
+}
+
+/* 躯干局部坐标系：du 沿脊柱向上，dv 朝身体正面。
+ * 方向直接取自解算出来的骨盆→肩向量 —— 不能从躯干角反推，
+ * 躺着的时候两者正好相反，那样人会断成两截。 */
+function frame(P) {
+  var dx = P.shoulder.x - P.pelvis.x, dy = P.shoulder.y - P.pelvis.y;
+  var L = Math.sqrt(dx * dx + dy * dy) || 1;
+  var ux = dx / L, uy = dy / L;
+  return { ux: ux, uy: uy, nx: -uy, ny: ux, o: P.pelvis };
+}
+function at(G, f, du, dv) {
+  return G.pt({ x: f.o.x + f.ux * du + f.nx * dv, y: f.o.y + f.uy * du + f.ny * dv });
+}
+
+/* 短裤：远侧裤腿 → 胯 → 近侧裤腿 */
+function shorts(ctx, G, P, F, N) {
+  cloth(ctx, G, P.pelvisF, P.kneeF, 0.44, 0.74, 0.58, F.pants, F.pantsL);
+  var f = frame(P);
+  function q(du, dv) { return at(G, f, du, dv); }
+  smooth(ctx, [q(-0.52, 0.44), q(-0.16, 0.50), q(0.34, 0.40), q(0.44, 0.00),
+               q(0.32, -0.40), q(-0.18, -0.52), q(-0.52, -0.46)]);
+  ctx.fillStyle = N.pants; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.pantsL; ctx.stroke();
+  cloth(ctx, G, P.pelvis, P.knee, 0.44, 0.74, 0.58, N.pants, N.pantsL);
+}
+
+/* 躯干：上衣。肩、胸、腰、胯的轮廓一条曲线走完 */
+function trunkShape(ctx, G, P, N) {
+  var f = frame(P);
+  function q(du, dv) { return at(G, f, du, dv); }
+  var sp = SEG.spine;
+  smooth(ctx, [
+    q(0.02, 0.42), q(sp * 0.34, 0.36), q(sp * 0.68, 0.50), q(sp * 0.96, 0.46),
+    q(sp + 0.14, 0.22), q(sp + 0.16, -0.10),
+    q(sp * 0.96, -0.48), q(sp * 0.68, -0.52), q(sp * 0.34, -0.44), q(0.02, -0.46)
+  ]);
+  ctx.fillStyle = N.shirt; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.shirtL; ctx.stroke();
+}
+
+/* 颈 + 头（侧面轮廓：额、鼻、唇、下巴都在同一条线上） */
+function neckHead(ctx, G, P, N, C) {
+  var s = G.s, ha = P.ang.head, mir = G.mir;
+  limb(ctx, G, [[P.shoulder, P.neckTop, 0.34, 0.31]], N.skin, N.line);
+
+  var hc = G.pt(P.headC);
+  // 头轴方向 =（sin ha, -cos ha）；镜像时整个世界翻面，旋转量也跟着翻
+  var rot = ha * RAD * mir;
+  var rx = SEG.headRx * s, ry = SEG.headRy * s;
+  ctx.save();
+  ctx.translate(hc.x, hc.y);
+  ctx.rotate(rot);
+  ctx.scale(mir, 1);
+
+  // 侧脸轮廓（局部坐标：x 朝前，y 朝上，单位 = 头半径）
+  var prof = [
+    [0.00, 1.00], [0.56, 0.88], [0.86, 0.50], [0.90, 0.20], [0.82, 0.06],
+    [1.06, -0.20], [1.05, -0.22], [0.84, -0.32], [0.88, -0.46], [0.74, -0.68],
+    [0.44, -0.90], [0.06, -0.98], [-0.42, -0.82], [-0.78, -0.44],
+    [-0.94, 0.06], [-0.74, 0.70]
+  ];
+  var pts = [];
+  for (var i = 0; i < prof.length; i++) pts.push({ x: prof[i][0] * rx, y: -prof[i][1] * ry });
+  smooth(ctx, pts);
+  ctx.fillStyle = N.skin; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.line; ctx.stroke();
+
+  // 耳（在下颌后上方，不是脸中间）
+  ctx.beginPath();
+  ctx.arc(-0.34 * rx, -0.06 * ry, rx * 0.15, Math.PI * 0.55, Math.PI * 1.75);
+  ctx.lineWidth = G.lw * 0.85; ctx.strokeStyle = N.line; ctx.stroke();
+
+  // 眉、眼、嘴 —— 三笔，别多
+  ctx.strokeStyle = C.face; ctx.lineCap = 'round';
+  ctx.lineWidth = Math.max(1, rx * 0.13);
+  ctx.beginPath();
+  ctx.moveTo(0.34 * rx, -0.10 * ry); ctx.lineTo(0.66 * rx, -0.14 * ry);   // 眉
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(0.52 * rx, 0.12 * ry, rx * 0.10, 0, 6.2832);
+  ctx.fillStyle = C.face; ctx.fill();                                     // 眼
+  ctx.beginPath();
+  ctx.moveTo(0.52 * rx, 0.52 * ry); ctx.lineTo(0.76 * rx, 0.50 * ry);     // 嘴
+  ctx.lineWidth = Math.max(1, rx * 0.11);
+  ctx.stroke();
+  ctx.lineCap = 'butt';
+
+  // 头发：贴着颅顶的一层，前面留出额头
+  ctx.save();
+  ctx.beginPath();
+  var hair = [
+    [0.66, 0.80], [0.92, 0.40], [1.02, 0.62], [0.86, 0.96],
+    [0.30, 1.16], [-0.42, 1.10], [-0.94, 0.66], [-1.10, 0.02],
+    [-1.02, -0.34], [-0.84, -0.14], [-0.84, 0.36], [-0.52, 0.80],
+    [-0.04, 0.96], [0.34, 0.92]
+  ];
+  var hp = [];
+  for (var j = 0; j < hair.length; j++) hp.push({ x: hair[j][0] * rx, y: -hair[j][1] * ry });
+  smooth(ctx, hp);
+  ctx.fillStyle = N.hair; ctx.fill();
+  ctx.restore();
+  ctx.restore();
+}
+
+/* ---------- 正视图（平衡、重心类动作用） ----------
+ * 同一套关节角，只是换成冠状面投影 + 一点点侧转（YAW），
+ * 这样「向前抬起来的腿」是缩短、不是向旁边甩。
+ */
+var YAW = 0.34;
+
+function fSolve(p) {
+  var lean = num(p.lean, 0), sway = num(p.sway, 0), trunk = num(p.trunk, 0);
+  var P = { legs: [], arms: [] };
+  function proj(v) { return { x: v.x + v.z * YAW, y: v.y }; }
+
+  // 躯干：侧倾 lean，骨盆侧移 sway
+  var pel = { x: sway, y: 0, z: 0 };
+  var lr = lean * RAD;
+  var sh = { x: pel.x + Math.sin(lr) * SEG.spine, y: pel.y - Math.cos(lr) * SEG.spine, z: 0 };
+  var nk = { x: sh.x + Math.sin(lr * 0.5) * SEG.neck, y: sh.y - Math.cos(lr * 0.5) * SEG.neck, z: 0 };
+  var hd = { x: nk.x + Math.sin(lr * 0.3) * SEG.headRy * 0.94,
+             y: nk.y - Math.cos(lr * 0.3) * SEG.headRy * 0.94, z: 0 };
+  P.pelvis = proj(pel); P.shoulder = proj(sh); P.neckTop = proj(nk); P.headC = proj(hd);
+  P.lean = lean;
+
+  // 骨盆 / 肩带随侧倾一起转
+  function off(base, w, sgn, rot) {
+    var r = rot * RAD;
+    return { x: base.x + sgn * w * Math.cos(r), y: base.y + sgn * w * Math.sin(r), z: 0 };
+  }
+  var sides = [-1, 1];
+  for (var i = 0; i < 2; i++) {
+    var sg = sides[i], S = sg < 0 ? 'L' : 'R';
+    var hip = off(pel, SEG.hipW, sg, lean * 0.35);
+    var sho = off(sh, SEG.shoW, sg, lean * 0.5);
+
+    // 腿
+    var abd  = clamp(num(p['abd' + S], 4), LIM.abd);
+    var hf   = clamp(num(p['hip' + S], 0), LIM.hip);
+    var kf   = clamp(num(p['knee' + S], 0), LIM.knee);
+    var rise = num(p['rise' + S], 0);
+    var kn = seg3(hip, SEG.thigh, hf, abd, sg);
+    var an = seg3(kn, SEG.shank, hf - kf, abd, sg);
+    P.legs.push({ sg: sg, hip: proj(hip), knee: proj(kn), ankle: proj(an),
+                  z: (kn.z + an.z) / 2, rise: rise, abd: abd, fwd: hf });
+
+    // 手臂：外展 armAbd + 肩前屈 sho + 屈肘 elb
+    var aab = clamp(num(p['armAbd' + S], 6), LIM.abd);
+    var sf  = clamp(num(p['sho' + S], 0), LIM.sho);
+    var ef  = clamp(num(p['elb' + S], 0), LIM.elb);
+    var el = seg3(sho, SEG.uarm, sf, aab, sg);
+    var wr = seg3(el, SEG.farm, sf + ef, aab, sg);
+    var hn = seg3(wr, SEG.hand, sf + ef, aab, sg);
+    P.arms.push({ sg: sg, sho: proj(sho), elbow: proj(el), wrist: proj(wr), hand: proj(hn),
+                  z: (el.z + wr.z) / 2 });
+  }
+  P.proj = proj;
+  return P;
+}
+
+/* 从关节出发的一段肢体：sag = 矢状面角（+ 向前），abd = 外展角 */
+function seg3(p, L, sag, abd, sg) {
+  var a = sag * RAD, b = abd * RAD;
+  return {
+    x: p.x + sg * Math.sin(b) * L,
+    y: p.y + Math.cos(b) * Math.cos(a) * L,
+    z: p.z + Math.cos(b) * Math.sin(a) * L
+  };
+}
+
+/* 正视图：解算 + 落地，渲染和体检共用 */
+function fPlace(track, t) {
+  var K = fSolve(sample(track, t));
+  var lowest = -1e9, i;
+  for (i = 0; i < 2; i++) {
+    var lg = K.legs[i];
+    lg.sole = lg.ankle.y + (0.20 - lg.rise * 0.10) * SEG.foot;
+    if (lg.sole > lowest) lowest = lg.sole;
+  }
+  var ay = track.ay != null ? track.ay : 0;
+  shift(K, 0, ay - lowest);
+  for (i = 0; i < 2; i++) K.legs[i].sole += ay - lowest;
+  K.ay = ay;
+  return K;
+}
+
+function drawFront(ctx, W, H, track, t, opt, G) {
+  var C = G.C, s = G.s, i;
+  var K = fPlace(track, t);
+  var ay = K.ay;
+
+  props(ctx, track.props, G, 'back');
+  var contact = [];
+  for (i = 0; i < 2; i++) contact.push({ x: K.legs[i].ankle.x, y: K.legs[i].sole });
+  shadow(ctx, G, contact);
+
+  var far = { skin: C.skinF, line: C.lineF, shirt: C.shirtF, shirtL: C.shirtLF,
+              pants: C.pantsF, pantsL: C.pantsLF, shoe: C.shoeF, shoeL: C.shoeLF, hair: C.hairF };
+  var near = { skin: C.skin, line: C.line, shirt: C.shirt, shirtL: C.shirtL,
+               pants: C.pants, pantsL: C.pantsL, shoe: C.shoe, shoeL: C.shoeL, hair: C.hair };
+
+  // 抬起来的腿在前面 —— 按深度排序，谁在前谁后画
+  if (track.plumb && (!opt.layers || opt.layers.plumb !== false)) plumbLine(ctx, G, track, K, ay, opt);
+
+  var legs = K.legs.slice().sort(function (a, b) { return a.z - b.z; });
+  var arms = K.arms.slice().sort(function (a, b) { return a.z - b.z; });
+
+  // 按深度排序决定前后遮挡；两条腿都用正常配色 —— 站着的那条腿才是重点，
+  // 画成半透明会让人以为它不重要。
+  for (i = 0; i < 2; i++) drawFLeg(ctx, G, legs[i], near);
+  fShorts(ctx, G, K, near);
+  for (i = 0; i < 2; i++) drawFArm(ctx, G, arms[i], near);
+  fTrunk(ctx, G, K, near);
+  for (i = 0; i < 2; i++) {
+    cloth(ctx, G, arms[i].sho, arms[i].elbow, 0.52, 0.50, 0.40, near.shirt, near.shirtL);
+  }
+  fHead(ctx, G, K, near, C);
+
+  props(ctx, track.props, G, 'front');
+}
+
+/* 重心线：从头顶垂下来，落在哪只脚上一目了然。画在人身后，不挡脸。 */
+function plumbLine(ctx, G, track, K, ay, opt) {
+  var C = G.C, s = G.s;
+  {
+    var a = G.pt({ x: K.headC.x, y: K.headC.y - SEG.headRy * 1.15 }), b = G.pt({ x: K.headC.x, y: ay + 0.12 });
+    ctx.save();
+    ctx.setLineDash([s * 0.14, s * 0.13]);
+    ctx.strokeStyle = C.focus; ctx.lineWidth = Math.max(1.4, s * 0.045);
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(b.x, b.y, s * 0.12, 0, 6.2832);
+    ctx.fillStyle = C.focus; ctx.fill();
+  }
+}
+
+function shift(K, dx, dy) {
+  function m(p) { p.x += dx; p.y += dy; }
+  m(K.pelvis); m(K.shoulder); m(K.neckTop); m(K.headC);
+  for (var i = 0; i < 2; i++) {
+    m(K.legs[i].hip); m(K.legs[i].knee); m(K.legs[i].ankle);
+    m(K.arms[i].sho); m(K.arms[i].elbow); m(K.arms[i].wrist); m(K.arms[i].hand);
+  }
+}
+
+function drawFLeg(ctx, G, lg, K) {
+  limb(ctx, G, [[lg.hip, lg.knee, 0.60, 0.44], [lg.knee, lg.ankle, 0.44, 0.28]], K.skin, K.line);
+  // 正面看到的鞋：脚尖略朝外
+  var s = G.s, a = G.pt(lg.ankle);
+  var w = s * 0.40, h = s * (0.34 - lg.rise * 0.06), sg = lg.sg;
+  ctx.save();
+  ctx.translate(a.x + sg * s * 0.03 * G.mir, a.y + s * 0.02);
+  ctx.rotate(sg * G.mir * 0.13);
+  roundRect(ctx, -w / 2, 0, w, h, s * 0.12);
+  ctx.fillStyle = K.shoe; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = K.shoeL; ctx.stroke();
+  ctx.restore();
+}
+
+function drawFArm(ctx, G, am, K) {
+  limb(ctx, G, [[am.sho, am.elbow, 0.40, 0.32], [am.elbow, am.wrist, 0.32, 0.25],
+                [am.wrist, am.hand, 0.26, 0.30]], K.skin, K.line);
+}
+
+function fShorts(ctx, G, K, N) {
+  for (var i = 0; i < 2; i++) {
+    cloth(ctx, G, K.legs[i].hip, K.legs[i].knee, 0.46, 0.68, 0.56, N.pants, N.pantsL);
+  }
+  var p = K.pelvis, w = SEG.hipW + 0.16;
+  smooth(ctx, [G.pt({ x: p.x - w, y: p.y - 0.40 }), G.pt({ x: p.x, y: p.y - 0.46 }),
+               G.pt({ x: p.x + w, y: p.y - 0.40 }), G.pt({ x: p.x + w * 0.96, y: p.y + 0.26 }),
+               G.pt({ x: p.x, y: p.y + 0.20 }), G.pt({ x: p.x - w * 0.96, y: p.y + 0.26 })]);
+  ctx.fillStyle = N.pants; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.pantsL; ctx.stroke();
+}
+
+function fTrunk(ctx, G, K, N) {
+  var p = K.pelvis, sh = K.shoulder;
+  function L(f, dx) { return G.pt({ x: p.x + (sh.x - p.x) * f + dx, y: p.y + (sh.y - p.y) * f }); }
+  smooth(ctx, [
+    L(0.00, -0.56), L(0.32, -0.49), L(0.66, -0.64), L(0.97, -0.78),
+    L(1.06, -0.62), L(1.09, -0.18), L(1.09, 0.18), L(1.06, 0.62),
+    L(0.97, 0.78), L(0.66, 0.64), L(0.32, 0.49), L(0.00, 0.56)
+  ]);
+  ctx.fillStyle = N.shirt; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.shirtL; ctx.stroke();
+}
+
+function fHead(ctx, G, K, N, C) {
+  var s = G.s;
+  limb(ctx, G, [[K.shoulder, K.neckTop, 0.36, 0.33]], N.skin, N.line);
+  var hc = G.pt(K.headC), rx = SEG.headRx * s, ry = SEG.headRy * s;
+  ctx.save();
+  ctx.translate(hc.x, hc.y);
+  ctx.rotate(-K.lean * RAD * 0.35 * G.mir);
+  ctx.save(); ctx.scale(rx / ry, 1);
+  ctx.beginPath(); ctx.arc(0, 0, ry, 0, 6.2832);
+  ctx.restore();
+  ctx.fillStyle = N.skin; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = N.line; ctx.stroke();
+  // 耳
+  for (var e = 0; e < 2; e++) {
+    var sg = e ? 1 : -1;
+    ctx.beginPath(); ctx.arc(sg * rx * 0.96, ry * 0.06, rx * 0.15, 0, 6.2832);
+    ctx.fillStyle = N.skin; ctx.fill(); ctx.lineWidth = G.lw * 0.8; ctx.stroke();
+  }
+  // 头发
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(-rx * 1.06, ry * 0.16);
+  ctx.quadraticCurveTo(-rx * 1.14, -ry * 1.06, 0, -ry * 1.13);
+  ctx.quadraticCurveTo(rx * 1.14, -ry * 1.06, rx * 1.06, ry * 0.16);
+  ctx.quadraticCurveTo(rx * 1.00, -ry * 0.30, rx * 0.52, -ry * 0.48);
+  ctx.quadraticCurveTo(-rx * 0.30, -ry * 0.66, -rx * 1.00, -ry * 0.30);
+  ctx.closePath();
+  ctx.fillStyle = N.hair; ctx.fill();
+  ctx.restore();
+  // 眉、眼、嘴
+  ctx.strokeStyle = C.face; ctx.fillStyle = C.face; ctx.lineCap = 'round';
+  ctx.lineWidth = Math.max(1, rx * 0.12);
+  for (var i = 0; i < 2; i++) {
+    var g = i ? 1 : -1;
+    ctx.beginPath();
+    ctx.moveTo(g * rx * 0.18, -ry * 0.20); ctx.lineTo(g * rx * 0.60, -ry * 0.24);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(g * rx * 0.39, ry * 0.02, rx * 0.10, 0, 6.2832); ctx.fill();
+  }
+  ctx.beginPath();
+  ctx.moveTo(-rx * 0.20, ry * 0.46); ctx.quadraticCurveTo(0, ry * 0.58, rx * 0.20, ry * 0.46);
+  ctx.lineWidth = Math.max(1, rx * 0.11); ctx.stroke();
+  ctx.lineCap = 'butt';
+  ctx.restore();
+}
+
+/* ---------- 公共层 ---------- */
+
+function trailPath(track) {
+  if (track._trail) return track._trail;
+  var out = [];
+  for (var i = 0; i <= 40; i++) {
+    var P = place(solve(sample(track, i / 40)), track);
+    out.push(P[track.trail]);
+  }
+  track._trail = out;
+  return out;
+}
+
+function shadow(ctx, G, pts) {
+  var s = G.s, C = G.C, i;
+  var lo = -1e9, x0 = 1e9, x1 = -1e9;
+  for (i = 0; i < pts.length; i++) {
+    if (pts[i].y > lo) lo = pts[i].y;
+    if (pts[i].x < x0) x0 = pts[i].x;
+    if (pts[i].x > x1) x1 = pts[i].x;
+  }
+  var c = G.pt({ x: (x0 + x1) / 2, y: lo });
+  var w = Math.max((x1 - x0) * 0.62 + 0.55, 0.8) * s;
+  ctx.save();
+  ctx.translate(c.x, c.y + s * 0.04);
+  ctx.scale(1, 0.17);
+  ctx.beginPath(); ctx.arc(0, 0, w, 0, 6.2832);
+  ctx.fillStyle = C.shadow; ctx.fill();
+  ctx.restore();
+}
+
+function focusRing(ctx, G, track, P, t, opt) {
+  if (!track.focus || (opt.layers && opt.layers.highlight === false)) return;
+  var s = G.s, C = G.C;
+  var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
+  for (var f = 0; f < track.focus.length; f++) {
+    var jp = P[track.focus[f]]; if (!jp) continue;
+    var g = G.pt(jp);
+    ctx.beginPath(); ctx.arc(g.x, g.y, s * (0.42 + 0.10 * pulse), 0, 6.2832);
+    ctx.strokeStyle = C.focus; ctx.lineWidth = s * 0.07;
+    ctx.globalAlpha = 0.26 + 0.34 * (1 - pulse);
+    ctx.stroke(); ctx.globalAlpha = 1;
+  }
+}
+
+/* ---------- 道具：床、椅子、地面、扶手、目标物 ---------- */
+
+function props(ctx, list, G, layer) {
+  if (!list) return;
+  var s = G.s, C = G.C, X = G.X, Y = G.Y;
+  for (var i = 0; i < list.length; i++) {
+    var o = list[i];
+    if ((o.layer || 'back') !== layer) continue;
+    ctx.save();
+    if (o.k === 'floor') {
+      ctx.fillStyle = C.floorSoft;
+      ctx.fillRect(-2000, Y(0), 4000, s * 1.6);
+      ctx.fillStyle = C.floor;
+      ctx.fillRect(-2000, Y(0), 4000, Math.max(2, s * 0.09));
+    } else if (o.k === 'bed') {
+      var by = Y(o.y || 0), x0 = X(o.x0), x1 = X(o.x1);
+      ctx.fillStyle = C.prop;
+      roundRect(ctx, Math.min(x0, x1), by, Math.abs(x1 - x0), s * 0.78, s * 0.12); ctx.fill();
+      ctx.fillStyle = C.propL;
+      ctx.fillRect(Math.min(x0, x1), by, Math.abs(x1 - x0), Math.max(1.5, s * 0.05));
+    } else if (o.k === 'chair') {
+      var xa = Math.min(X(o.x0), X(o.x1)), wid = Math.abs(X(o.x1) - X(o.x0));
+      var st = Y(o.seat), gy = Y(0);
+      ctx.fillStyle = C.prop;
+      if (o.back) {                                  // 靠背在人后面
+        var bx = (G.mir > 0) ? xa : xa + wid - s * 0.20;
+        roundRect(ctx, bx, Y(o.seat - 1.55), s * 0.20, s * 1.55, s * 0.07); ctx.fill();
+      }
+      roundRect(ctx, xa, st, wid, s * 0.22, s * 0.08); ctx.fill();
+      roundRect(ctx, xa + s * 0.06, st + s * 0.20, s * 0.17, gy - st - s * 0.20, s * 0.05); ctx.fill();
+      roundRect(ctx, xa + wid - s * 0.23, st + s * 0.20, s * 0.17, gy - st - s * 0.20, s * 0.05); ctx.fill();
+    } else if (o.k === 'rail') {
+      ctx.fillStyle = C.prop;
+      roundRect(ctx, X(o.x) - s * 0.09, Y(o.y), s * 0.18, (0 - o.y) * s, s * 0.06); ctx.fill();
+      roundRect(ctx, X(o.x) - s * 0.62, Y(o.y) - s * 0.09, s * 1.24, s * 0.18, s * 0.09); ctx.fill();
+    } else if (o.k === 'target') {                   // 杯子
+      ctx.fillStyle = C.accentSoft; ctx.strokeStyle = C.accent;
+      ctx.lineWidth = Math.max(1.5, s * 0.05);
+      ctx.beginPath();
+      ctx.moveTo(X(o.x) - s * 0.20, Y(o.y) - s * 0.24);
+      ctx.lineTo(X(o.x) + s * 0.20, Y(o.y) - s * 0.24);
+      ctx.lineTo(X(o.x) + s * 0.15, Y(o.y) + s * 0.24);
+      ctx.lineTo(X(o.x) - s * 0.15, Y(o.y) + s * 0.24);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (o.k === 'table') {
+      ctx.fillStyle = C.prop;
+      roundRect(ctx, X(o.x0), Y(o.y), (o.x1 - o.x0) * s, s * 0.16, s * 0.06); ctx.fill();
+      roundRect(ctx, X(o.x1) - s * 0.28, Y(o.y), s * 0.16, (0 - o.y) * s, s * 0.05); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
 /* ---------- 配色 ---------- */
 
 var THEME = {
   light: {
-    skin: '#EFC3A0', skinF: '#F6DECB', line: '#B07C52', lineF: '#D6B79B',
-    shoe: '#5B6B6E', shoeF: '#9DAAAC',
-    cloth: '#CFDBDA', clothLine: '#94AAA9', hair: '#3D3A36',
-    floor: '#B5C2BC', floorSoft: 'rgba(150,170,164,0.22)',
-    prop: '#CBD6D1', propLine: '#A6B5AE',
-    focus: '#C8791A', accent: '#0F6F5C', accentSoft: '#DCEBE5',
-    trail: 'rgba(200,121,26,0.55)'
+    skin: '#F0C6A2', line: '#BC8657', skinF: '#D6AB88', lineF: '#A87A50',
+    shirt: '#2F9C82', shirtL: '#0E6B58', shirtF: '#237E6A', shirtLF: '#0A5446',
+    pants: '#40606E', pantsL: '#27424E', pantsF: '#334E5A', pantsLF: '#1D333D',
+    shoe: '#33454C', shoeL: '#1F2C31', shoeF: '#293840', shoeLF: '#162126',
+    hair: '#332F2A', hairF: '#282521', face: '#7A5638',
+    floor: '#B7C7BF', floorSoft: 'rgba(146,170,160,0.20)',
+    prop: '#CBD8D1', propL: '#A9BAB2',
+    shadow: 'rgba(38,70,58,0.13)',
+    focus: '#B96F14', accent: '#0E6B58', accentSoft: '#DCEBE5',
+    trail: 'rgba(185,111,20,0.55)'
   },
   dark: {
-    skin: '#C8926B', skinF: '#8E6A50', line: '#6E4A2C', lineF: '#5A4335',
-    shoe: '#39474A', shoeF: '#2C3639',
-    cloth: '#48605F', clothLine: '#334746', hair: '#191A19',
-    floor: '#46534E', floorSoft: 'rgba(120,140,135,0.16)',
-    prop: '#414D48', propLine: '#5A6963',
+    skin: '#C8926B', line: '#6E4A2C', skinF: '#8A6750', lineF: '#5A4335',
+    shirt: '#1F7B66', shirtL: '#0C5545', shirtF: '#3D5D57', shirtLF: '#2A4740',
+    pants: '#31474F', pantsL: '#1E2F36', pantsF: '#3A4A50', pantsLF: '#2A383D',
+    shoe: '#28353A', shoeL: '#161F22', shoeF: '#39474C', shoeLF: '#28343A',
+    hair: '#1A1A18', hairF: '#3A3833', face: '#4A342A',
+    floor: '#46534E', floorSoft: 'rgba(120,140,135,0.14)',
+    prop: '#414D48', propL: '#5A6963',
+    shadow: 'rgba(0,0,0,0.26)',
     focus: '#E8A33A', accent: '#4FBFA2', accentSoft: '#1E3B34',
     trail: 'rgba(232,163,58,0.55)'
   }
 };
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { draw: draw, sample: sample, solve: solve, place: place, SEG: SEG, THEME: THEME };
+  module.exports = { draw: draw, sample: sample, solve: solve, place: place,
+                     fPlace: fPlace, world: world, SEG: SEG, LIM: LIM, THEME: THEME };
 }
