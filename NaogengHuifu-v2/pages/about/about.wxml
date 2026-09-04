@@ -18,7 +18,7 @@
   <view class="blk">
     <view class="bt">开头那几个问题是干什么的</view>
     <view class="bp">只用来把跟他有关的内容挑出来。已经能自己走路的人，不该还在看「怎么翻身」；还起不来的人，也不该看「上下楼梯」。</view>
-    <view class="bp"><text class="k">我们不做诊断、不打分、不分期、不评估疗效，也不提供在线问诊。</text>这些是医疗判断，软件不能做，也不该做。有治疗师在带的，一律以治疗师说的为准。</view>
+    <view class="bp">有治疗师在带的，一律以治疗师说的为准。</view>
     <view class="lnk hit" bindtap="redo">重新做一次快筛</view>
   </view>
 

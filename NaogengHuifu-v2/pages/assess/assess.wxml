@@ -15,10 +15,6 @@
     <view>{{item.t}}</view>
   </view>
 
-  <view class="why" wx:if="{{qi === 0}}">
-    这几个问题只用来帮你筛出跟他有关的内容。我们不做诊断、不打分、不下结论 —— 那是医生的事。答案只存在你自己手机里。
-  </view>
-
 </view>
 
 <view class="dock">

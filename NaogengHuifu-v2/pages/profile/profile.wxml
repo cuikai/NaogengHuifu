@@ -1,7 +1,7 @@
 <view class="pg flat" style="--fs:{{ui.fs}}">
 
   <view class="h1">{{weekly ? '这一周的变化' : '这是他现在的位置'}}</view>
-  <view class="lead">下面的内容都是按你刚才勾的情况筛出来的。这不是医生的诊断，也不是评分。</view>
+  <view class="lead">下面的内容都是按你刚才勾的情况筛出来的。</view>
 
   <view class="axis">
     <view class="t">走 · 移动</view>
@@ -38,11 +38,6 @@
         <view class="q">{{item.sub}}　·　{{item.dose}}</view>
       </view>
     </view>
-  </view>
-
-  <view class="why">
-    这些内容来自公开的康复指南与共识，每一条剂量都能核到出处。软件只负责按你勾的情况把相关的挑出来，
-    不评估疗效、不生成治疗方案。有治疗师在带的，以治疗师说的为准。
   </view>
 
 </view>

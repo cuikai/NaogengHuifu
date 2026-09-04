@@ -31,7 +31,7 @@
   </view>
 
   <view class="sec">第一次做到</view>
-  <view class="lead">这十件事来自改良 Barthel 指数。只记他哪天第一次做到，不算分、不下结论。</view>
+  <view class="lead">这十件事来自改良 Barthel 指数。只记他哪天第一次做到。</view>
 
   <view class="ms hit {{item.on ? 'on' : ''}}" wx:for="{{ms}}" wx:key="id"
         data-id="{{item.id}}" bindtap="toggleMs">
