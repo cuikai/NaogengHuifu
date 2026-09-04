@@ -28,8 +28,13 @@ var SEG = {
   spine:  2.15,                 // 骨盆 → 肩
   uarm:   1.30, farm: 1.08, hand: 0.46,
   thigh:  1.80, shank: 1.68, foot: 0.78,
-  shoW:   0.80,                 // 正视：肩半宽
-  hipW:   0.46                  // 正视：髋半宽
+  shoW:   0.80,                 // 正视：肩峰半宽（衣服的肩线走这里）
+  hipW:   0.46,                 // 正视：髋半宽
+  /* 上臂那根胶囊不从肩峰画起，而是沿着胳膊往下让开这么一段 —— 圆头顶在肩线
+   * 上方，正面看就是垫了肩，侧面看是肩上鼓个包。让开之后三角肌的位置也对了。
+   * 只挪胶囊的起点，肘、腕、手仍从肩峰按原长度解算，一个像素都没动：
+   * 姿势库里「手正好按在椅面上 / 正好扶上横杆」那些角度全部照旧成立。 */
+  shoDrop: 0.22
 };
 
 /* ---------- 手 ----------
@@ -132,6 +137,10 @@ function solve(pose) {
   P.kneeF  = dn(hpF,     a.thighF, SEG.thigh);
   P.ankleF = dn(P.kneeF, a.shankF, SEG.shank);
   P.toeF   = dn(P.ankleF, a.footF, SEG.foot);
+
+  // 肘、腕、手照旧从肩峰解算；armSho 只是上臂胶囊的起点，沿着胳膊让开一小段
+  P.armSho  = dn(P.shoulder, a.uarm,  SEG.shoDrop);
+  P.armShoF = dn(shF,        a.uarmF, SEG.shoDrop);
 
   P.elbow = dn(P.shoulder, a.uarm, SEG.uarm);
   P.wrist = dn(P.elbow,    a.farm, SEG.farm);
@@ -279,10 +288,10 @@ function capsule(ctx, p0, p1, w0, w1) {
 }
 
 /* 过点的光滑闭合曲线（中点二次贝塞尔） */
-function smooth(ctx, pts) {
+function smooth(ctx, pts) { ctx.beginPath(); smoothTo(ctx, pts); }
+function smoothTo(ctx, pts) {
   var n = pts.length;
   var m = { x: (pts[n - 1].x + pts[0].x) / 2, y: (pts[n - 1].y + pts[0].y) / 2 };
-  ctx.beginPath();
   ctx.moveTo(m.x, m.y);
   for (var i = 0; i < n; i++) {
     var a = pts[i], b = pts[(i + 1) % n];
@@ -365,33 +374,68 @@ function drawSide(ctx, W, H, track, t, opt, G) {
             pants: C.pants, pantsL: C.pantsL, shoe: C.shoe, shoeL: C.shoeL, hair: C.hair };
 
   // 远侧：手臂 + 腿
-  arm(ctx, G, P.shoulderF, P.elbowF, P.wristF, P.handF, P.ang.handF, F);
+  arm(ctx, G, P.armShoF, P.elbowF, P.wristF, P.handF, P.ang.handF, F, grip(track, P.handF));
   leg(ctx, G, P.pelvisF, P.kneeF, P.ankleF, P.ang.footF, F);
   // 仰卧时手臂贴在身体两侧 —— 画在躯干后面，不然一条胳膊横在肚子上
-  if (track.armBack) arm(ctx, G, P.shoulder, P.elbow, P.wrist, P.hand, P.ang.hand, N);
+  if (track.armBack) arm(ctx, G, P.armSho, P.elbow, P.wrist, P.hand, P.ang.hand, N, grip(track, P.hand));
   // 近侧腿
   leg(ctx, G, P.pelvis, P.knee, P.ankle, P.ang.foot, N);
   // 短裤（盖住两条大腿根，人才有胯）
   shorts(ctx, G, P, F, N);
-  // 躯干
-  trunkShape(ctx, G, P, N);
+  // 躯干（近侧袖子拼进同一条剪影）
+  trunkShape(ctx, G, P, N, track.armBack ? null : span(G, P.armSho, P.elbow, 0.52, 0.47, 0.40));
   // 颈 + 头
   neckHead(ctx, G, P, N, C);
   // 近侧手臂（最前面）
-  if (!track.armBack) arm(ctx, G, P.shoulder, P.elbow, P.wrist, P.hand, P.ang.hand, N);
+  if (!track.armBack) arm(ctx, G, P.armSho, P.elbow, P.wrist, P.hand, P.ang.hand, N, grip(track, P.hand));
 
   props(ctx, track.props, G, 'front');
   focusRing(ctx, G, track, P, t, opt);
   return P;
 }
 
-/* 手臂：整条一次画完（上臂+前臂+手+拇指），再套上短袖 */
-function arm(ctx, G, sh, el, wr, hd, handAng, K) {
-  var d = vec(handAng), n = vec(handAng - 90 * G.mir);
-  var thumb = { x: wr.x + (d.x * 0.20 + n.x * 0.16) * SEG.hand,
-                y: wr.y + (d.y * 0.20 + n.y * 0.16) * SEG.hand };
-  limb(ctx, G, [[sh, el, 0.40, 0.32], [el, wr, 0.32, 0.25], [wr, hd, 0.25, 0.27]],
-       K.skin, K.line, [[thumb, 0.105]]);
+/* 手：掌 + 四指 + 拇指，三段胶囊，交给 limb 的「先描边再填充」合成一个剪影。
+ * 原来这里是一根锥形胶囊加一个小圆点，缩略图上看是一支桨。多出的这两笔
+ * 正好是让人认出「这是一只手」的部分 —— 扶横杆的动作尤其要看得出在握。
+ * sgn 指出拇指在哪一侧；gr = 0 自然微屈，1 握紧。 */
+function handSegs(wr, hd, sgn, gr) {
+  var dx = hd.x - wr.x, dy = hd.y - wr.y;
+  var L = Math.sqrt(dx * dx + dy * dy) || 1e-4;
+  var ux = dx / L, uy = dy / L;                    // 腕 → 指尖
+  var px = uy * sgn, py = -ux * sgn;               // 掌侧：拇指和四指都朝这边卷
+  function at(a, b) { return { x: wr.x + ux * a + px * b, y: wr.y + uy * a + py * b }; }
+
+  var knu = at(L * 0.50, L * 0.05);                // 掌指关节
+  var fa = (16 + gr * 76) * RAD;                   // 四指：自然微屈 → 扣住横杆
+  var fl = L * (0.50 - gr * 0.12);
+  var tip = { x: knu.x + (ux * Math.cos(fa) + px * Math.sin(fa)) * fl,
+              y: knu.y + (uy * Math.cos(fa) + py * Math.sin(fa)) * fl };
+
+  var tb = at(L * 0.30, L * 0.09);                 // 拇指根
+  var ta = (34 - gr * 12) * RAD;                   // 握紧时拇指收回来扣在四指上
+  var tl = L * (0.30 + gr * 0.06);
+  var ttip = { x: tb.x + (ux * Math.cos(ta) + px * Math.sin(ta)) * tl,
+               y: tb.y + (uy * Math.cos(ta) + py * Math.sin(ta)) * tl };
+
+  return [[wr, knu, L * 0.55, L * 0.66], [knu, tip, L * 0.62, L * 0.50],
+          [tb, ttip, L * 0.30, L * 0.25]];
+}
+
+/* 手离横杆多近算「握住了」—— 和体检脚本判「扶上没扶上」用同一个距离 */
+function grip(track, h) {
+  if (!track || !track.touchRail) return 0;
+  var r = null, ps = track.props || [], i;
+  for (i = 0; i < ps.length; i++) if (ps[i].k === 'rail') r = ps[i];
+  if (!r) return 0;
+  var d = Math.sqrt((h.x - r.x) * (h.x - r.x) + (h.y - r.y) * (h.y - r.y));
+  var g = (0.70 - d) / 0.35;
+  return g < 0 ? 0 : (g > 1 ? 1 : g);
+}
+
+/* 手臂：整条一次画完（上臂+前臂+手），再套上短袖 */
+function arm(ctx, G, sh, el, wr, hd, handAng, K, gr) {
+  var segs = [[sh, el, 0.40, 0.32], [el, wr, 0.32, 0.25]];
+  limb(ctx, G, segs.concat(handSegs(wr, hd, 1, gr || 0)), K.skin, K.line);
   cloth(ctx, G, sh, el, 0.52, 0.47, 0.40, K.shirt, K.shirtL);
 }
 
@@ -441,15 +485,29 @@ function limb(ctx, G, segs, fill, line, dots) {
   ctx.lineCap = 'butt';
 }
 
-/* 袖口 / 裤脚：只填色不描边，再在袖口画一条边线 —— 衣服和肩膀连成一体 */
+/* 袖口 / 裤脚：只填色不描边，再在袖口画一条边线 —— 衣服和肩膀连成一体。
+ * pad 是必须的：limb 的轮廓线是「描边再填充」，那圈描边比填充区还宽出一个
+ * 线宽。衣服如果只按肢体的宽度盖，边上就会漏出一条深色细线 —— 看上去像
+ * 袖子和裤腿是另外贴上去的一块。 */
 function cloth(ctx, G, a, b, f, w0, w1, fill, line) {
-  var m = { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
-  capsule(ctx, G.pt(a), G.pt(m), w0 * G.s, w1 * G.s);
+  var v = span(G, a, b, f, w0, w1);
+  capsule(ctx, G.pt(v.a), G.pt(v.b), v.w0 * G.s, v.w1 * G.s);
   ctx.fillStyle = fill; ctx.fill();
-  var d = { x: b.x - a.x, y: b.y - a.y };
-  var L = Math.sqrt(d.x * d.x + d.y * d.y) || 1;
-  var nx = -d.y / L * w1 / 2, ny = d.x / L * w1 / 2;
-  var p0 = G.pt({ x: m.x + nx, y: m.y + ny }), p1 = G.pt({ x: m.x - nx, y: m.y - ny });
+  cuff(ctx, G, v, line);
+}
+
+/* 袖子 / 裤腿这一段的几何。躯干那条路径也要用同一份，两边才拼得严丝合缝 */
+function span(G, a, b, f, w0, w1) {
+  var pad = G.lw / G.s * 2.4;
+  return { a: a, b: { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f },
+           d: { x: b.x - a.x, y: b.y - a.y }, w0: w0 + pad, w1: w1 + pad };
+}
+
+/* 袖口 / 裤脚的那条边线 */
+function cuff(ctx, G, v, line) {
+  var L = Math.sqrt(v.d.x * v.d.x + v.d.y * v.d.y) || 1;
+  var nx = -v.d.y / L * v.w1 / 2, ny = v.d.x / L * v.w1 / 2;
+  var p0 = G.pt({ x: v.b.x + nx, y: v.b.y + ny }), p1 = G.pt({ x: v.b.x - nx, y: v.b.y - ny });
   ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y);
   ctx.strokeStyle = line; ctx.lineWidth = G.lw; ctx.lineCap = 'round'; ctx.stroke();
   ctx.lineCap = 'butt';
@@ -480,18 +538,35 @@ function shorts(ctx, G, P, F, N) {
   cloth(ctx, G, P.pelvis, P.knee, 0.44, 0.74, 0.58, N.pants, N.pantsL);
 }
 
-/* 躯干：上衣。肩、胸、腰、胯的轮廓一条曲线走完 */
-function trunkShape(ctx, G, P, N) {
+/* 躯干：上衣。肩、胸、腰、胯的轮廓一条曲线走完。
+ * sv 给的话，近侧袖子拼进同一条路径 —— 分开画，躯干的轮廓线会在袖子边上断掉，
+ * 肩膀那里就凭空多出一个台阶。之后 arm() 里的 cloth 再把袖子填一遍盖住胳膊，
+ * 边界正好落在这里已经描好的那条线上。 */
+function trunkShape(ctx, G, P, N, sv) {
   var f = frame(P);
   function q(du, dv) { return at(G, f, du, dv); }
   var sp = SEG.spine;
-  smooth(ctx, [
+  var body = [
     q(0.02, 0.42), q(sp * 0.34, 0.36), q(sp * 0.68, 0.50), q(sp * 0.96, 0.46),
     q(sp + 0.14, 0.22), q(sp + 0.16, -0.10),
     q(sp * 0.96, -0.48), q(sp * 0.68, -0.52), q(sp * 0.34, -0.44), q(0.02, -0.46)
-  ]);
-  ctx.fillStyle = N.shirt; ctx.fill();
-  ctx.lineWidth = G.lw; ctx.strokeStyle = N.shirtL; ctx.stroke();
+  ];
+  paint(ctx, G, N.shirt, N.shirtL, body, sv);
+}
+
+/* 先把整条剪影描一遍边，再逐块填色。
+ * 不能描完一次性 fill：曲线和胶囊的绕向相反，重叠的那块会被非零环绕规则
+ * 抵消成一个洞 —— 肩膀上凭空出现一道弧。 */
+function paint(ctx, G, fill, line, body, sv, sv2) {
+  var i, all = [sv, sv2];
+  ctx.beginPath();
+  smoothTo(ctx, body);
+  for (i = 0; i < 2; i++) if (all[i]) capsuleTo(ctx, G.pt(all[i].a), G.pt(all[i].b), all[i].w0 * G.s, all[i].w1 * G.s);
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = line; ctx.lineWidth = G.lw * 2; ctx.stroke();
+  ctx.fillStyle = fill;
+  smooth(ctx, body); ctx.fill();
+  for (i = 0; i < 2; i++) if (all[i]) { capsule(ctx, G.pt(all[i].a), G.pt(all[i].b), all[i].w0 * G.s, all[i].w1 * G.s); ctx.fill(); }
 }
 
 /* 颈 + 头（侧面轮廓：额、鼻、唇、下巴都在同一条线上） */
@@ -588,7 +663,7 @@ function fSolve(p) {
   for (var i = 0; i < 2; i++) {
     var sg = sides[i], S = sg < 0 ? 'L' : 'R';
     var hip = off(pel, SEG.hipW, sg, lean * 0.35);
-    var sho = off(sh, SEG.shoW, sg, lean * 0.5);
+    var acr = off(sh, SEG.shoW, sg, lean * 0.5);          // 肩峰：衣服的肩线
 
     // 腿
     var abd  = clamp(num(p['abd' + S], 4), LIM.abd);
@@ -604,11 +679,15 @@ function fSolve(p) {
     var aab = clamp(num(p['armAbd' + S], 6), LIM.abd);
     var sf  = clamp(num(p['sho' + S], 0), LIM.sho);
     var ef  = clamp(num(p['elb' + S], 0), LIM.elb);
-    var el = seg3(sho, SEG.uarm, sf, aab, sg);
+    var el = seg3(acr, SEG.uarm, sf, aab, sg);            // 肘：从肩峰算，和以前一样
+    // 上臂胶囊的起点：从肩峰沿着胳膊让开 shoDrop，三角肌就落在这里
+    var k = SEG.shoDrop / SEG.uarm;
+    var sho = { x: acr.x + (el.x - acr.x) * k, y: acr.y + (el.y - acr.y) * k,
+                z: acr.z + (el.z - acr.z) * k };
     var wr = seg3(el, SEG.farm, sf + ef, aab, sg);
     var hn = seg3(wr, SEG.hand, sf + ef, aab, sg);
-    P.arms.push({ sg: sg, sho: proj(sho), elbow: proj(el), wrist: proj(wr), hand: proj(hn),
-                  z: (el.z + wr.z) / 2 });
+    P.arms.push({ sg: sg, acr: proj(acr), sho: proj(sho), elbow: proj(el), wrist: proj(wr),
+                  hand: proj(hn), z: (el.z + wr.z) / 2 });
   }
   P.proj = proj;
   return P;
@@ -665,11 +744,8 @@ function drawFront(ctx, W, H, track, t, opt, G) {
   // 画成半透明会让人以为它不重要。
   for (i = 0; i < 2; i++) drawFLeg(ctx, G, legs[i], near);
   fShorts(ctx, G, K, near);
-  for (i = 0; i < 2; i++) drawFArm(ctx, G, arms[i], near);
-  fTrunk(ctx, G, K, near);
-  for (i = 0; i < 2; i++) {
-    cloth(ctx, G, arms[i].sho, arms[i].elbow, 0.52, 0.50, 0.40, near.shirt, near.shirtL);
-  }
+  for (i = 0; i < 2; i++) drawFArm(ctx, G, arms[i], near, grip(track, arms[i].hand));
+  fShirt(ctx, G, K, near);
   fHead(ctx, G, K, near, C);
 
   props(ctx, track.props, G, 'front');
@@ -695,7 +771,8 @@ function shift(K, dx, dy) {
   m(K.pelvis); m(K.shoulder); m(K.neckTop); m(K.headC);
   for (var i = 0; i < 2; i++) {
     m(K.legs[i].hip); m(K.legs[i].knee); m(K.legs[i].ankle);
-    m(K.arms[i].sho); m(K.arms[i].elbow); m(K.arms[i].wrist); m(K.arms[i].hand);
+    m(K.arms[i].acr); m(K.arms[i].sho); m(K.arms[i].elbow);
+    m(K.arms[i].wrist); m(K.arms[i].hand);
   }
 }
 
@@ -713,9 +790,9 @@ function drawFLeg(ctx, G, lg, K) {
   ctx.restore();
 }
 
-function drawFArm(ctx, G, am, K) {
-  limb(ctx, G, [[am.sho, am.elbow, 0.40, 0.32], [am.elbow, am.wrist, 0.32, 0.25],
-                [am.wrist, am.hand, 0.26, 0.30]], K.skin, K.line);
+function drawFArm(ctx, G, am, K, gr) {
+  var segs = [[am.sho, am.elbow, 0.40, 0.32], [am.elbow, am.wrist, 0.32, 0.25]];
+  limb(ctx, G, segs.concat(handSegs(am.wrist, am.hand, -am.sg, gr || 0)), K.skin, K.line);
 }
 
 function fShorts(ctx, G, K, N) {
@@ -730,16 +807,26 @@ function fShorts(ctx, G, K, N) {
   ctx.lineWidth = G.lw; ctx.strokeStyle = N.pantsL; ctx.stroke();
 }
 
-function fTrunk(ctx, G, K, N) {
-  var p = K.pelvis, sh = K.shoulder;
+/* 上衣：躯干和两只袖子拼成一条路径，先描边再填充 —— 和 limb 同一个套路。
+ * 分开画的话，袖子的圆头会盖在肩线上方，正面看就是垫了肩。
+ * 现在肩峰是衣服的最高点，三角肌从肩峰下面鼓出来，轮廓一路顺下去。 */
+function fShirt(ctx, G, K, N) {
+  var p = K.pelvis, sh = K.shoulder, i;
   function L(f, dx) { return G.pt({ x: p.x + (sh.x - p.x) * f + dx, y: p.y + (sh.y - p.y) * f }); }
-  smooth(ctx, [
-    L(0.00, -0.56), L(0.32, -0.49), L(0.66, -0.64), L(0.97, -0.78),
-    L(1.06, -0.62), L(1.09, -0.18), L(1.09, 0.18), L(1.06, 0.62),
-    L(0.97, 0.78), L(0.66, 0.64), L(0.32, 0.49), L(0.00, 0.56)
-  ]);
-  ctx.fillStyle = N.shirt; ctx.fill();
-  ctx.lineWidth = G.lw; ctx.strokeStyle = N.shirtL; ctx.stroke();
+  var sv = [], apex = [];
+  for (i = 0; i < 2; i++) {
+    sv.push(span(G, K.arms[i].sho, K.arms[i].elbow, 0.52, 0.47, 0.40));
+    // 三角肌那个圆头的正上方。衣服的肩线正好从这一点过 —— 高了肩上鼓个包，
+    // 低了脖子和肩膀之间凹一个坑，两种都是「肩膀很奇怪」。
+    apex.push(G.pt({ x: sv[i].a.x, y: sv[i].a.y - sv[i].w0 / 2 }));
+  }
+  var body = [
+    L(0.00, -0.56), L(0.30, -0.47), L(0.66, -0.62), L(0.88, -0.72),
+    apex[0], L(1.07, -0.19), L(1.07, 0.19), apex[1],
+    L(0.88, 0.72), L(0.66, 0.62), L(0.30, 0.47), L(0.00, 0.56)
+  ];
+  paint(ctx, G, N.shirt, N.shirtL, body, sv[0], sv[1]);
+  for (i = 0; i < 2; i++) cuff(ctx, G, sv[i], N.shirtL);   // 袖口：衣服和胳膊的分界
 }
 
 function fHead(ctx, G, K, N, C) {
