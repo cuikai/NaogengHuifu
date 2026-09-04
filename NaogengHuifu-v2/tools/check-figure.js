@@ -15,7 +15,7 @@
 var fig = require('../utils/figure.js');
 var LIB = require('../utils/poses.js');
 
-var LIM = fig.LIM, SEG = fig.SEG;
+var LIM = fig.LIM, SEG = fig.SEG, HLIM = fig.HLIM;
 var TABLE = process.argv.indexOf('--table') >= 0;
 var N = 24;                      // 每个动作抽 24 帧
 var TOL = 0.06;                  // 允许的误差（头高）≈ 1.4cm
@@ -65,7 +65,7 @@ function railOf(m) {
 }
 
 LIB.forEach(function (m) {
-  if (m.gif) return;                                   // 手部动作还是图
+  if (m.gif) return;                                   // 还在用图的动作（现在没有了）
 
   /* --- phases --- */
   var ph = m.phases || [], prev = 0;
@@ -87,6 +87,26 @@ LIB.forEach(function (m) {
       var t = s / N;
       var p = fig.sample(tr, t);
       limitCheck(id, t, p);
+
+      if (m.handView) {                                 // ---- 手部特写 ----
+        var hk = [['wri', 'wri'], ['curl', 'curl'], ['spread', 'spread'], ['thumb', 'thumb']];
+        for (var q = 0; q < hk.length; q++) {
+          var hv = p[hk[q][0]], hr = HLIM[hk[q][1]];
+          if (hv == null) continue;
+          if (hv < hr[0] - 1e-6 || hv > hr[1] + 1e-6) {
+            bad(id, 't=' + t.toFixed(2) + ' ' + hk[q][0] + '=' + hv.toFixed(2) + ' 超出范围 [' + hr[0] + ',' + hr[1] + ']');
+          }
+        }
+        var K = m.handView === 'palm' ? fig.palmSolve(p) : fig.handSolve(p);
+        // 指尖不能穿到手掌背面去：完全握拳时指尖应落在掌心里，不是掌根以外
+        if (m.handView === 'palm' && (p.curl || 0) > 0.9) {
+          for (var fi = 0; fi < K.fingers.length; fi++) {
+            var tip = K.fingers[fi].pts[3];
+            if (tip.y > 0.1) bad(id, 't=' + t.toFixed(2) + ' 握拳时第 ' + (fi + 1) + ' 指的指尖伸到手腕以下了');
+          }
+        }
+        continue;
+      }
 
       if (m.front) {                                    // ---- 正视图 ----
         var K = fig.fPlace(tr, t);
@@ -183,5 +203,6 @@ if (problems.length) {
   problems.forEach(function (p) { console.log('  ✗ ' + p); });
   process.exit(1);
 } else {
-  console.log('\n✓ ' + LIB.filter(function (m) { return !m.gif; }).length + ' 个动作全部通过：关节角在生理范围内，脚站在支撑面上，手没有撑到地上。');
+  console.log('\n✓ ' + LIB.filter(function (m) { return !m.gif; }).length +
+    ' 个动作全部通过：关节角在生理范围内，脚站在支撑面上，手没有撑到地上。');
 }

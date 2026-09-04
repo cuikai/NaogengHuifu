@@ -18,14 +18,14 @@
     </block>
     <figure wx:else move="{{m.id}}" speed="{{speed}}" mirror="{{mirror}}" bindtick="onTick"></figure>
 
-    <view class="bar" wx:if="{{!m.gif}}">
+    <view class="bar">
       <view class="seg" wx:for="{{phases}}" wx:key="label">
         <view class="fill" style="width:{{item.pct}}%"></view>
       </view>
     </view>
-    <view class="phase" wx:if="{{!m.gif}}">{{phaseText}}</view>
+    <view class="phase">{{phaseText}}</view>
 
-    <view class="ctl" wx:if="{{!m.gif}}">
+    <view class="ctl">
       <view class="c hit {{speed === 0.5 ? 'on' : ''}}" bindtap="slow">0.5×　慢放</view>
       <view class="c hit {{mirror ? 'on' : ''}}" bindtap="flip">镜像患侧</view>
       <view class="c hit {{cmp ? 'on' : ''}}" wx:if="{{m.compare}}" bindtap="toggleCmp">对照常见错误</view>

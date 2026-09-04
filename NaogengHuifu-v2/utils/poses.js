@@ -479,19 +479,33 @@ var LIBRARY = [
 },
 
 /* ───────────────────────── 手 · 精细 ─────────────────────────
- * 这两个暂时沿用 v1 的图 —— 手部关节太多，需要单独的手部绘制器，排在第二批。
- * 组件检测到 gif 字段就走 <image>，其余字段和 canvas 动作完全一致。
+ * 手部特写用同一套渲染器的手部视图（handView）。
+ * 角度：wri 腕（+背伸/-掌屈）· curl 手指卷曲（0 完全伸直、1 完全握拳、负数是掌指过伸）
+ *       spread 五指分开 · thumb 拇指（0 外展伸直、1 横过掌心）
  */
 {
   id: 'grip', name: '握拳伸展', sub: '张开、握紧',
   m: null, h: [1, 2, 3], group: '手',
-  gif: '/images/mv/grip.gif', ratio: 1.0405,
+  handView: 'palm',
+  view: { cx: -0.06, cy: -0.42, span: 4.3 },
   dose: '20 次 / 组 · 3 组 · 一天 2～3 次',
   purpose: '手指长时间攥着会慢慢僵死，掰不开。每天张开握紧是最直接的预防 —— 也是以后能拿住东西的前提。',
-  cycle: 3000,
+  focus: ['finger'],
+  base: { wri: 6, curl: 0.30, spread: 0.2, thumb: 0.3 },
+  cycle: 3600,
+  keyframes: [
+    // 张开到最大：掌指关节略过伸（-0.26 ≈ 过伸 17°）、五指分开、拇指外展
+    { t: 0.00, wri: 8, curl: -0.26, spread: 1, thumb: 0 },
+    { t: 0.18, wri: 8, curl: -0.26, spread: 1, thumb: 0, ease: 'hold' },
+    // 握成拳：掌指 88°、近节指间 105°、远节指间 72°，拇指横过手指外面
+    { t: 0.50, wri: 2, curl: 1, spread: 0, thumb: 1 },
+    { t: 0.68, wri: 2, curl: 1, spread: 0, thumb: 1, ease: 'hold' },
+    { t: 1.00, wri: 8, curl: -0.26, spread: 1, thumb: 0 }
+  ],
   phases: [
-    { to: 0.5, label: '五指尽量张开，撑到最大' },
-    { to: 1.0, label: '再慢慢握成拳' }
+    { to: 0.18, label: '五指尽量张开，撑到最大' },
+    { to: 0.68, label: '再慢慢握成拳，拇指压在手指外面' },
+    { to: 1.00, label: '重新张开' }
   ],
   cautions: ['他自己做不了，就用你的手一根一根轻轻掰开 —— 只用很轻的力。', '掰不动就停，不要较劲。']
 },
@@ -499,13 +513,28 @@ var LIBRARY = [
 {
   id: 'wrist', name: '腕关节屈伸', sub: '手腕上下摆',
   m: null, h: [1, 2, 3, 4], group: '手',
-  gif: '/images/mv/wrist.gif', ratio: 0.7714,
+  handView: 'side', box: 'mid',
+  view: { cx: -0.35, cy: 0.28, span: 4.30 },
+  // 前臂垫在桌面上，手腕露在桌沿外面 —— 这样才是「前臂垫稳，只动手腕」
+  props: [{ k: 'table', x0: -3.6, x1: -0.50, y: 0.47 }],
   dose: '20 次 / 组 · 2～3 组 · 一天 2 次',
   purpose: '手腕僵住会让整只手都用不上 —— 抓握、端碗、写字，全都要先有一个能立起来的手腕。',
-  cycle: 2800,
+  focus: ['wrist'],
+  base: { wri: 0, curl: 0.20, spread: 0.06, thumb: 0.18 },
+  cycle: 3200,
+  keyframes: [
+    // 背伸约 60°、掌屈约 55°（正常主动活动度），手指全程放松微屈
+    { t: 0.00, wri: 0 },
+    { t: 0.26, wri: 60 },
+    { t: 0.40, wri: 60, ease: 'hold' },
+    { t: 0.70, wri: -55 },
+    { t: 0.84, wri: -55, ease: 'hold' },
+    { t: 1.00, wri: 0 }
+  ],
   phases: [
-    { to: 0.5, label: '前臂垫稳，手腕往上翘起来' },
-    { to: 1.0, label: '再往下垂，到有点紧就够' }
+    { to: 0.40, label: '前臂垫稳，手腕往上翘起来' },
+    { to: 0.84, label: '再往下垂，到有点紧就够' },
+    { to: 1.00, label: '回到中间' }
   ],
   cautions: ['是上下摆，不是转圈 —— 手腕不适合大幅度旋转。', '不要压到疼。']
 }

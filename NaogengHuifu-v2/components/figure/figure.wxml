@@ -1,4 +1,3 @@
-<view class="wrap {{wide ? 'wide' : ''}}" style="{{ratio ? 'padding-top:' + ratio + '%' : ''}}">
-  <image wx:if="{{gif}}" class="cv" src="{{gif}}" mode="aspectFit" lazy-load />
-  <canvas wx:else type="2d" id="cv" class="cv"></canvas>
+<view class="wrap {{box}}">
+  <canvas type="2d" id="cv" class="cv"></canvas>
 </view>

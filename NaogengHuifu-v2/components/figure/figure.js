@@ -2,7 +2,8 @@
  * 骨骼动画组件。
  *
  * 一个 <canvas type="2d">，按 utils/poses.js 里的关节角度关键帧实时绘制。
- * 不再依赖 GIF —— 所以可以调速、可以镜像患侧、可以叠信息层，包体也不涨。
+ * 全部 14 个动作（含两个手部特写）都走这一条路 —— 所以可以调速、可以镜像患侧、
+ * 可以叠信息层，包体也不涨。
  */
 const fig = require('../../utils/figure.js');
 const lib = require('../../utils/library.js');
@@ -17,17 +18,15 @@ Component({
     paused: { type: Boolean, value: false }
   },
 
-  data: { wide: false, gif: '', ratio: 0 },
+  data: { box: '' },
 
   lifetimes: {
     attached() {
       const m = lib.get(this.data.move);
       if (!m) return;
-      // 手部动作暂时还是图 —— 关节太多，需要单独的手部绘制器
-      if (m.gif) this.setData({ gif: m.gif, ratio: (m.ratio * 100).toFixed(2) });
-      else this.setData({ wide: !!m.wide });
+      this.setData({ box: m.box || (m.wide ? 'wide' : '') });
     },
-    ready() { if (!this.data.gif) this.init(); },
+    ready() { this.init(); },
     detached() { this.stopped = true; }
   },
 

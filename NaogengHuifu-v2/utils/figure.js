@@ -32,6 +32,28 @@ var SEG = {
   hipW:   0.46                  // 正视：髋半宽
 };
 
+/* ---------- 手 ----------
+ * 单位换成「掌宽」，因为手是特写，和全身不共用一套比例。
+ * 手指用一个 curl（0 完全伸直、1 完全握拳、负数是掌指关节过伸）驱动三个关节，
+ * 比例取自握拳时各关节的实际屈曲角：掌指 88°、近节指间 105°、远节指间 72°。
+ */
+var HAND = {
+  fore: 2.30, foreW0: 0.98, foreW1: 0.70,
+  palm: 1.00, palmW: 0.94, wristW: 0.74,
+  /* mcp: 掌指关节在掌骨头的纵向位置（指列弓）; u: 横向位次; L: 三节指骨长; g: 握拳时的屈曲增益 */
+  fing: [
+    { mcp: 0.02, u: -1.5, L: [0.50, 0.30, 0.22], w: 0.21, g: 0.92 },  // 食指
+    { mcp: 0.08, u: -0.5, L: [0.55, 0.34, 0.23], w: 0.22, g: 1.00 },  // 中指
+    { mcp: 0.04, u:  0.5, L: [0.51, 0.32, 0.22], w: 0.21, g: 1.03 },  // 无名指
+    { mcp: -0.06, u: 1.5, L: [0.40, 0.24, 0.19], w: 0.19, g: 1.08 }   // 小指
+  ],
+  thumb: { L: [0.52, 0.38, 0.28], w: 0.25 }
+};
+/* 桡侧 3/4 视角下的指列视差：越往小指方向越远，画面上略往右上错、并且略短。
+ * 只在掌指关节这一处偏移（不能逐节累加，累加会把手指掰弯）。 */
+var FAN = { x: 0.048, y: -0.058, shrink: 0.972 };
+var HLIM = { wri: [-78, 72], curl: [-0.28, 1], spread: [0, 1], thumb: [0, 1] };
+
 /* 生理活动度上下限（度）—— 超出的一律夹回来 */
 var LIM = {
   trunk: [-180, 180],        // 躯干是世界朝向，不是关节，不设生理上限
@@ -169,6 +191,7 @@ var EASE = {
 };
 
 var KEYS = ['trunk','neck','hip','knee','ankle','sho','elb','wri','flat','plant',
+            'curl','spread','thumb',
             'hipF','kneeF','ankleF','shoF','elbF','wriF','flatF',
             'lean','sway','hipL','hipR','kneeL','kneeR','abdL','abdR',
             'shoL','shoR','elbL','elbR','armAbdL','armAbdR','riseL','riseR'];
@@ -270,6 +293,7 @@ function draw(ctx, W, H, track, t, opt) {
   ctx.lineJoin = 'round';
   ctx.lineCap = 'butt';
 
+  if (track.handView) return drawHand(ctx, W, H, track, t, opt, G);
   if (track.front) return drawFront(ctx, W, H, track, t, opt, G);
   return drawSide(ctx, W, H, track, t, opt, G);
 }
@@ -730,6 +754,205 @@ function fHead(ctx, G, K, N, C) {
   ctx.restore();
 }
 
+/* ---------- 手部视图 ----------
+ * 前臂 + 手掌 + 五指，按关节角画。视角是桡侧 3/4 —— 拇指朝观察者，
+ * 手指的卷曲看得最清楚，同时四指斜排开、不会互相遮死。
+ */
+
+function handSolve(p) {
+  var wri = clamp(num(p.wri, 0), HLIM.wri) * RAD;
+  var curl = clamp(num(p.curl, 0), HLIM.curl);
+  var spread = clamp(num(p.spread, 0), HLIM.spread);
+  var th = clamp(num(p.thumb, 0), HLIM.thumb);
+
+  var K = { wri: wri, fingers: [], curl: curl };
+  // 前臂沿 -x 伸向手肘；手在腕关节处转 wri（+ 背伸，向手背方向翘）
+  K.wrist = { x: 0, y: 0 };
+  K.elbow = { x: -HAND.fore, y: 0 };
+  function hp(u, v) {                       // 手的局部坐标 → 世界（u 沿手指方向，v 朝手掌侧）
+    var c = Math.cos(-wri), s2 = Math.sin(-wri);
+    return { x: K.wrist.x + u * c - v * s2, y: K.wrist.y + u * s2 + v * c };
+  }
+  K.hp = hp;
+  K.palmTip = hp(HAND.palm, 0);
+
+  for (var i = 0; i < 4; i++) {
+    var f = HAND.fing[i];
+    // 张开时四指扇开（spread 加大指列间距）；卷曲由同一个 curl 驱动三个关节
+    var lat = f.u * (1 + spread * 0.75);
+    var mcp = curl >= 0 ? 88 * curl * f.g : 66 * curl;
+    var pip = curl > 0 ? 105 * curl * f.g : 0;
+    var dip = curl > 0 ? 72 * curl * f.g : 0;
+    var sc = Math.pow(FAN.shrink, Math.abs(lat));       // 远的手指略短
+    var base = hp(HAND.palm + f.mcp, 0);
+    base = { x: base.x + lat * FAN.x, y: base.y + lat * FAN.y };
+    var ang = [mcp, mcp + pip, mcp + pip + dip], pts = [base];
+    for (var j = 0; j < 3; j++) {
+      var d = handDir(ang[j], wri), L = f.L[j] * sc;
+      pts.push({ x: pts[j].x + d.x * L, y: pts[j].y + d.y * L });
+    }
+    K.fingers.push({ pts: pts, w: f.w * sc, lat: lat });
+  }
+
+  // 侧视图里拇指掌骨埋在手掌里，只画露出来的两节；不然会长出第五根手指。
+  var tb = hp(HAND.palm * 0.54, HAND.palmW * 0.30);
+  var b = 16 + 40 * th;                            // 相对手轴，+ 朝掌侧
+  var T = [tb], ta = [b, b + 10 + 30 * th];
+  var TL = [HAND.thumb.L[1], HAND.thumb.L[2]];
+  for (var k = 0; k < 2; k++) {
+    var dd = handDir(ta[k], wri);
+    T.push({ x: T[k].x + dd.x * TL[k], y: T[k].y + dd.y * TL[k] });
+  }
+  K.thumb = T;
+  return K;
+}
+
+/* 手指某一节的方向：局部角 a（0 = 顺着手指伸直，+ 向掌侧卷）叠加腕角 */
+function handDir(a, wri) {
+  var r = a * RAD - wri;
+  return { x: Math.cos(r), y: Math.sin(r) };
+}
+
+/* ---- 掌面视图：手指朝上，正对观察者 ----
+ * 张开 = 五指散开，握拳 = 手指折过来盖住掌心。这个视角一眼就认得出是不是拳头，
+ * 侧视图做不到（四根手指会叠在一起）。
+ * 屈曲让手指朝观察者转，投影上就是缩短 + 往下落。
+ */
+var PALMZ = 0.34;                       // 朝观察者的分量投影到画面上的比例
+
+function palmSolve(p) {
+  var curl = clamp(num(p.curl, 0), HLIM.curl);
+  var spread = clamp(num(p.spread, 0), HLIM.spread);
+  var th = clamp(num(p.thumb, 0), HLIM.thumb);
+  var K = { fingers: [] };
+  K.wrist = { x: 0, y: 0 };
+  K.elbow = { x: 0, y: 1.60 };          // 画面上 y 向下，前臂在下方
+  K.palmTop = { x: -0.04, y: -HAND.palm };
+
+  var MCP = [                            // 掌指关节：指列弓
+    { x: -0.34, y: -0.97, ab: -10 }, { x: -0.11, y: -1.05, ab: -3 },
+    { x: 0.12, y: -1.02, ab: 4 },    { x: 0.33, y: -0.90, ab: 12 }
+  ];
+  for (var i = 0; i < 4; i++) {
+    var f = HAND.fing[i], m = MCP[i];
+    var ab = m.ab * (0.32 + 0.68 * spread) * RAD;
+    var mcp = curl >= 0 ? 88 * curl * f.g : 66 * curl;
+    var pip = curl > 0 ? 105 * curl * f.g : 0;
+    var dip = curl > 0 ? 72 * curl * f.g : 0;
+    var ang = [mcp, mcp + pip, mcp + pip + dip], pts = [{ x: m.x, y: m.y }];
+    for (var j = 0; j < 3; j++) {
+      var a = ang[j] * RAD, L = f.L[j];
+      pts.push({
+        x: pts[j].x + Math.sin(ab) * Math.cos(a) * L,
+        y: pts[j].y - Math.cos(ab) * Math.cos(a) * L + Math.sin(a) * L * PALMZ
+      });
+    }
+    K.fingers.push({ pts: pts, w: f.w, curl: mcp });
+  }
+
+  // 拇指：从掌根桡侧岔出去；握拳时折过来压在手指外面
+  var tb = { x: -HAND.palmW * 0.46, y: -HAND.palm * 0.34 };
+  var d0 = -58, d1 = 26;                                  // 相对「朝上」的方向角
+  var b = d0 + (d1 - d0) * th;
+  var flex = [0, 18 + 26 * th, 10 + 26 * th];
+  var T = [tb], acc = b;
+  for (var k = 0; k < 3; k++) {
+    acc += flex[k];
+    var r = acc * RAD, L2 = HAND.thumb.L[k];
+    var fz = (k === 0 ? 0 : (0.30 + 0.45 * th));
+    T.push({ x: T[k].x + Math.sin(r) * L2, y: T[k].y - Math.cos(r) * L2 * (1 - fz * 0.35) + fz * L2 * 0.30 });
+  }
+  K.thumb = T;
+  return K;
+}
+
+function drawPalm(ctx, W, H, track, t, opt, G) {
+  var C = G.C, s = G.s;
+  var K = palmSolve(sample(track, t));
+  var N = { skin: C.skin, line: C.line };
+  var pw = HAND.palmW;
+
+  props(ctx, track.props, G, 'back');
+
+  // 伸直的手指在手掌后面（看得到全长），弯下来的手指盖在手掌前面
+  var back = [], front = [];
+  for (var i = 0; i < 4; i++) (K.fingers[i].curl > 30 ? front : back).push(K.fingers[i]);
+  for (i = 0; i < back.length; i++) drawFinger(ctx, G, back[i], N);
+
+  limb(ctx, G, [
+    [K.elbow, K.wrist, HAND.foreW0, HAND.wristW],
+    [{ x: -0.02, y: -0.06 }, { x: -0.04, y: -HAND.palm * 0.92 }, HAND.wristW, pw],
+    [{ x: -pw * 0.24, y: -HAND.palm * 0.20 }, { x: -pw * 0.34, y: -HAND.palm * 0.56 }, pw * 0.56, pw * 0.46]
+  ], N.skin, N.line);
+
+  for (i = 0; i < front.length; i++) drawFinger(ctx, G, front[i], N);
+  limb(ctx, G, [[K.thumb[0], K.thumb[1], HAND.thumb.w * 1.15, HAND.thumb.w],
+                [K.thumb[1], K.thumb[2], HAND.thumb.w, HAND.thumb.w * 0.9],
+                [K.thumb[2], K.thumb[3], HAND.thumb.w * 0.9, HAND.thumb.w * 0.82]], N.skin, N.line);
+
+  var cf = { x: K.elbow.x, y: K.elbow.y - (K.elbow.y - K.wrist.y) * 0.30 };
+  cloth(ctx, G, K.elbow, cf, 1.0, HAND.foreW0 * 1.16, HAND.foreW0 * 1.04, C.shirt, C.shirtL);
+  props(ctx, track.props, G, 'front');
+
+  if (track.focus && (!opt.layers || opt.layers.highlight !== false)) {
+    var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
+    var g = G.pt(K.fingers[1].pts[1]);
+    ctx.beginPath(); ctx.arc(g.x, g.y, s * (0.48 + 0.12 * pulse), 0, 6.2832);
+    ctx.strokeStyle = C.focus; ctx.lineWidth = s * 0.08;
+    ctx.globalAlpha = 0.26 + 0.34 * (1 - pulse); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+}
+
+function drawHand(ctx, W, H, track, t, opt, G) {
+  if (track.handView === 'palm') return drawPalm(ctx, W, H, track, t, opt, G);
+  var C = G.C, s = G.s, pt = G.pt;
+  var K = handSolve(sample(track, t));
+  var N = { skin: C.skin, line: C.line };
+  var F = { skin: C.skinF, line: C.lineF };
+
+  props(ctx, track.props, G, 'back');
+
+  // 小指侧先画（离观察者远），食指和拇指最后 —— 前后关系才对
+  for (var i = 3; i >= 2; i--) drawFinger(ctx, G, K.fingers[i], F);
+
+  // 前臂 + 手掌：一条路径，先描边再填并集
+  var pw = HAND.palmW;
+  limb(ctx, G, [
+    [K.elbow, K.wrist, HAND.foreW0, HAND.foreW1],
+    [K.hp(-0.04, 0), K.hp(HAND.palm * 0.92, -0.06), HAND.wristW, pw * 0.90],
+    // 大鱼际：拇指根部那一坨，手掌才有厚度
+    [K.hp(HAND.palm * 0.14, pw * 0.22), K.hp(HAND.palm * 0.46, pw * 0.30), pw * 0.60, pw * 0.50]
+  ], N.skin, N.line);
+
+  for (var j = 1; j >= 0; j--) drawFinger(ctx, G, K.fingers[j], N);
+  // 拇指（只有露出手掌的两节）
+  limb(ctx, G, [[K.thumb[0], K.thumb[1], HAND.thumb.w * 1.05, HAND.thumb.w * 0.94],
+                [K.thumb[1], K.thumb[2], HAND.thumb.w * 0.94, HAND.thumb.w * 0.86]],
+       N.skin, N.line);
+
+  // 袖口
+  var cf = { x: K.elbow.x + (K.wrist.x - K.elbow.x) * 0.30, y: K.elbow.y };
+  cloth(ctx, G, K.elbow, cf, 1.0, HAND.foreW0 * 1.14, HAND.foreW0 * 1.02, C.shirt, C.shirtL);
+
+  props(ctx, track.props, G, 'front');
+
+  // 目标关节高亮
+  if (track.focus && (!opt.layers || opt.layers.highlight !== false)) {
+    var pulse = 0.5 + 0.5 * Math.sin(t * Math.PI * 4);
+    var spot = track.focus[0] === 'wrist' ? K.wrist : K.fingers[1].pts[1];
+    var g = pt(spot);
+    ctx.beginPath(); ctx.arc(g.x, g.y, s * (0.52 + 0.12 * pulse), 0, 6.2832);
+    ctx.strokeStyle = C.focus; ctx.lineWidth = s * 0.085;
+    ctx.globalAlpha = 0.26 + 0.34 * (1 - pulse); ctx.stroke(); ctx.globalAlpha = 1;
+  }
+}
+
+function drawFinger(ctx, G, f, K) {
+  limb(ctx, G, [[f.pts[0], f.pts[1], f.w * 1.06, f.w],
+                [f.pts[1], f.pts[2], f.w, f.w * 0.92],
+                [f.pts[2], f.pts[3], f.w * 0.92, f.w * 0.86]], K.skin, K.line);
+}
+
 /* ---------- 公共层 ---------- */
 
 function trailPath(track) {
@@ -859,5 +1082,6 @@ var THEME = {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { draw: draw, sample: sample, solve: solve, place: place,
-                     fPlace: fPlace, world: world, SEG: SEG, LIM: LIM, THEME: THEME };
+                     fPlace: fPlace, handSolve: handSolve, palmSolve: palmSolve, world: world,
+                     SEG: SEG, LIM: LIM, HAND: HAND, HLIM: HLIM, THEME: THEME };
 }
