@@ -434,14 +434,15 @@ function grip(track, h) {
 
 /* 手臂：整条一次画完（上臂+前臂+手），再套上短袖 */
 function arm(ctx, G, sh, el, wr, hd, handAng, K, gr) {
-  var segs = [[sh, el, 0.40, 0.32], [el, wr, 0.32, 0.25]];
+  var segs = [[sh, el, 0.40, 0.32]].concat(bulge(el, wr, 0.26, 0.32, 0.34, 0.23));
   limb(ctx, G, segs.concat(handSegs(wr, hd, 1, gr || 0)), K.skin, K.line);
   cloth(ctx, G, sh, el, 0.52, 0.47, 0.40, K.shirt, K.shirtL);
 }
 
 /* 腿：大腿 + 小腿一条画完，再穿鞋 */
 function leg(ctx, G, hip, kn, ank, footAng, K) {
-  limb(ctx, G, [[hip, kn, 0.62, 0.44], [kn, ank, 0.44, 0.27]], K.skin, K.line);
+  limb(ctx, G, [[hip, kn, 0.68, 0.47]].concat(bulge(kn, ank, 0.30, 0.47, 0.51, 0.27)),
+       K.skin, K.line);
   shoe(ctx, G, ank, footAng, K);
 }
 
@@ -467,13 +468,62 @@ function fillSeg(ctx, G, a, b, w0, w1, fill, line) {
 /* 一条肢体 = 若干段拼起来的一个整体。
  * 先用两倍线宽把整条路径描一遍，再把并集填上 —— 内部的接缝被填色盖掉，
  * 只剩下最外面半条描边。这样肘、膝就不会各挂一个圆圈，看着才像一条胳膊。 */
-function limb(ctx, G, segs, fill, line, dots) {
-  var i;
-  ctx.beginPath();
+/* 一条肢体的外轮廓：右边顺着走到指尖，绕过去，左边倒着走回来。
+ * 关节两侧都用圆角接上。原来是把每一段的胶囊直接并起来 —— 并集在弯曲的
+ * 内侧会顶出一个尖角，膝盖后面、肘窝里那道生硬的折口就是它。补一个圆盖不住：
+ * 要盖到尖角得把半径放到 1.41 倍，那样关节整个鼓成一个球。 */
+function chainTo(ctx, G, segs) {
+  var S = [], i;
   for (i = 0; i < segs.length; i++) {
-    var g = segs[i];
-    capsuleTo(ctx, G.pt(g[0]), G.pt(g[1]), g[2] * G.s, g[3] * G.s);
+    var a = G.pt(segs[i][0]), b = G.pt(segs[i][1]);
+    var dx = b.x - a.x, dy = b.y - a.y;
+    var L = Math.sqrt(dx * dx + dy * dy) || 1e-6;
+    S.push({ a: a, b: b, ux: dx / L, uy: dy / L,
+             r0: segs[i][2] * G.s / 2, r1: segs[i][3] * G.s / 2 });
   }
+  var n = S.length, cur = null;
+  function off(s, k, p, r) { return { x: p.x + s.uy * k * r, y: p.y - s.ux * k * r }; }
+  function to(c, r, p, half) {        // 绕 c 画弧到 p；half=1 表示走半圈（端头）
+    if (cur == null) { ctx.moveTo(p.x, p.y); cur = p; return; }
+    var a0 = Math.atan2(cur.y - c.y, cur.x - c.x);
+    if (half) { ctx.arc(c.x, c.y, r, a0, a0 + Math.PI, false); cur = p; return; }
+    var a1 = Math.atan2(p.y - c.y, p.x - c.x), d = a1 - a0;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    ctx.arc(c.x, c.y, r, a0, a1, d < 0);
+    cur = p;
+  }
+  function seg(p) { ctx.lineTo(p.x, p.y); cur = p; }
+
+  for (i = 0; i < n; i++) {           // 右侧，正走
+    to(S[i].a, S[i].r0, off(S[i], 1, S[i].a, S[i].r0));
+    seg(off(S[i], 1, S[i].b, S[i].r1));
+  }
+  to(S[n - 1].b, S[n - 1].r1, off(S[n - 1], -1, S[n - 1].b, S[n - 1].r1), 1);   // 指尖绕半圈
+  for (i = n - 1; i >= 0; i--) {      // 左侧，倒走
+    to(S[i].b, S[i].r1, off(S[i], -1, S[i].b, S[i].r1));
+    seg(off(S[i], -1, S[i].a, S[i].r0));
+  }
+  to(S[0].a, S[0].r0, off(S[0], 1, S[0].a, S[0].r0), 1);                        // 根部绕半圈
+  ctx.closePath();
+}
+
+/* 一段带鼓肚的肢体。小腿肚、前臂都不是从关节直着收细的锥形 —— 少了这个
+ * 鼓起来的地方，腿和胳膊看着就是两根木棍。at 是最粗处在这一段的位置。 */
+function bulge(a, b, at, w0, wm, w1) {
+  var m = { x: a.x + (b.x - a.x) * at, y: a.y + (b.y - a.y) * at };
+  return [[a, m, w0, wm], [m, b, wm, w1]];
+}
+
+function limb(ctx, G, segs, fill, line, dots) {
+  var i, chain = [segs[0]];
+  ctx.beginPath();
+  for (i = 1; i < segs.length; i++) {
+    // 首尾相接的算一条链（上臂→前臂→手）；断开的自成一条（拇指）
+    if (segs[i][0] === segs[i - 1][1]) chain.push(segs[i]);
+    else { chainTo(ctx, G, chain); chain = [segs[i]]; }
+  }
+  chainTo(ctx, G, chain);
   for (i = 0; dots && i < dots.length; i++) {
     var d = G.pt(dots[i][0]);
     ctx.moveTo(d.x + dots[i][1] * G.s, d.y);
@@ -528,14 +578,14 @@ function at(G, f, du, dv) {
 
 /* 短裤：远侧裤腿 → 胯 → 近侧裤腿 */
 function shorts(ctx, G, P, F, N) {
-  cloth(ctx, G, P.pelvisF, P.kneeF, 0.44, 0.74, 0.58, F.pants, F.pantsL);
+  cloth(ctx, G, P.pelvisF, P.kneeF, 0.44, 0.72, 0.60, F.pants, F.pantsL);
   var f = frame(P);
   function q(du, dv) { return at(G, f, du, dv); }
   smooth(ctx, [q(-0.52, 0.44), q(-0.16, 0.50), q(0.34, 0.40), q(0.44, 0.00),
                q(0.32, -0.40), q(-0.18, -0.52), q(-0.52, -0.46)]);
   ctx.fillStyle = N.pants; ctx.fill();
   ctx.lineWidth = G.lw; ctx.strokeStyle = N.pantsL; ctx.stroke();
-  cloth(ctx, G, P.pelvis, P.knee, 0.44, 0.74, 0.58, N.pants, N.pantsL);
+  cloth(ctx, G, P.pelvis, P.knee, 0.44, 0.72, 0.60, N.pants, N.pantsL);
 }
 
 /* 躯干：上衣。肩、胸、腰、胯的轮廓一条曲线走完。
@@ -777,29 +827,39 @@ function shift(K, dx, dy) {
 }
 
 function drawFLeg(ctx, G, lg, K) {
-  limb(ctx, G, [[lg.hip, lg.knee, 0.60, 0.44], [lg.knee, lg.ankle, 0.44, 0.28]], K.skin, K.line);
-  // 正面看到的鞋：脚尖略朝外
-  var s = G.s, a = G.pt(lg.ankle);
-  var w = s * 0.40, h = s * (0.34 - lg.rise * 0.06), sg = lg.sg;
+  limb(ctx, G, [[lg.hip, lg.knee, 0.66, 0.47]].concat(bulge(lg.knee, lg.ankle, 0.30, 0.47, 0.51, 0.28)),
+       K.skin, K.line);
+  // 正面看到的鞋：脚背窄、往脚尖张开，脚尖略朝外。
+  // 原来是个圆角方块 —— 放大了看就是两块砖，脚踝直接插在砖上。
+  // y = 0 是踝，y = 1 是这只脚的触地点 —— 鞋底就落在 fPlace 算出来的那个点上。
+  // 原来是个高度写死的圆角方块，鞋底比触地点还低 0.2 个头高，人一直踩在地里。
+  var s = G.s, a = G.pt(lg.ankle), sg = lg.sg;
+  var d = (lg.sole - lg.ankle.y) * s;
   ctx.save();
-  ctx.translate(a.x + sg * s * 0.03 * G.mir, a.y + s * 0.02);
+  ctx.translate(a.x + sg * s * 0.03 * G.mir, a.y);
   ctx.rotate(sg * G.mir * 0.13);
-  roundRect(ctx, -w / 2, 0, w, h, s * 0.12);
+  function f(x, y) { return { x: x * s, y: y * d }; }
+  smooth(ctx, [f(-0.13, -0.92), f(0.13, -0.92), f(0.21, 0.10),
+               f(0.19, 1.02), f(0.00, 1.14), f(-0.19, 1.02), f(-0.21, 0.10)]);
   ctx.fillStyle = K.shoe; ctx.fill();
+  ctx.lineWidth = G.lw; ctx.strokeStyle = K.shoeL; ctx.stroke();
+  // 鞋底那条边
+  ctx.beginPath();
+  ctx.moveTo(-0.175 * s, 0.72 * d); ctx.lineTo(0.175 * s, 0.72 * d);
   ctx.lineWidth = G.lw; ctx.strokeStyle = K.shoeL; ctx.stroke();
   ctx.restore();
 }
 
 function drawFArm(ctx, G, am, K, gr) {
-  var segs = [[am.sho, am.elbow, 0.40, 0.32], [am.elbow, am.wrist, 0.32, 0.25]];
+  var segs = [[am.sho, am.elbow, 0.40, 0.32]].concat(bulge(am.elbow, am.wrist, 0.26, 0.32, 0.34, 0.23));
   limb(ctx, G, segs.concat(handSegs(am.wrist, am.hand, -am.sg, gr || 0)), K.skin, K.line);
 }
 
 function fShorts(ctx, G, K, N) {
   for (var i = 0; i < 2; i++) {
-    cloth(ctx, G, K.legs[i].hip, K.legs[i].knee, 0.46, 0.68, 0.56, N.pants, N.pantsL);
+    cloth(ctx, G, K.legs[i].hip, K.legs[i].knee, 0.46, 0.70, 0.60, N.pants, N.pantsL);
   }
-  var p = K.pelvis, w = SEG.hipW + 0.16;
+  var p = K.pelvis, w = SEG.hipW + 0.07;   // 比上衣窄一点：宽出去就成了纸尿裤
   smooth(ctx, [G.pt({ x: p.x - w, y: p.y - 0.40 }), G.pt({ x: p.x, y: p.y - 0.46 }),
                G.pt({ x: p.x + w, y: p.y - 0.40 }), G.pt({ x: p.x + w * 0.96, y: p.y + 0.26 }),
                G.pt({ x: p.x, y: p.y + 0.20 }), G.pt({ x: p.x - w * 0.96, y: p.y + 0.26 })]);
