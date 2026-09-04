@@ -5,12 +5,19 @@
 
   <view class="blk">
     <view class="bt">这些内容是从哪来的</view>
-    <view class="bp">照护要点和训练动作，都来自国内公开的康复指南、专家共识，以及三甲医院、国家级康复机构的公开科普。每一条剂量都有出处，且经过多个来源交叉核对。</view>
+    <view class="bp">照护要点和训练动作，都来自国内公开的康复指南、专家共识，以及三甲医院、国家级康复机构的公开科普。</view>
+    <view class="bp">规矩有三条：能核到指南的写指南；属于常规做法的<text class="k">明说是常规做法</text>；证据本身弱的<text class="k">把弱说出来</text>。把常规做法说成指南推荐，比不写更糟。</view>
     <view class="src">
       <view class="si">中国脑血管病临床管理指南（第 2 版）· 康复管理</view>
+      <view class="si">中国卒中学会急性缺血性卒中再灌注治疗指南（2024）</view>
+      <view class="si">成人脑卒中患者运动康复循证实践指南 · 中国康复医学会</view>
       <view class="si">中国脑卒中患者远程康复管理专家共识（2025）</view>
       <view class="si">脑卒中患者居家康复环境评估与改造实践指南（2025 ICF 版）</view>
+      <view class="si">卒中相关性肺炎诊治中国专家共识（2019 更新版）</view>
+      <view class="si">卒中相关非运动症状多学科管理专家共识</view>
+      <view class="si">中国心源性卒中防治指南</view>
       <view class="si">中国高龄脑卒中患者康复治疗技术专家共识（2019）</view>
+      <view class="si">压力性损伤预防与治疗国际临床实践指南</view>
       <view class="si">改良 Barthel 指数（MBI）条目</view>
     </view>
   </view>
@@ -33,8 +40,16 @@
   </view>
 
   <view class="blk warn">
-    <view class="bt">这里始终不做的一件事</view>
+    <view class="bt">发病不到 2 周的，先听医院的</view>
+    <view class="bp">指南推荐在生命体征稳定、症状不再进展的前提下，发病 24～48 小时后尽早开始活动；但有大型试验提示<text class="k">发病 24 小时内的高强度离床活动可能反而有害</text>。</view>
+    <view class="bp">所以这段时间这里只把阶梯钉在最低一档，不加量、不减支撑，也不给跌倒风险最高的单腿站立。练到什么程度，由住院的医生和治疗师定。</view>
+  </view>
+
+  <view class="blk warn">
+    <view class="bt">这里始终不做的几件事</view>
     <view class="bp"><text class="k">吞咽训练</text> —— 误吸可以直接致命，必须由言语或吞咽治疗师评估后指导。这里只讲进食安全（坐直、小口、慢喂）。</view>
+    <view class="bp"><text class="k">不做诊断、不生成治疗方案、不评估疗效、不做在线问诊。</text>不算分、不分级、不下结论 —— 那属于功能评定，是医疗判断。</view>
+    <view class="bp"><text class="k">不替代医生。</text>有治疗师在带的，一律以治疗师说的为准。</view>
   </view>
 
   <view class="blk">
@@ -45,6 +60,6 @@
 
   <view class="danger hit" bindtap="clear">清空全部记录</view>
 
-  <view class="ver">脑梗恢复 · v2.0.0</view>
+  <view class="ver">脑梗恢复 · v2.1.0</view>
 
 </view>

@@ -42,3 +42,21 @@
 }
 .tt { font-size: calc(32rpx * var(--fs)); font-weight: 700; color: var(--blue-ink); line-height: 1.55; }
 .td { font-size: calc(28rpx * var(--fs)); color: var(--no); margin-top: 10rpx; font-weight: 600; }
+
+
+/* ---------- 这个数是哪来的 ---------- */
+.ev {
+  margin-top: 28rpx; padding: 6rpx 28rpx 8rpx;
+  background: var(--warn-soft); border: 2rpx solid var(--warn-line); border-radius: 28rpx;
+}
+.ev-h {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22rpx 0;
+  font-size: calc(28rpx * var(--fs)); font-weight: 700; color: var(--warn-ink);
+}
+.ev-x { font-weight: 400; color: var(--muted); font-size: calc(25rpx * var(--fs)); }
+.ev-p {
+  font-size: calc(26rpx * var(--fs)); color: var(--warn-ink);
+  line-height: 1.75; padding-bottom: 18rpx;
+}
+.ev-p.sub { color: var(--muted); font-size: calc(24rpx * var(--fs)); }

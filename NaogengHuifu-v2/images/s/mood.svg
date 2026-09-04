@@ -1,0 +1,52 @@
+<svg width="240" height="180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 侧视图：人朝左坐在床沿上，屁股在床面上、大腿伸出床沿、脚踩地，整个人往前塌下去。
+       近侧的腿画在躯干之后（盖在上面）—— 不然两块蓝色糊成一团，看着像站着。
+       背朝右，所以搭在背上的那只手从右边平着进来，不横穿身体。 -->
+
+  <!-- ── 云后面透出来的太阳 ── -->
+  <circle cx="208" cy="28" r="19" fill="#F6E3BC"/>
+  <g stroke="#E6C98C" stroke-width="5">
+    <path d="M231 8 l3 -3"/><path d="M238 32 h2"/><path d="M230 52 l3 3"/>
+  </g>
+  <path d="M146 44 q0 -17 17 -18 q6 -16 24 -15 q18 1 21 17 q16 1 16 16 q0 13 -17 13 h-44 q-17 0 -17 -13 Z"
+        fill="#E4E9E7" stroke="#C3CDC9" stroke-width="4"/>
+  <g stroke="#C3CDC9" stroke-width="5">
+    <path d="M166 64 v9"/><path d="M185 62 v13"/><path d="M204 64 v9"/>
+  </g>
+
+  <!-- ── 地面 · 床 ── -->
+  <path d="M4 168 H236" stroke="#DED9C9" stroke-width="8"/>
+  <rect x="80" y="110" width="152" height="17" rx="8" fill="#D6D0BE"/>
+  <rect x="212" y="127" width="14" height="35" rx="5" fill="#CFC9B6"/>
+
+  <!-- ── 躯干：背弓着，整个往前塌 ── -->
+  <path d="M88 108 Q80 84 78 62 Q76 50 90 48 Q106 46 110 62 Q116 84 114 108 Z"
+        fill="#BCD6F2" stroke="#6F9BD0" stroke-width="4"/>
+
+  <!-- ── 头：低着，下巴快贴到胸口 ── -->
+  <g transform="rotate(24 72 34)">
+    <circle cx="72" cy="34" r="19" fill="#F0C4A0" stroke="#C9885C" stroke-width="4"/>
+    <path d="M54 30 q0 -19 19 -19 q19 0 19 21 q0 5 -2 8 l-9 -3 q3 -16 -11 -18 q-14 -2 -17 13 Z" fill="#4A4038"/>
+    <ellipse cx="88" cy="36" rx="4.6" ry="6" fill="#E6B590" stroke="#C9885C" stroke-width="2.6"/>
+    <circle cx="64" cy="36" r="3.1" fill="#4A4038"/>
+    <path d="M58 47 q8 -6 14 -1" stroke="#C9885C" stroke-width="3.2"/>
+  </g>
+
+  <!-- ── 近侧的腿：画在躯干上面，一条折线从髋 → 膝 → 踝 ── -->
+  <path d="M100 100 H58 V152" stroke="#6F9BD0" stroke-width="24" fill="none"/>
+  <path d="M100 100 H58 V152" stroke="#A9C9EA" stroke-width="17" fill="none"/>
+  <path d="M49 152 q-8 2 -8 7 q0 5 7 5 h20 q5 0 5 -5 q0 -5 -6 -7 Z" fill="#4A4038"/>
+
+  <!-- ── 近侧手臂：垂下来，手落在大腿上 ── -->
+  <path d="M84 60 Q70 76 66 88" stroke="#6F9BD0" stroke-width="17"/>
+  <path d="M84 60 Q70 76 66 88" stroke="#A9C9EA" stroke-width="11"/>
+  <circle cx="65" cy="90" r="9" fill="#F0C4A0" stroke="#C9885C" stroke-width="3.3"/>
+
+  <!-- ── 搭在背上的那只手：从右边平着进来，落在肩胛那一块 ── -->
+  <path d="M234 68 H130" stroke="#3F8F5F" stroke-width="16"/>
+  <path d="M234 68 H130" stroke="#5FB388" stroke-width="11"/>
+  <path d="M130 58 q-16 0 -19 9 q-2 9 8 11 q11 3 16 -6 Z" fill="#F0C4A0" stroke="#C9885C" stroke-width="3.3"/>
+  <g stroke="#C9885C" stroke-width="2.8" fill="none">
+    <path d="M113 67 q-7 2 -7 6"/><path d="M118 62 q-8 1 -8 6"/>
+  </g>
+</svg>

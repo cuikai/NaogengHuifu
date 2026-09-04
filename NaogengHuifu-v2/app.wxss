@@ -186,6 +186,28 @@ page {
 .stop .r { font-size: calc(28rpx * var(--fs)); color: #8a3a30; line-height: 1.7; margin-top: 10rpx; }
 .stop .r .k { font-weight: 700; }
 
+/* 「不只是停，要去医院」这一档 —— 边框加重、左侧一道实色，
+ * 和上面那块普通的停止信号在余光里就能分开。 */
+.stop.hard {
+  border-color: var(--no);
+  border-left-width: 12rpx;
+}
+.stop.hard .t { font-size: calc(33rpx * var(--fs)); }
+
+/* 急性期提示：黄色系，是「等一等」不是「出事了」，不用红 */
+.acute {
+  background: var(--warn-soft);
+  border: 2rpx solid var(--warn-line);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  margin-bottom: 28rpx;
+}
+.acute-t {
+  font-size: calc(31rpx * var(--fs)); font-weight: 700;
+  color: var(--warn-ink); margin-bottom: 10rpx;
+}
+.acute-p { font-size: calc(28rpx * var(--fs)); color: var(--warn-ink); line-height: 1.75; }
+
 .why {
   background: var(--warn-soft);
   border: 2rpx solid var(--warn-line);

@@ -40,6 +40,7 @@ function blank() {
     assessedAt: '',
     progress: {},       // 今天：动作 id → 已完成组数；自理项 id → 次数
     fb: {},             // 今天：动作 id → 0/1/2
+    fbDate: {},         // 动作 id → 上次计入连续计数的日期（按天去重）
     step: {},           // 动作 id → 进阶阶梯下标
     sets: {},           // 动作 id → 当前目标组数
     easy: {},           // 动作 id → 连续「很轻松」次数
@@ -129,13 +130,39 @@ function needWeekly() {
 
 /* ---------- 今日训练 ---------- */
 
-function todayPlan() {
-  if (!S.assessed) return [];
-  return plan.build(S.level, S.flags);
+/**
+ * 还在发病 2 周内吗。
+ *
+ * 快筛只问了「离发病多久」这一个档位，没有精确日期。所以这里做两件事：
+ *   ① 勾了「不到 2 周」才可能是急性期；
+ *   ② 从做快筛那天起再过 14 天，无论如何都退出急性期 —— 否则一个用户
+ *      会被永远钉在急性期的内容里，那比不设限还糟。
+ */
+function isAcute() {
+  if (!assess.isAcute(S.ans)) return false;
+  const from = S.assessedAt || S.startDate;
+  return daysBetween(from, ymd()) < 14;
 }
 
-function setsTarget(id) { return S.sets[id] || lib.baseSets(id); }
-function stepLabel(id) { return lib.ladder(id)[S.step[id] || 0]; }
+function todayPlan() {
+  if (!S.assessed) return [];
+  return plan.build(S.level, S.flags, { acute: isAcute() });
+}
+
+/** 急性期一律停在阶梯最低一档、不加组 —— 强度由医院定，软件不擅自往上推 */
+function stepIndex(id) {
+  const i = S.step[id] || 0;
+  return isAcute() ? Math.min(i, assess.ACUTE_STEP_CAP) : i;
+}
+function setsTarget(id) {
+  const base = lib.baseSets(id);
+  const n = S.sets[id] || base;
+  return isAcute() ? Math.min(n, base) : n;
+}
+function stepLabel(id) { return lib.ladder(id)[stepIndex(id)]; }
+
+/** 勾了的安全标记里，哪几条是「先看医生再练」那一类 */
+function urgentFlags() { return assess.urgentFlags(S.flags); }
 
 function moveGet(id) { return S.progress['mv_' + id] || 0; }
 
@@ -152,7 +179,9 @@ function moveSet(id, n) { S.progress['mv_' + id] = Math.max(0, n); save(); }
 
 function feedback(id, f) {
   S.fb[id] = f;
-  const r = plan.applyFeedback(S, id, f);
+  // 把今天的日期传进去，让「连续 2 次很轻松 / 连续 3 天疼」按天去重 ——
+  // 同一天改主意不该被算成两天。
+  const r = plan.applyFeedback(S, id, f, ymd());
   markCareDay();
   save();
   return r;
@@ -219,7 +248,8 @@ function reset() { S = blank(); save(); }
 module.exports = {
   load, save, ymd, prettyDate, daysBetween, day,
   saveAssessment, needWeekly, pushWeekly,
-  todayPlan, setsTarget, stepLabel, moveGet, moveBump, moveSet, feedback, moveDone, doneCount,
+  todayPlan, setsTarget, stepLabel, stepIndex, isAcute, urgentFlags,
+  moveGet, moveBump, moveSet, feedback, moveDone, doneCount,
   adlList, get, bump, adlDone,
   careDaysThisMonth, milestoneCount, addNote, todayNote, reset,
   state: () => S

@@ -1,0 +1,36 @@
+<svg width="300" height="150" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 纯图形，不放中文：SVG 里的文字依赖设备字体，字号一变就会溢出或缺字。
+       文字说明放在卡片的 caption 里。 -->
+
+  <!-- 一周七格，练 4 天 -->
+  <g>
+    <rect x="12" y="18" width="32" height="44" rx="10" fill="#E1EFE9" stroke="#0E6B58" stroke-width="5"/>
+    <path d="M20 39 l6 7 12 -14" stroke="#0E6B58" stroke-width="6"/>
+    <rect x="53" y="18" width="32" height="44" rx="10" fill="#E1EFE9" stroke="#0E6B58" stroke-width="5"/>
+    <path d="M61 39 l6 7 12 -14" stroke="#0E6B58" stroke-width="6"/>
+    <rect x="94" y="18" width="32" height="44" rx="10" fill="#fff" stroke="#DEE5E1" stroke-width="5"/>
+    <rect x="135" y="18" width="32" height="44" rx="10" fill="#E1EFE9" stroke="#0E6B58" stroke-width="5"/>
+    <path d="M143 39 l6 7 12 -14" stroke="#0E6B58" stroke-width="6"/>
+    <rect x="176" y="18" width="32" height="44" rx="10" fill="#E1EFE9" stroke="#0E6B58" stroke-width="5"/>
+    <path d="M184 39 l6 7 12 -14" stroke="#0E6B58" stroke-width="6"/>
+    <rect x="217" y="18" width="32" height="44" rx="10" fill="#fff" stroke="#DEE5E1" stroke-width="5"/>
+    <rect x="258" y="18" width="32" height="44" rx="10" fill="#fff" stroke="#DEE5E1" stroke-width="5"/>
+  </g>
+  <path d="M12 78 H290" stroke="#DEE5E1" stroke-width="4"/>
+
+  <!-- 每次的时长：钟面上填出一段，示意「一天里的一小段」 -->
+  <g transform="translate(46 116)">
+    <circle cx="0" cy="0" r="28" fill="#fff" stroke="#0E6B58" stroke-width="6"/>
+    <path d="M0 -20 A20 20 0 0 1 17 10 L0 0 Z" fill="#A8D2C4"/>
+    <path d="M0 0 V-19" stroke="#0E6B58" stroke-width="5"/>
+    <path d="M0 0 L15 9" stroke="#0E6B58" stroke-width="5"/>
+  </g>
+
+  <!-- 可以拆成几段：三小条加起来等于上面那一段 -->
+  <g transform="translate(94 116)">
+    <rect x="0"   y="-11" width="52" height="22" rx="11" fill="#A8D2C4"/>
+    <rect x="62"  y="-11" width="52" height="22" rx="11" fill="#A8D2C4"/>
+    <rect x="124" y="-11" width="52" height="22" rx="11" fill="#A8D2C4"/>
+    <path d="M52 0 h10 M114 0 h10" stroke="#DEE5E1" stroke-width="4"/>
+  </g>
+</svg>

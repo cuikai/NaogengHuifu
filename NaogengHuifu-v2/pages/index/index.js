@@ -11,6 +11,7 @@ Page({
     planCount: 0, planDone: 0, thumbs: [],
     adlDone: 0, adlTotal: 0,
     needWeekly: false, lastWeek: '',
+    acute: false, acuteNote: A.ACUTE_NOTE, urgent: [],
     msCount: 0, cardCount: cards.length
   },
 
@@ -33,6 +34,9 @@ Page({
       adlDone: store.adlDone(),
       adlTotal: store.adlList().length,
       needWeekly: store.needWeekly(),
+      acute: store.isAcute(),
+      // 「先看医生再练」那一档要在首页就露头 —— 埋在画像页里等于没有
+      urgent: store.urgentFlags(),
       lastWeek: weekly.length ? store.prettyDate(weekly[weekly.length - 1].date) : store.prettyDate(S.assessedAt),
       msCount: store.milestoneCount()
     });

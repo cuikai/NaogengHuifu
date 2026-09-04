@@ -20,6 +20,16 @@
     <view class="h1">今天练这 {{planCount}} 个</view>
     <view class="lead">{{mLabel}}。这些是按他现在的情况筛出来的，大约 20 分钟，分两次做完也行。</view>
 
+    <view class="acute" wx:if="{{acute}}">
+      <view class="acute-t">发病还不到 2 周</view>
+      <view class="acute-p">{{acuteNote}}</view>
+    </view>
+
+    <view class="stop hard" wx:for="{{urgent}}" wx:key="t">
+      <view class="t">{{item.t}}　·　{{item.urgentWhen}}</view>
+      <view class="r">{{item.urgentDo}}</view>
+    </view>
+
     <view class="echo" wx:if="{{echo}}">
       <text wx:if="{{echo.done >= echo.total}}">昨天 {{echo.total}} 个动作都做完了。</text>
       <text wx:else>昨天做了 {{echo.done}} 个动作。</text>
@@ -37,7 +47,7 @@
     </view>
 
     <view class="tile hit" data-url="/pages/today/today" bindtap="go">
-      <view class="tb wide">
+      <view class="tb">
         <view class="tt">今天让他自己做</view>
         <view class="ts {{adlDone >= adlTotal ? 'on' : ''}}">{{adlDone}} / {{adlTotal}} 件</view>
       </view>

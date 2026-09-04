@@ -34,6 +34,54 @@
 .fq { text-align: center; font-size: calc(23rpx * var(--fs)); color: var(--ink2); margin-top: 8rpx; line-height: 1.45; }
 
 .pts { margin-top: 32rpx; }
+.pts2 { margin-top: 8rpx; }
+
+/* BE-FAST 补的两条 —— 和上面三格同一个红色系，但不抢它的位置 */
+.extra {
+  margin-top: 24rpx; padding: 24rpx 26rpx 22rpx;
+  background: var(--no-soft); border: 3rpx solid var(--no-line); border-radius: 30rpx;
+}
+.extra-t { font-size: calc(29rpx * var(--fs)); font-weight: 700; color: var(--no); }
+.extra-i { margin-top: 18rpx; }
+.extra-k { font-size: calc(30rpx * var(--fs)); font-weight: 700; color: var(--ink); line-height: 1.45; }
+.extra-v { font-size: calc(26rpx * var(--fs)); color: var(--ink2); line-height: 1.6; margin-top: 6rpx; }
+.extra-n {
+  margin-top: 18rpx; padding-top: 16rpx; border-top: 2rpx solid var(--no-line);
+  font-size: calc(25rpx * var(--fs)); color: var(--ink2); line-height: 1.65;
+}
+
+/* 绝对禁忌 —— 视觉上要比普通「✕」更重，不能被划过去 */
+.never {
+  margin-top: 28rpx; padding: 24rpx 26rpx 22rpx;
+  background: var(--no-soft); border: 3rpx solid var(--no); border-radius: 30rpx;
+}
+.never-t { font-size: calc(31rpx * var(--fs)); font-weight: 700; color: var(--no); }
+.never-i {
+  position: relative; margin-top: 16rpx; padding-left: 30rpx;
+  font-size: calc(28rpx * var(--fs)); color: var(--ink); line-height: 1.65;
+}
+.never-i::before {
+  content: ''; position: absolute; left: 4rpx; top: 16rpx;
+  width: 12rpx; height: 12rpx; border-radius: 50%; background: var(--no);
+}
+
+/* 练之前先看的四个数 */
+.gate {
+  margin-top: 28rpx; padding: 24rpx 26rpx 22rpx;
+  background: var(--card); box-shadow: var(--sh); border-radius: 30rpx;
+}
+.gate-t { font-size: calc(31rpx * var(--fs)); font-weight: 700; color: var(--ink); }
+.gate-r {
+  display: flex; align-items: baseline; flex-wrap: wrap;
+  margin-top: 18rpx; padding-top: 16rpx; border-top: 2rpx solid var(--line2);
+}
+.gate-k { width: 130rpx; flex: none; font-size: calc(28rpx * var(--fs)); color: var(--ink2); }
+.gate-v { flex: 1 1 auto; font-size: calc(32rpx * var(--fs)); font-weight: 700; color: var(--blue-ink); }
+.gate-q { width: 100%; font-size: calc(24rpx * var(--fs)); color: var(--muted); line-height: 1.5; margin-top: 6rpx; }
+.gate-n {
+  margin-top: 18rpx; padding-top: 16rpx; border-top: 2rpx solid var(--line2);
+  font-size: calc(24rpx * var(--fs)); color: var(--muted); line-height: 1.65;
+}
 
 .why-t {
   font-size: calc(29rpx * var(--fs)); font-weight: 700;

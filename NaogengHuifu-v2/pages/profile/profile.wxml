@@ -3,6 +3,19 @@
   <view class="h1">{{weekly ? '这一周的变化' : '这是他现在的位置'}}</view>
   <view class="lead">下面的内容都是按你刚才勾的情况筛出来的。</view>
 
+  <view class="acute" wx:if="{{acute}}">
+    <view class="acute-t">发病还不到 2 周</view>
+    <view class="acute-p">{{acuteNote}}</view>
+  </view>
+
+  <block wx:if="{{urgent.length}}">
+    <view class="sec">这几条要先看医生，再决定练不练</view>
+    <view class="stop hard" wx:for="{{urgent}}" wx:key="t">
+      <view class="t">{{item.t}}　·　{{item.urgentWhen}}</view>
+      <view class="r">{{item.urgentDo}}</view>
+    </view>
+  </block>
+
   <view class="axis">
     <view class="t">走 · 移动</view>
     <view class="rung">

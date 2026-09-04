@@ -1,11 +1,12 @@
 const app = getApp();
 const store = require('../../utils/store.js');
 const lib = require('../../utils/library.js');
-const { STOP } = require('../../utils/adl.js');
+const { STOP, CALL } = require('../../utils/adl.js');
+const evidence = require('../../utils/evidence.js');
 
 Page({
   data: {
-    ui: { fs: 1 }, m: null, stop: STOP,
+    ui: { fs: 1 }, m: null, stop: STOP, call: CALL, acute: false, ev: null, evG: null, showEv: false,
     n: 0, sets: 3, full: false, stepLabel: '',
     speed: 1, mirror: false, cmp: false,
     phases: [], phaseText: '',
@@ -20,6 +21,8 @@ Page({
     this.setData({
       ui: app.globalData.ui,
       m: m,
+      ev: evidence.forMove(m.id),
+      evG: evidence.GLOBAL,
       phases: (m.phases || []).map((p) => ({ label: p.label, pct: 0 })),
       phaseText: (m.phases && m.phases[0].label) || ''
     });
@@ -33,6 +36,7 @@ Page({
     const n = store.moveGet(id), sets = store.setsTarget(id);
     this.setData({
       n: n, sets: sets, full: n >= sets,
+      acute: store.isAcute(),
       stepLabel: store.stepLabel(id),
       fb: S.fb[id] == null ? null : S.fb[id]
     });
@@ -56,6 +60,8 @@ Page({
       this.setData({ phases: segs, phaseText: text });
     }
   },
+
+  toggleEv() { this.setData({ showEv: !this.data.showEv }); },
 
   slow() { this.setData({ speed: this.data.speed === 1 ? 0.5 : 1 }); },
   flip() { this.setData({ mirror: !this.data.mirror }); },

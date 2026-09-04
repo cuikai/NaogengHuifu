@@ -67,6 +67,32 @@
       <text class="k">{{item.k}}</text> —— {{item.v}}
     </view>
   </view>
+  <view class="stop hard">
+    <view class="t">这几样不只是停 —— 要去医院</view>
+    <view class="r" wx:for="{{call}}" wx:key="k">
+      <text class="k">{{item.k}}</text> —— {{item.v}}
+    </view>
+  </view>
+
+  <view class="acute" wx:if="{{acute}}">
+    <view class="acute-t">发病还不到 2 周 —— 这个动作先按最低一档做</view>
+    <view class="acute-p">不加组、不减支撑、不加幅度。练到什么程度，由住院的医生和治疗师定。</view>
+  </view>
+
+  <!-- 这个数是哪来的 —— 默认收起来，想查的人点开 -->
+  <view class="ev">
+    <view class="ev-h hit" bindtap="toggleEv">
+      <text>这个动作和这个剂量，依据是什么</text>
+      <text class="ev-x">{{showEv ? '收起' : '展开'}}</text>
+    </view>
+    <block wx:if="{{showEv}}">
+      <view class="ev-p" wx:if="{{ev.why}}">{{ev.why}}</view>
+      <view class="ev-p" wx:if="{{ev.note}}">{{ev.note}}</view>
+      <view class="ev-p sub">{{evG.total}}</view>
+      <view class="ev-p sub">{{evG.sets}}</view>
+      <view class="ev-p sub">{{evG.ladder}}</view>
+    </block>
+  </view>
 
   <view class="sec">练完了，告诉我一句</view>
   <view class="lead">这一下点击决定明天给他多少量 —— 不点，明天就还是今天这个量。</view>

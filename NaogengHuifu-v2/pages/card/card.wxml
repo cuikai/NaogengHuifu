@@ -43,9 +43,46 @@
     </view>
   </view>
 
+  <!-- BE-FAST 补的两条：最容易被漏掉的后循环症状 -->
+  <view class="extra" wx:if="{{c.extra}}">
+    <view class="extra-t">{{c.extra.t}}</view>
+    <view class="extra-i" wx:for="{{c.extra.items}}" wx:key="k">
+      <view class="extra-k">{{item.k}}</view>
+      <view class="extra-v">{{item.v}}</view>
+    </view>
+    <view class="extra-n" wx:if="{{c.extra.note}}">{{c.extra.note}}</view>
+  </view>
+
+  <!-- 绝对禁忌：一个动作都不要做 -->
+  <view class="never" wx:if="{{c.never}}">
+    <view class="never-t">{{c.never.t}}</view>
+    <view class="never-i" wx:for="{{c.never.items}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <!-- 练之前先看的四个数 -->
+  <view class="gate" wx:if="{{c.gate}}">
+    <view class="gate-t">{{c.gate.t}}</view>
+    <view class="gate-r" wx:for="{{c.gate.rows}}" wx:key="k">
+      <view class="gate-k">{{item.k}}</view>
+      <view class="gate-v">{{item.v}}</view>
+      <view class="gate-q">{{item.q}}</view>
+    </view>
+    <view class="gate-n" wx:if="{{c.gate.note}}">{{c.gate.note}}</view>
+  </view>
+
   <!-- 要点 -->
   <view class="pts">
     <view class="pt" wx:for="{{c.points}}" wx:key="p">
+      <view class="n {{item.bad ? 'bad' : ''}}">{{item.n}}</view>
+      <view>
+        <view class="p">{{item.p}}</view>
+        <view class="q" wx:if="{{item.q}}">{{item.q}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="pts pts2" wx:if="{{c.points2}}">
+    <view class="pt" wx:for="{{c.points2}}" wx:key="p">
       <view class="n {{item.bad ? 'bad' : ''}}">{{item.n}}</view>
       <view>
         <view class="p">{{item.p}}</view>
