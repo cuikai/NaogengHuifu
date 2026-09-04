@@ -24,6 +24,11 @@ Component({
     attached() {
       const m = lib.get(this.data.move);
       if (!m) return;
+      this.mv = m;
+      // 代偿轨只在这里拼一次 —— 放进 loop 里会每帧克隆一个对象
+      this.cmpTrack = m.compare
+        ? Object.assign({}, m, { keyframes: m.compare.keyframes, trail: null, focus: null })
+        : null;
       this.setData({ box: m.box || (m.wide ? 'wide' : '') });
     },
     ready() { this.init(); },
@@ -54,6 +59,19 @@ Component({
         this.h = res[0].height;
         this.t0 = Date.now();
         this.stopped = false;
+        // 每帧都会用到的东西先算好 —— 目标机型是几百块的安卓，
+        // 循环里少建一个对象就少一次 GC
+        const small = this.w < 130;
+        this.opt = {
+          theme: fig.THEME.light,
+          mirror: this.data.mirror,
+          zoom: small ? 1.14 : 1,
+          thumb: !!this.data.thumb,
+          layers: (this.data.thumb || small)
+            ? { trail: false, highlight: !this.data.thumb, plumb: false }
+            : { trail: true, highlight: true, plumb: true }
+        };
+        this.tick = () => this.loop();
         this.loop();
       });
     },
@@ -62,37 +80,21 @@ Component({
 
     /** 当前归一化时间，供父页面同步阶段条 */
     phase() {
-      const m = lib.get(this.data.move);
-      if (!m) return 0;
-      const cyc = (m.cycle || 4000) / (this.data.speed || 1);
+      if (!this.mv) return 0;
+      // 缩略图不按真实时长走 —— 详情页才需要真实节奏（见 figure.js 的 warp）
+      const base = this.data.thumb ? Math.min(this.mv.cycle || 4000, 4200) : (this.mv.cycle || 4000);
+      const cyc = base / (this.data.speed || 1);
       return ((Date.now() - (this.t0 || 0)) % cyc) / cyc;
     },
 
     loop() {
-      if (this.stopped || !this.ctx) return;
-      const m = lib.get(this.data.move);
-      if (!m) return;
-
-      let track = m;
-      if (this.data.cmp && m.compare) {
-        track = Object.assign({}, m, { keyframes: m.compare.keyframes, trail: null, focus: null });
-      }
-
+      if (this.stopped || !this.ctx || !this.mv || !this.opt) return;
+      const track = (this.data.cmp && this.cmpTrack) ? this.cmpTrack : this.mv;
       const t = this.data.paused ? 0.35 : this.phase();
-      const small = this.w < 130;
-      const layers = (this.data.thumb || small)
-        ? { trail: false, highlight: !this.data.thumb, plumb: false }
-        : { trail: true, highlight: true, plumb: true };
-
-      fig.draw(this.ctx, this.w, this.h, track, t, {
-        theme: fig.THEME.light,
-        mirror: this.data.mirror,
-        layers: layers,
-        zoom: small ? 1.14 : 1
-      });
-
+      this.opt.mirror = this.data.mirror;
+      fig.draw(this.ctx, this.w, this.h, track, t, this.opt);
       if (!this.data.thumb) this.triggerEvent('tick', { t: t });
-      this.canvas.requestAnimationFrame(() => this.loop());
+      this.canvas.requestAnimationFrame(this.tick);
     }
   }
 });

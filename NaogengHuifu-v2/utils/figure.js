@@ -217,6 +217,38 @@ function sample(track, t) {
   return out;
 }
 
+/* 缩略图用的时间重映射。
+ * 真实时长是按文字里的秒数排的（「保持 5 秒」就真的停 5 秒），到了列表里的
+ * 小图上，一个 14 秒的循环有 10 秒是不动的 —— 看着像卡住了。
+ * 这里按「姿势变化量」重新分配时间：静止段快速走过，动的部分照常。
+ * 只影响缩略图，动作详情页仍然是真实节奏，患者跟着数拍子不会错。 */
+function warp(track, u) {
+  var W = track._warp;
+  if (!W) {
+    var N = 60, acc = [0], prev = sample(track, 0), i, k;
+    for (i = 1; i <= N; i++) {
+      var p = sample(track, i / N), d = 0;
+      for (k in p) {
+        if (typeof p[k] !== 'number') continue;
+        // 0~1 的量（重心横移、手指卷曲…）折算成度，和关节角同一个量纲
+        var g = (k === 'sway' || k === 'curl' || k === 'spread' || k === 'thumb' ||
+                 k === 'flat' || k === 'plant') ? 60 : 1;
+        d += Math.abs(p[k] - (prev[k] || 0)) * g;
+      }
+      acc.push(acc[i - 1] + d + 1.2);      // +1.2 保底：完全静止的段也慢慢走，不是跳过
+      prev = p;
+    }
+    var total = acc[N] || 1;
+    for (i = 0; i <= N; i++) acc[i] /= total;
+    W = track._warp = acc;
+  }
+  var n = W.length - 1, lo = 0;
+  while (lo < n - 1 && W[lo + 1] <= u) lo++;
+  var span = W[lo + 1] - W[lo];
+  var f = span > 1e-9 ? (u - W[lo]) / span : 0;
+  return (lo + f) / n;
+}
+
 function merge(base, kf) {
   var o = {}, i;
   for (i in base) o[i] = base[i];
@@ -292,6 +324,8 @@ function draw(ctx, W, H, track, t, opt) {
   ctx.clearRect(0, 0, W, H);
   ctx.lineJoin = 'round';
   ctx.lineCap = 'butt';
+
+  if (opt.thumb && track.keyframes) t = warp(track, t);
 
   if (track.handView) return drawHand(ctx, W, H, track, t, opt, G);
   if (track.front) return drawFront(ctx, W, H, track, t, opt, G);
@@ -1066,15 +1100,18 @@ var THEME = {
     focus: '#B96F14', accent: '#0E6B58', accentSoft: '#DCEBE5',
     trail: 'rgba(185,111,20,0.55)'
   },
+  /* 暗色：app.json 现在是 darkmode:false，这套配色还没被用到。
+   * 留着是为了以后打开夜间模式时不用重调 —— 深色底上不能照搬亮色的值：
+   * 头发、鞋子如果还用近黑色，会直接糊进背景里，人就成了秃头没鞋。 */
   dark: {
-    skin: '#C8926B', line: '#6E4A2C', skinF: '#8A6750', lineF: '#5A4335',
-    shirt: '#1F7B66', shirtL: '#0C5545', shirtF: '#3D5D57', shirtLF: '#2A4740',
-    pants: '#31474F', pantsL: '#1E2F36', pantsF: '#3A4A50', pantsLF: '#2A383D',
-    shoe: '#28353A', shoeL: '#161F22', shoeF: '#39474C', shoeLF: '#28343A',
-    hair: '#1A1A18', hairF: '#3A3833', face: '#4A342A',
-    floor: '#46534E', floorSoft: 'rgba(120,140,135,0.14)',
-    prop: '#414D48', propL: '#5A6963',
-    shadow: 'rgba(0,0,0,0.26)',
+    skin: '#D9A276', line: '#8A5B37', skinF: '#A87A55', lineF: '#6B462A',
+    shirt: '#2A8E76', shirtL: '#155F4E', shirtF: '#1E6B58', shirtLF: '#0F4739',
+    pants: '#456470', pantsL: '#2B424C', pantsF: '#34505B', pantsLF: '#20333B',
+    shoe: '#485A62', shoeL: '#2B3940', shoeF: '#374750', shoeLF: '#212D33',
+    hair: '#4E463C', hairF: '#3A342D', face: '#5C3B24',
+    floor: '#4E5C56', floorSoft: 'rgba(150,180,170,0.10)',
+    prop: '#53625B', propL: '#6E7E76',
+    shadow: 'rgba(0,0,0,0.30)',
     focus: '#E8A33A', accent: '#4FBFA2', accentSoft: '#1E3B34',
     trail: 'rgba(232,163,58,0.55)'
   }
@@ -1082,6 +1119,7 @@ var THEME = {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { draw: draw, sample: sample, solve: solve, place: place,
-                     fPlace: fPlace, handSolve: handSolve, palmSolve: palmSolve, world: world,
+                     fPlace: fPlace, handSolve: handSolve, palmSolve: palmSolve,
+                     warp: warp, world: world,
                      SEG: SEG, LIM: LIM, HAND: HAND, HLIM: HLIM, THEME: THEME };
 }

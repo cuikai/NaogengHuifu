@@ -67,10 +67,11 @@ function railOf(m) {
 LIB.forEach(function (m) {
   if (m.gif) return;                                   // 还在用图的动作（现在没有了）
 
-  /* --- phases --- */
+  /* --- phases：递增、覆盖 0~1，而且「停 N 秒」要真的停够 N 秒 --- */
   var ph = m.phases || [], prev = 0;
   for (var i = 0; i < ph.length; i++) {
     if (!(ph[i].to > prev)) bad(m.id, 'phases 第 ' + (i + 1) + ' 段的 to 没有递增');
+    holdCheck(m, ph[i], prev);
     prev = ph[i].to;
   }
   if (ph.length && Math.abs(prev - 1) > 1e-6) bad(m.id, 'phases 最后一段没有停在 1.0');
@@ -186,6 +187,41 @@ LIB.forEach(function (m) {
     }
   });
 });
+
+/* 「停 2 秒」「保持 5 秒」「数到 10」—— 文字里承诺的时长，动画必须真的停够。
+ * 患者是跟着动画数拍子做的，说停 5 秒结果只停 2 秒，练的就是另一个剂量。
+ * 量的是这一段里「姿势基本不动」的最长连续时间，不是整段时长。 */
+function holdCheck(m, phase, prev) {
+  var mt = /(?:停|保持|数到)\s*(\d+)\s*秒?/.exec(phase.label);
+  if (!mt) return;
+  var want = Number(mt[1]);
+  var cyc = (m.cycle || 4000) / 1000;
+  // 和「这一段静止的起点」比，不是和上一帧比 —— 否则把动作切得够细，
+  // 每一帧的变化都小于阈值，一个缓慢移动的过程会被误判成静止不动。
+  var steps = 240, best = 0, start = 0, anchor = null;
+  for (var i = 0; i <= steps; i++) {
+    var t = prev + (phase.to - prev) * i / steps;
+    var p = fig.sample(m, t);
+    if (anchor && !same(p, anchor)) { anchor = p; start = i; }
+    else if (!anchor) { anchor = p; start = i; }
+    var run = (i - start) / steps * (phase.to - prev) * cyc;
+    if (run > best) best = run;
+  }
+  if (best + 0.3 < want) {
+    bad(m.id, '文字说「' + phase.label + '」，动画实际只停了 ' + best.toFixed(1) + ' 秒');
+  }
+}
+
+/* 两个姿势是不是「基本没动」。阈值按量纲分开：角度 1.5°，0~1 的量 0.03 */
+function same(a, b) {
+  for (var k in a) {
+    if (typeof a[k] !== 'number') continue;
+    var unit = (k === 'sway' || k === 'curl' || k === 'spread' || k === 'thumb' ||
+                k === 'flat' || k === 'plant') ? 0.03 : 1.5;
+    if (Math.abs(a[k] - (b[k] || 0)) > unit) return false;
+  }
+  return true;
+}
 
 function isAir(m, t) { return false; }
 function mix(m, cmp) {                       // 代偿轨：换一组关键帧，并带上它自己的声明

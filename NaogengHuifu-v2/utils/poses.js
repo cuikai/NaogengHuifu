@@ -49,19 +49,21 @@ var LIBRARY = [
   anchor: 'pelvis', ax: 0, ay: -0.50, armBack: true,
   props: [{ k: 'bed', x0: -6.0, x1: 6.0 }],
   focus: ['ankle'], trail: 'toe',
-  base: LIE, cycle: 3600,
+  /* 周期是按文字里的秒数排的：勾 1.2s → 停 2s → 绷 1.6s → 停 2s → 回中 1.0s。
+   * 患者是跟着动画数拍子做的，说停 2 秒就得真的停 2 秒。 */
+  base: LIE, cycle: 7800,
   keyframes: [
-    { t: 0.00, ankle: 0, ankleF: 0 },
-    { t: 0.26, ankle: 22, ankleF: 20 },                  // 勾脚尖：主动背屈约 20°
-    { t: 0.42, ankle: 22, ankleF: 20, ease: 'hold' },
-    { t: 0.70, ankle: -40, ankleF: -38 },                // 绷脚尖：跖屈约 40°
-    { t: 0.86, ankle: -40, ankleF: -38, ease: 'hold' },
-    { t: 1.00, ankle: 0, ankleF: 0 }
+    { t: 0.000, ankle: 0, ankleF: 0 },
+    { t: 0.154, ankle: 22, ankleF: 20 },                 // 勾脚尖：主动背屈约 20°
+    { t: 0.410, ankle: 22, ankleF: 20, ease: 'hold' },
+    { t: 0.615, ankle: -40, ankleF: -38 },               // 绷脚尖：跖屈约 40°
+    { t: 0.872, ankle: -40, ankleF: -38, ease: 'hold' },
+    { t: 1.000, ankle: 0, ankleF: 0 }
   ],
   phases: [
-    { to: 0.42, label: '勾脚尖，勾到最大，停 2 秒' },
-    { to: 0.86, label: '绷脚尖，绷到最大，停 2 秒' },
-    { to: 1.00, label: '回到中间' }
+    { to: 0.410, label: '勾脚尖，勾到最大，停 2 秒' },
+    { to: 0.872, label: '绷脚尖，绷到最大，停 2 秒' },
+    { to: 1.000, label: '回到中间' }
   ],
   cautions: ['慢慢来，一次一次数，不要甩。', '小腿突然肿胀、发热、疼 —— 停下来，告诉医生。']
 },
@@ -108,24 +110,24 @@ var LIBRARY = [
   armBack: true,
   props: [{ k: 'bed', x0: -6.0, x1: 6.0 }],
   focus: ['pelvis'], trail: 'pelvis',
-  base: LIE, cycle: 5600,
+  base: LIE, cycle: 9800,   // 抬 2s → 保持 5s → 放下 2s → 落床 0.8s
   keyframes: [
     // 放下：屁股落床，屈髋约 45°、屈膝约 118°
     { t: 0.00, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1,
       sho: 4, elb: 10, shoF: 2, elbF: 8 },
     // 抬起：肩-髋-膝成一条直线 —— 屈髋回到 0，这才叫「臀部发力」
-    { t: 0.26, trunk: -108, neck: 16, hip: 1, knee: 106, flat: 1, hipF: 0, kneeF: 105, flatF: 1,
+    { t: 0.204, trunk: -108, neck: 16, hip: 1, knee: 106, flat: 1, hipF: 0, kneeF: 105, flatF: 1,
       sho: 2, elb: 8, shoF: 0, elbF: 6 },
-    { t: 0.66, trunk: -108, neck: 16, hip: 1, knee: 106, flat: 1, hipF: 0, kneeF: 105, flatF: 1,
+    { t: 0.714, trunk: -108, neck: 16, hip: 1, knee: 106, flat: 1, hipF: 0, kneeF: 105, flatF: 1,
       sho: 2, elb: 8, shoF: 0, elbF: 6, ease: 'hold' },
-    { t: 0.92, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1,
+    { t: 0.918, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1,
       sho: 4, elb: 10, shoF: 2, elbF: 8 },
     { t: 1.00, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1,
       sho: 4, elb: 10, shoF: 2, elbF: 8, ease: 'hold' }
   ],
   phases: [
-    { to: 0.26, label: '收紧臀部，把腰抬起来' },
-    { to: 0.66, label: '保持 5 秒 · 正常呼吸，不要憋气' },
+    { to: 0.204, label: '收紧臀部，把腰抬起来' },
+    { to: 0.714, label: '保持 5 秒 · 正常呼吸，不要憋气' },
     { to: 1.00, label: '慢慢放下来' }
   ],
   cautions: ['抬不起来就先只做「用力想抬」，也有用。', '抬得低一点没关系，不要憋气。'],
@@ -135,8 +137,8 @@ var LIBRARY = [
     keyframes: [
       { t: 0.00, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1 },
       // 只抬了一点点，屈髋还剩 30°，靠挺腰（颈也跟着后仰）凑出来
-      { t: 0.26, trunk: -98, neck: 26, hip: 30, knee: 112, flat: 1, hipF: 29, kneeF: 111, flatF: 1 },
-      { t: 0.66, trunk: -98, neck: 26, hip: 30, knee: 112, flat: 1, hipF: 29, kneeF: 111, flatF: 1, ease: 'hold' },
+      { t: 0.204, trunk: -98, neck: 26, hip: 30, knee: 112, flat: 1, hipF: 29, kneeF: 111, flatF: 1 },
+      { t: 0.714, trunk: -98, neck: 26, hip: 30, knee: 112, flat: 1, hipF: 29, kneeF: 111, flatF: 1, ease: 'hold' },
       { t: 1.00, trunk: -93, neck: 10, hip: 45, knee: 118, flat: 1, hipF: 44, kneeF: 116, flatF: 1 }
     ]
   }
@@ -215,18 +217,18 @@ var LIBRARY = [
   anchor: 'pelvis', ax: -0.7, ay: SEAT - 0.30,
   props: [{ k: 'chair', x0: -2.75, x1: -0.15, seat: SEAT, back: true }, { k: 'floor' }],
   focus: ['knee'], trail: 'toe',
-  base: SIT, cycle: 4600,
+  base: SIT, cycle: 7000,   // 抬 1.5s → 停 3s → 放下 2.5s
   keyframes: [
-    { t: 0.00, knee: 95, flat: 1 },
+    { t: 0.000, knee: 95, flat: 1 },
     // 小腿抬平（屈膝剩约 8°），脚尖勾起来 = 踝背屈 18°；此时脚离地，flat 关掉
-    { t: 0.36, knee: 8, flat: 0, ankle: 18 },
-    { t: 0.64, knee: 8, flat: 0, ankle: 18, ease: 'hold' },
-    { t: 1.00, knee: 95, flat: 1 }
+    { t: 0.214, knee: 8, flat: 0, ankle: 18 },
+    { t: 0.643, knee: 8, flat: 0, ankle: 18, ease: 'hold' },
+    { t: 1.000, knee: 95, flat: 1 }
   ],
   phases: [
-    { to: 0.36, label: '慢慢把小腿抬平，脚尖勾起来' },
-    { to: 0.64, label: '停 3 秒 · 大腿前面应该发紧' },
-    { to: 1.00, label: '慢慢放下，不要摔下去' }
+    { to: 0.214, label: '慢慢把小腿抬平，脚尖勾起来' },
+    { to: 0.643, label: '停 3 秒 · 大腿前面应该发紧' },
+    { to: 1.000, label: '慢慢放下，不要摔下去' }
   ],
   cautions: ['放下来的那一下要慢 —— 这一半才是真正在练力量。', '两条腿轮流做，好腿也要做。']
 },
@@ -243,37 +245,39 @@ var LIBRARY = [
   anchor: 'feet', ax: -1.00, axFoot: 0.30, ay: 0,
   props: [{ k: 'chair', x0: -3.05, x1: -0.45, seat: SEAT, back: true }, { k: 'floor' }],
   focus: ['knee'], trail: 'headC',
-  base: STAND, cycle: 6000,
+  base: STAND, cycle: 8000,   // 前倾1.8s → 起立1.6s → 站直停2s → 坐回2s → 落座0.6s
   keyframes: [
     // ① 坐着：屈髋 90、屈膝 95，双脚平踩，手轻放在大腿上
     { t: 0.00, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
       sho: 1, elb: 61, shoF: 1, elbF: 61, plant: 0 },
     // ② 脚往后收：屈膝加大到 108，小腿前倾（踝背屈自动变大）
-    { t: 0.16, trunk: 10, neck: -4, hip: 92, knee: 106, flat: 1, hipF: 90, kneeF: 104, flatF: 1,
+    { t: 0.100, trunk: 10, neck: -4, hip: 92, knee: 106, flat: 1, hipF: 90, kneeF: 104, flatF: 1,
       sho: -2, elb: 67, shoF: -2, elbF: 67, plant: 0 },
     // ③ 身体前倾，鼻子过脚尖：躯干前倾 42°，屈髋到 118；手臂顺势前摆当配重
-    { t: 0.34, trunk: 42, neck: -10, hip: 118, knee: 104, flat: 1, hipF: 116, kneeF: 102, flatF: 1,
+    { t: 0.225, trunk: 42, neck: -10, hip: 118, knee: 104, flat: 1, hipF: 116, kneeF: 102, flatF: 1,
       sho: 78, elb: 22, shoF: 74, elbF: 20, plant: 0.15 },
     // ④ 离座：臀部刚离开椅面，膝踝一起发力
-    { t: 0.44, trunk: 40, neck: -8, hip: 100, knee: 88, flat: 1, hipF: 98, kneeF: 86, flatF: 1,
+    { t: 0.290, trunk: 40, neck: -8, hip: 100, knee: 88, flat: 1, hipF: 98, kneeF: 86, flatF: 1,
       sho: 84, elb: 16, shoF: 80, elbF: 14, plant: 0.75 },
-    { t: 0.56, trunk: 24, neck: -4, hip: 56, knee: 50, flat: 1, hipF: 54, kneeF: 48, flatF: 1,
+    { t: 0.360, trunk: 24, neck: -4, hip: 56, knee: 50, flat: 1, hipF: 54, kneeF: 48, flatF: 1,
       sho: 56, elb: 16, shoF: 52, elbF: 14, plant: 1 },
     // ⑤ 站直
-    { t: 0.70, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
+    { t: 0.425, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
       sho: 5, elb: 10, shoF: 2, elbF: 8, plant: 1 },
-    { t: 0.84, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
+    { t: 0.675, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
       sho: 5, elb: 10, shoF: 2, elbF: 8, plant: 1, ease: 'hold' },
     // ⑥ 慢慢坐回去：先屈髋屈膝往后坐，不是直接砸下去
-    { t: 0.93, trunk: 34, neck: -8, hip: 86, knee: 72, flat: 1, hipF: 84, kneeF: 70, flatF: 1,
+    { t: 0.820, trunk: 34, neck: -8, hip: 86, knee: 72, flat: 1, hipF: 84, kneeF: 70, flatF: 1,
       sho: 66, elb: 22, shoF: 62, elbF: 20, plant: 0.5 },
-    { t: 1.00, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
-      sho: 1, elb: 61, shoF: 1, elbF: 61, plant: 0 }
+    { t: 0.925, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
+      sho: 1, elb: 61, shoF: 1, elbF: 61, plant: 0 },
+    { t: 1.000, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
+      sho: 1, elb: 61, shoF: 1, elbF: 61, plant: 0, ease: 'hold' }
   ],
   phases: [
-    { to: 0.34, label: '脚往后收，身体前倾 —— 鼻子过脚尖' },
-    { to: 0.56, label: '用腿的力量顶起来，不要靠手撑' },
-    { to: 0.84, label: '站直，停 2 秒再坐' },
+    { to: 0.225, label: '脚往后收，身体前倾 —— 鼻子过脚尖' },
+    { to: 0.425, label: '用腿的力量顶起来，不要靠手撑' },
+    { to: 0.675, label: '站直，停 2 秒再坐' },
     { to: 1.00, label: '慢慢坐回去，别砸下去' }
   ],
   cautions: ['椅子要有靠背、别带轮子；后面顶着墙更稳。', '起来时头晕就先坐回去，坐一分钟再试。'],
@@ -285,23 +289,25 @@ var LIBRARY = [
       // 手的角度是解出来的：手掌正好按在椅面上（不是悬在半空，更不是撑到地上）
       { t: 0.00, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
         sho: -30, elb: 65, shoF: -30, elbF: 65, plant: 0 },
-      { t: 0.16, trunk: 8, neck: -2, hip: 92, knee: 104, flat: 1, hipF: 90, kneeF: 102, flatF: 1,
+      { t: 0.100, trunk: 8, neck: -2, hip: 92, knee: 104, flat: 1, hipF: 90, kneeF: 102, flatF: 1,
         sho: -38, elb: 66, shoF: -38, elbF: 66, plant: 0 },
-      { t: 0.34, trunk: 18, neck: -4, hip: 100, knee: 102, flat: 1, hipF: 98, kneeF: 100, flatF: 1,
+      { t: 0.225, trunk: 18, neck: -4, hip: 100, knee: 102, flat: 1, hipF: 98, kneeF: 100, flatF: 1,
         sho: -35, elb: 63, shoF: -35, elbF: 63, plant: 0.15 },
       // 用手把身体推起来：肘伸直的这一下就是「靠手撑」
-      { t: 0.44, trunk: 20, neck: -4, hip: 92, knee: 88, flat: 1, hipF: 90, kneeF: 86, flatF: 1,
+      { t: 0.290, trunk: 20, neck: -4, hip: 92, knee: 88, flat: 1, hipF: 90, kneeF: 86, flatF: 1,
         sho: -14, elb: 31, shoF: -14, elbF: 31, plant: 0.75 },
-      { t: 0.56, trunk: 14, neck: -2, hip: 52, knee: 48, flat: 1, hipF: 50, kneeF: 46, flatF: 1,
+      { t: 0.360, trunk: 14, neck: -2, hip: 52, knee: 48, flat: 1, hipF: 50, kneeF: 46, flatF: 1,
         sho: -6, elb: 14, shoF: -6, elbF: 14, plant: 1 },
-      { t: 0.70, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
+      { t: 0.425, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
         sho: 5, elb: 10, shoF: 2, elbF: 8, plant: 1 },
-      { t: 0.84, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
+      { t: 0.675, trunk: 2, neck: -1, hip: 2, knee: 3, flat: 1, hipF: -1, kneeF: 4, flatF: 1,
         sho: 5, elb: 10, shoF: 2, elbF: 8, plant: 1, ease: 'hold' },
-      { t: 0.93, trunk: 26, neck: -6, hip: 86, knee: 72, flat: 1, hipF: 84, kneeF: 70, flatF: 1,
+      { t: 0.820, trunk: 26, neck: -6, hip: 86, knee: 72, flat: 1, hipF: 84, kneeF: 70, flatF: 1,
         sho: -18, elb: 40, shoF: -18, elbF: 40, plant: 0.5 },
-      { t: 1.00, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
-        sho: -30, elb: 65, shoF: -30, elbF: 65, plant: 0 }
+      { t: 0.925, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
+        sho: -30, elb: 65, shoF: -30, elbF: 65, plant: 0 },
+      { t: 1.000, trunk: 4, neck: -2, hip: 90, knee: 95, flat: 1, hipF: 88, kneeF: 92, flatF: 1,
+        sho: -30, elb: 65, shoF: -30, elbF: 65, plant: 0, ease: 'hold' }
     ]
   }
 },
@@ -317,20 +323,20 @@ var LIBRARY = [
   touchRail: true, bothFeetDown: true,                         // 脚不许挪动、不许抬起
   base: { lean: 0, sway: 0, abdL: 5, abdR: 5, hipL: 0, hipR: 0, kneeL: 4, kneeR: 4,
           armAbdL: 7, armAbdR: 7, shoL: 4, shoR: 4, elbL: 10, elbR: 46 },
-  cycle: 5400,
+  cycle: 11500,   // 每边真的停满 3 秒
   keyframes: [
     // 脚不动，只把骨盆和重量横着挪过去；手轻搭扶手（右手屈肘不变）
     // 手一直搭在横杆上：身体挪过去，肩外展角跟着解出来，手不会离开杆
     { t: 0.00, lean: 0, sway: 0, abdL: 5, abdR: 5, kneeL: 4, kneeR: 4, armAbdR: 8, elbR: 45 },
-    { t: 0.24, lean: 5, sway: -0.52, abdL: 2, abdR: 9, kneeL: 2, kneeR: 8, armAbdR: 15, elbR: 45 },
-    { t: 0.40, lean: 5, sway: -0.52, abdL: 2, abdR: 9, kneeL: 2, kneeR: 8, armAbdR: 15, elbR: 45, ease: 'hold' },
-    { t: 0.64, lean: -5, sway: 0.52, abdL: 9, abdR: 2, kneeL: 8, kneeR: 2, armAbdR: 1, elbR: 46 },
-    { t: 0.82, lean: -5, sway: 0.52, abdL: 9, abdR: 2, kneeL: 8, kneeR: 2, armAbdR: 1, elbR: 46, ease: 'hold' },
+    { t: 0.130, lean: 5, sway: -0.52, abdL: 2, abdR: 9, kneeL: 2, kneeR: 8, armAbdR: 15, elbR: 45 },
+    { t: 0.391, lean: 5, sway: -0.52, abdL: 2, abdR: 9, kneeL: 2, kneeR: 8, armAbdR: 15, elbR: 45, ease: 'hold' },
+    { t: 0.609, lean: -5, sway: 0.52, abdL: 9, abdR: 2, kneeL: 8, kneeR: 2, armAbdR: 1, elbR: 46 },
+    { t: 0.870, lean: -5, sway: 0.52, abdL: 9, abdR: 2, kneeL: 8, kneeR: 2, armAbdR: 1, elbR: 46, ease: 'hold' },
     { t: 1.00, lean: 0, sway: 0, abdL: 5, abdR: 5, kneeL: 4, kneeR: 4, armAbdR: 8, elbR: 45 }
   ],
   phases: [
-    { to: 0.40, label: '重心慢慢移到健侧，停 3 秒' },
-    { to: 0.82, label: '再慢慢移到患侧，停 3 秒 —— 这一边才是重点' },
+    { to: 0.391, label: '重心慢慢移到健侧，停 3 秒' },
+    { to: 0.870, label: '再慢慢移到患侧，停 3 秒 —— 这一边才是重点' },
     { to: 1.00, label: '回到正中' }
   ],
   cautions: ['旁边要有扶手或椅背，手轻轻搭着就行，不要用力抓。', '脚不要挪动，只是把重量换过去。']
@@ -346,18 +352,18 @@ var LIBRARY = [
   props: [{ k: 'floor' }, { k: 'rail', x: 1.50, y: -3.85 }],   // 横杆高度 ≈92cm
   touchRail: true,
   focus: ['ankle'], trail: 'shoulder',
-  base: STAND, cycle: 4000,
+  base: STAND, cycle: 5200,   // 踮 1.2s → 停 2s → 慢慢放下 2s
   keyframes: [
     // 手扶在横杆上，肩肘角度是按「手落在杆上」解出来的。
     // 踮起来时身体升高约半个头高，手不动 → 肘自然伸开，这才是「扶着」不是「吊着」。
     { t: 0.00, ankle: 0, ankleF: 0, flat: 1, flatF: 1, sho: -15, elb: 81, shoF: -15, elbF: 81 },
-    { t: 0.34, ankle: -38, ankleF: -36, flat: 0, flatF: 0, sho: -6, elb: 57, shoF: -6, elbF: 57 },
-    { t: 0.58, ankle: -38, ankleF: -36, flat: 0, flatF: 0, sho: -6, elb: 57, shoF: -6, elbF: 57, ease: 'hold' },
+    { t: 0.231, ankle: -38, ankleF: -36, flat: 0, flatF: 0, sho: -6, elb: 57, shoF: -6, elbF: 57 },
+    { t: 0.615, ankle: -38, ankleF: -36, flat: 0, flatF: 0, sho: -6, elb: 57, shoF: -6, elbF: 57, ease: 'hold' },
     { t: 1.00, ankle: 0, ankleF: 0, flat: 1, flatF: 1, sho: -15, elb: 81, shoF: -15, elbF: 81 }
   ],
   phases: [
-    { to: 0.34, label: '踮起来，尽量高' },
-    { to: 0.58, label: '停 2 秒' },
+    { to: 0.231, label: '踮起来，尽量高' },
+    { to: 0.615, label: '停 2 秒' },
     { to: 1.00, label: '慢慢放下来，脚跟轻轻落地' }
   ],
   cautions: ['一定要扶着东西。', '小腿抽筋就停下来，把脚尖往回勾一勾。']
@@ -375,21 +381,21 @@ var LIBRARY = [
   touchRail: true,
   base: { lean: 0, sway: 0, abdL: 5, abdR: 5, hipL: 0, hipR: 0, kneeL: 4, kneeR: 4,
           armAbdL: 7, armAbdR: 7, shoL: 4, shoR: 4, elbL: 10, elbR: 46 },
-  cycle: 6000,
+  cycle: 14500,   // 「数到 10」就是真的 10 秒
   keyframes: [
     { t: 0.00, lean: 0, sway: 0, hipR: 0, kneeR: 4, abdR: 5, armAbdL: 7, armAbdR: 8, elbR: 45 },
     // ① 重心先移到站立腿（左）上：骨盆横移，躯干略向左倾
-    { t: 0.18, lean: 5, sway: -0.36, hipR: 0, kneeR: 4, abdR: 5, armAbdL: 7, armAbdR: 11, elbR: 46 },
+    { t: 0.103, lean: 5, sway: -0.36, hipR: 0, kneeR: 4, abdR: 5, armAbdL: 7, armAbdR: 11, elbR: 46 },
     // ② 抬另一条腿：屈髋 55°、屈膝 88°，脚离地约 25cm；对侧手臂外展帮着平衡，
     //    扶手那只手保持在横杆上不动
-    { t: 0.34, lean: 7, sway: -0.42, hipR: 55, kneeR: 88, abdR: 11, armAbdL: 26, armAbdR: 11, elbR: 48 },
-    { t: 0.78, lean: 7, sway: -0.42, hipR: 55, kneeR: 88, abdR: 11, armAbdL: 24, armAbdR: 11, elbR: 48, ease: 'hold' },
-    { t: 0.92, lean: 5, sway: -0.30, hipR: 6, kneeR: 8, abdR: 5, armAbdL: 10, armAbdR: 10, elbR: 47 },
+    { t: 0.172, lean: 7, sway: -0.42, hipR: 55, kneeR: 88, abdR: 11, armAbdL: 26, armAbdR: 11, elbR: 48 },
+    { t: 0.862, lean: 7, sway: -0.42, hipR: 55, kneeR: 88, abdR: 11, armAbdL: 24, armAbdR: 11, elbR: 48, ease: 'hold' },
+    { t: 0.945, lean: 5, sway: -0.30, hipR: 6, kneeR: 8, abdR: 5, armAbdL: 10, armAbdR: 10, elbR: 47 },
     { t: 1.00, lean: 0, sway: 0, hipR: 0, kneeR: 4, abdR: 5, armAbdL: 7, armAbdR: 8, elbR: 45 }
   ],
   phases: [
-    { to: 0.18, label: '重心先移到站立的那条腿' },
-    { to: 0.78, label: '抬起另一条腿，心里数到 10' },
+    { to: 0.103, label: '重心先移到站立的那条腿' },
+    { to: 0.862, label: '抬起另一条腿，心里数到 10' },
     { to: 1.00, label: '慢慢放下' }
   ],
   cautions: ['扶手就在手边，站不稳马上扶。', '先练好腿单腿站，找到感觉再换患侧。']
@@ -453,16 +459,16 @@ var LIBRARY = [
   anchor: 'ground', ax: 0, ay: 0,
   props: [{ k: 'floor' }],
   focus: ['shoulder'], trail: 'hand',
-  base: STAND, cycle: 4800,
+  base: STAND, cycle: 7000,   // 举 2s → 停 2s → 慢慢放下 3s
   keyframes: [
     { t: 0.00, sho: 6, elb: 12, shoF: 3, elbF: 10, trunk: 2, neck: -1 },
-    { t: 0.44, sho: 152, elb: 6, shoF: 5, elbF: 10, trunk: 2, neck: 2 },   // 手臂伸直举到接近头顶
-    { t: 0.62, sho: 152, elb: 6, shoF: 5, elbF: 10, trunk: 2, neck: 2, ease: 'hold' },
+    { t: 0.286, sho: 152, elb: 6, shoF: 5, elbF: 10, trunk: 2, neck: 2 },   // 手臂伸直举到接近头顶
+    { t: 0.571, sho: 152, elb: 6, shoF: 5, elbF: 10, trunk: 2, neck: 2, ease: 'hold' },
     { t: 1.00, sho: 6, elb: 12, shoF: 3, elbF: 10, trunk: 2, neck: -1 }
   ],
   phases: [
-    { to: 0.44, label: '手臂伸直，往前往上举' },
-    { to: 0.62, label: '举到不疼的最高处，停 2 秒' },
+    { to: 0.286, label: '手臂伸直，往前往上举' },
+    { to: 0.571, label: '举到不疼的最高处，停 2 秒' },
     { to: 1.00, label: '慢慢放下来' }
   ],
   cautions: ['疼就是上限，到疼之前停住 —— 卒中后的肩膀经不起硬拉。', '肩膀出现持续疼痛、摸到凹陷，告诉医生。'],
@@ -471,8 +477,8 @@ var LIBRARY = [
     why: '手看着举高了，其实是腰往后仰、胳膊肘弯着凑出来的 —— 肩关节只动了一半，腰还容易闪着。举不高就举到能到的地方，别用身子凑。',
     keyframes: [
       { t: 0.00, sho: 6, elb: 12, shoF: 3, elbF: 10, trunk: 2, neck: -1 },
-      { t: 0.44, sho: 104, elb: 54, shoF: 4, elbF: 10, trunk: -14, neck: -12 },
-      { t: 0.62, sho: 104, elb: 54, shoF: 4, elbF: 10, trunk: -14, neck: -12, ease: 'hold' },
+      { t: 0.286, sho: 104, elb: 54, shoF: 4, elbF: 10, trunk: -14, neck: -12 },
+      { t: 0.571, sho: 104, elb: 54, shoF: 4, elbF: 10, trunk: -14, neck: -12, ease: 'hold' },
       { t: 1.00, sho: 6, elb: 12, shoF: 3, elbF: 10, trunk: 2, neck: -1 }
     ]
   }
@@ -487,7 +493,7 @@ var LIBRARY = [
   id: 'grip', name: '握拳伸展', sub: '张开、握紧',
   m: null, h: [1, 2, 3], group: '手',
   handView: 'palm',
-  view: { cx: -0.06, cy: -0.42, span: 4.3 },
+  view: { cx: -0.06, cy: -0.40, span: 4.75 },
   dose: '20 次 / 组 · 3 组 · 一天 2～3 次',
   purpose: '手指长时间攥着会慢慢僵死，掰不开。每天张开握紧是最直接的预防 —— 也是以后能拿住东西的前提。',
   focus: ['finger'],
@@ -514,7 +520,7 @@ var LIBRARY = [
   id: 'wrist', name: '腕关节屈伸', sub: '手腕上下摆',
   m: null, h: [1, 2, 3, 4], group: '手',
   handView: 'side', box: 'mid',
-  view: { cx: -0.35, cy: 0.28, span: 4.30 },
+  view: { cx: -0.30, cy: 0.30, span: 4.90 },
   // 前臂垫在桌面上，手腕露在桌沿外面 —— 这样才是「前臂垫稳，只动手腕」
   props: [{ k: 'table', x0: -3.6, x1: -0.50, y: 0.47 }],
   dose: '20 次 / 组 · 2～3 组 · 一天 2 次',
