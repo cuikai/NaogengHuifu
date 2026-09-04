@@ -15,7 +15,7 @@
 .si::before { content: '· '; }
 
 .lnk {
-  margin-top: 20rpx; font-size: calc(28rpx * var(--fs)); color: var(--blue-ink);
+  display: block; margin-top: 20rpx; font-size: calc(28rpx * var(--fs)); color: var(--blue-ink);
   background: var(--blue-soft); border-radius: 24rpx; padding: 22rpx 24rpx;
   word-break: break-all;
 }

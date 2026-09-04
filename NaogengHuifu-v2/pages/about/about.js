@@ -8,13 +8,6 @@ Page({
 
   redo() { wx.navigateTo({ url: '/pages/assess/assess' }); },
 
-  copyRepo() {
-    wx.setClipboardData({
-      data: 'https://' + this.data.repo,
-      success() { wx.showToast({ title: '地址已复制', icon: 'none' }); }
-    });
-  },
-
   clear() {
     wx.showModal({
       title: '清空全部记录？',

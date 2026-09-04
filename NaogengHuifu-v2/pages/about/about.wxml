@@ -40,7 +40,7 @@
   <view class="blk">
     <view class="bt">源码与讨论</view>
     <view class="bp">全部代码、动作数据和文献依据都是公开的。</view>
-    <view class="lnk hit" bindtap="copyRepo">{{repo}}　（点击复制）</view>
+    <text class="lnk" user-select>{{repo}}</text>
   </view>
 
   <view class="danger hit" bindtap="clear">清空全部记录</view>
