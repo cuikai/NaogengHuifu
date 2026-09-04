@@ -62,9 +62,17 @@ Page({
   toggleCmp() { this.setData({ cmp: !this.data.cmp }); },
 
   plus() {
-    if (this.data.n >= this.data.sets) store.moveSet(this.mv.id, 0);
-    else store.moveBump(this.mv.id);
+    // 做满之后这个按钮就是出口 —— 老人不认左上角的返回箭头，也不会向左滑。
+    // 要退组数用左边的「−」，不再让主按钮把已做的组数清零。
+    if (this.data.n >= this.data.sets) return this.back();
+    store.moveBump(this.mv.id);
     this.refresh();
+  },
+
+  back() {
+    const pages = getCurrentPages();
+    if (pages.length > 1) wx.navigateBack();
+    else wx.redirectTo({ url: '/pages/plan/plan' });
   },
 
   minus() {

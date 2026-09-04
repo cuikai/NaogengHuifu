@@ -84,5 +84,5 @@
 
 <view class="dock">
   <view class="btn ghost narrow hit {{n <= 0 ? 'dis' : ''}}" bindtap="minus">−</view>
-  <view class="btn hit {{full ? 'ok' : 'primary'}}" bindtap="plus">{{full ? '今天做完了 ✓' : '做完一组　' + n + ' / ' + sets}}</view>
+  <view class="btn hit {{full ? 'ok' : 'primary'}}" bindtap="plus">{{full ? '做完了，回去练下一个 ›' : '做完一组　' + n + ' / ' + sets}}</view>
 </view>

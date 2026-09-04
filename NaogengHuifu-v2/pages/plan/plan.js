@@ -13,7 +13,8 @@ Page({
       n: store.moveGet(m.id),
       sets: store.setsTarget(m.id),
       stepLabel: store.stepLabel(m.id),
-      fbDone: S.fb[m.id] != null
+      done: store.moveDone(m.id),
+      rated: S.fb[m.id] != null
     }));
     this.setData({ list: list, done: store.doneCount() });
   },

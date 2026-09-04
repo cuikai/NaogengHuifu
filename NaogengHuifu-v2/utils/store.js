@@ -158,8 +158,16 @@ function feedback(id, f) {
   return r;
 }
 
+/**
+ * 「已完成」= 组数做满，或者打过反馈。
+ * 反馈只决定明天给多少量，不是完成的门槛 —— 做满了就该算完成。
+ */
+function moveDone(id) {
+  return S.fb[id] != null || moveGet(id) >= setsTarget(id);
+}
+
 function doneCount() {
-  return todayPlan().filter(function (m) { return S.fb[m.id] != null; }).length;
+  return todayPlan().filter(function (m) { return moveDone(m.id); }).length;
 }
 
 /* ---------- 今天让他自己做 ---------- */
@@ -211,7 +219,7 @@ function reset() { S = blank(); save(); }
 module.exports = {
   load, save, ymd, prettyDate, daysBetween, day,
   saveAssessment, needWeekly, pushWeekly,
-  todayPlan, setsTarget, stepLabel, moveGet, moveBump, moveSet, feedback, doneCount,
+  todayPlan, setsTarget, stepLabel, moveGet, moveBump, moveSet, feedback, moveDone, doneCount,
   adlList, get, bump, adlDone,
   careDaysThisMonth, milestoneCount, addNote, todayNote, reset,
   state: () => S
