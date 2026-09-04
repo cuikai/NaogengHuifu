@@ -7,7 +7,7 @@
     <view wx:for="{{list}}" wx:key="id" class="{{item.fbDone ? 'on' : ''}}"></view>
   </view>
 
-  <view class="mv hit {{item.fbDone ? 'on' : ''}}" wx:for="{{list}}" wx:key="id"
+  <view class="mv hit native {{item.fbDone ? 'on' : ''}}" wx:for="{{list}}" wx:key="id"
         data-id="{{item.id}}" bindtap="open">
     <figure class="fg" move="{{item.id}}" thumb="{{true}}"></figure>
     <view class="b">

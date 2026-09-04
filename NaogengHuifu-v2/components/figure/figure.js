@@ -5,6 +5,9 @@
  * 全部 14 个动作（含两个手部特写）都走这一条路 —— 所以可以调速、可以镜像患侧、
  * 可以叠信息层，包体也不涨。
  */
+// 微信的页面转场约 300ms，留一点余量
+const ENTER_DELAY = 340;
+
 const fig = require('../../utils/figure.js');
 const lib = require('../../utils/library.js');
 
@@ -18,7 +21,7 @@ Component({
     paused: { type: Boolean, value: false }
   },
 
-  data: { box: '' },
+  data: { box: '', on: false },
 
   lifetimes: {
     attached() {
@@ -31,8 +34,20 @@ Component({
         : null;
       this.setData({ box: m.box || (m.wide ? 'wide' : '') });
     },
-    ready() { this.init(); },
-    detached() { this.stopped = true; }
+    // canvas 是原生层，页面转场时它不跟着一起滑进来 —— 会看到小人先浮在半空。
+    // 所以等转场结束再创建，转场期间只留下同色的占位底跟着页面走。
+    ready() {
+      this.timer = setTimeout(() => {
+        this.timer = null;
+        if (this.dead) return;
+        this.setData({ on: true }, () => this.init());
+      }, ENTER_DELAY);
+    },
+    detached() {
+      this.dead = true;
+      this.stopped = true;
+      if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    }
   },
 
   pageLifetimes: {
@@ -41,10 +56,14 @@ Component({
   },
 
   methods: {
-    init() {
+    init(retry) {
       const q = wx.createSelectorQuery().in(this);
       q.select('#cv').fields({ node: true, size: true }).exec((res) => {
-        if (!res || !res[0] || !res[0].node) return;
+        if (!res || !res[0] || !res[0].node) {
+          // 少数安卓机上节点比 setData 回调晚一拍，给一次重试
+          if (!retry && !this.dead) setTimeout(() => this.init(true), 100);
+          return;
+        }
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
         let dpr = 2;

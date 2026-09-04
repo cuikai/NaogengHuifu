@@ -134,6 +134,11 @@ page {
 .hit { transition: opacity .14s, transform .14s; }
 .hit:active { opacity: .72; transform: scale(.985); }
 
+/* 里面放了 canvas 的可点区域 —— 原生组件不跟着父级的 transform 走，
+   父级一旦有 transform，滚动时小人就会飘在外面。这里只用透明度做反馈。 */
+.hit.native { transition: opacity .14s; }
+.hit.native:active { opacity: .72; transform: none; }
+
 /* ---------- 选项（快筛用） ---------- */
 .opt {
   display: flex; align-items: center; gap: 22rpx;
